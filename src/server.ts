@@ -2,7 +2,7 @@ import net from "net";
 import fs from "fs";
 import path from "path";
 import Packet from "./networking/Packet";
-import * as types from "./types/types";
+import * as pkids from "./networking/types/PacketIds";
 
 let connections: net.Socket[] = [];
 
@@ -17,13 +17,10 @@ const server = net.createServer(socket => {
             case 0x00:
                 switch (state) {
                     case 0:
-                        const Handshake: types.Handshake = {
-                            ProtocolVersion: inboundPacket.readVarInt(),
-                            ServerAddress: inboundPacket.readString(),
-                            ServerPort: inboundPacket.readUnsignedShort(),
-                            NextState: inboundPacket.readVarInt()
-                        };
-                        state = Handshake.NextState;
+                        inboundPacket.readVarInt(); // Protocol Version
+                        inboundPacket.readString(); // Server Address
+                        inboundPacket.readUnsignedShort(); // Server Port
+                        state = inboundPacket.readVarInt(); // Next State
                         if (state === 1) {
                             const Response = new Packet();
                             Response.writeString(JSON.stringify({
@@ -87,7 +84,7 @@ const server = net.createServer(socket => {
                         }
                         connections.forEach(connection => {
                             if (connection.address() !== socket.address()) {
-                                
+
                             }
                         });
                         const PlayerPositionAndLook = new Packet();
@@ -137,33 +134,15 @@ const server = net.createServer(socket => {
                         break;
                 }
                 break;
-            case 0x03: // Chat Message
-                const ChatMessage = inboundPacket.readString();
-                ChatMessage;
+            case pkids.ServerboundPacketIds.ChatMessage:
                 break;
-            case 0x10: // Keep Alive
+            case pkids.ServerboundPacketIds.KeepAlive:
                 break;
-            case 0x12: // Player Position
-                const PlayerPosition: types.PlayerPosition = {
-                    X: inboundPacket.readDouble(),
-                    FeetY: inboundPacket.readDouble(),
-                    Z: inboundPacket.readDouble(),
-                    OnGround: inboundPacket.readBoolean()
-                }
-                PlayerPosition;
+            case pkids.ServerboundPacketIds.PlayerPosition:
                 break;
-            case 0x13: // Player Position And Rotation (serverbound)
-                const PlayerPositionAndRotation: types.PlayerPositionAndRotation = {
-                    X: inboundPacket.readDouble(),
-                    FeetY: inboundPacket.readDouble(),
-                    Z: inboundPacket.readDouble(),
-                    Yaw: inboundPacket.readFloat(),
-                    Pitch: inboundPacket.readFloat(),
-                    OnGround: inboundPacket.readBoolean()
-                }
-                PlayerPositionAndRotation;
+            case pkids.ServerboundPacketIds.PlayerPositionAndRotation:
                 break;
-            case 0x14: // Player Rotation
+            case pkids.ServerboundPacketIds.PlayerRotation:
                 break;
             default:
                 console.log(`Length: ${inboundPacketLength} Id: ${inboundPacketId} State: ${state}`);
