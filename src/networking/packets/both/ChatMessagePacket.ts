@@ -1,5 +1,5 @@
-import Packet from "./Packet";
-import { ServerboundPacketIds } from "../types/PacketIds";
+import Packet from "../Packet";
+import { ServerboundPacketIds } from "../../types/PacketIds";
 
 export default class ChatMessagePacket extends Packet {
     public static id = ServerboundPacketIds.ChatMessage;
@@ -8,5 +8,9 @@ export default class ChatMessagePacket extends Packet {
 
     public decryptPacket() {
         this.Message = this.readString();
+    }
+
+    public encryptPacket() {
+        this.writeString(this.Message);
     }
 }
