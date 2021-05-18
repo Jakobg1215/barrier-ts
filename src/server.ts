@@ -55,7 +55,7 @@ const server = net.createServer(socket => {
                         JoinGame.writeString("minecraft:overworld");
                         JoinGame.writeString("minecraft:the_nether");
                         JoinGame.writeString("minecraft:the_end");
-                        JoinGame.append(fs.readFileSync(path.join(__dirname, "../../NBT/Dimension Codec.nbt")));
+                        JoinGame.append(fs.readFileSync(path.join(__dirname, "../NBT/Dimension Codec.nbt")));
                         JoinGame.writeString("minecraft:overworld");
                         JoinGame.writeLong(BigInt(0));
                         JoinGame.writeVarInt(10);
@@ -67,7 +67,7 @@ const server = net.createServer(socket => {
                         socket.write(JoinGame.buildPacket(0x24));
                         for (let x = -8; x < 8; x++) {
                             for (let z = -8; z < 8; z++) {
-                                const chunk = new Packet(fs.readFileSync(path.join(__dirname, "../../NBT/chunk.nbt")));
+                                const chunk = new Packet(fs.readFileSync(path.join(__dirname, "../NBT/chunk.nbt")));
                                 const ChunkData = new Packet();
                                 ChunkData.writeInt(x);
                                 ChunkData.writeInt(z);
