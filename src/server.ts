@@ -1,13 +1,10 @@
 import net from "net";
 import fs from "fs";
 import path from "path";
-import Packet from "./networking/Packet";
+import Packet from "./networking/packets/Packet";
 import * as pkids from "./networking/types/PacketIds";
 
-let connections: net.Socket[] = [];
-
 const server = net.createServer(socket => {
-    connections.push(socket);
     let state = 0;
     socket.on("data", data => {
         const inboundPacket = new Packet(data);
@@ -82,11 +79,6 @@ const server = net.createServer(socket => {
                                 socket.write(ChunkData.buildPacket(0x20));
                             }
                         }
-                        connections.forEach(connection => {
-                            if (connection.address() !== socket.address()) {
-
-                            }
-                        });
                         const PlayerPositionAndLook = new Packet();
                         PlayerPositionAndLook.writeDouble(0);
                         PlayerPositionAndLook.writeDouble(4);
@@ -149,9 +141,6 @@ const server = net.createServer(socket => {
         }
     });
     socket.on("error", err => console.log(err));
-    socket.on("end", () => {
-        connections = connections.slice(connections.indexOf(socket), 1);
-    });
 });
 
 server.listen(25565);
