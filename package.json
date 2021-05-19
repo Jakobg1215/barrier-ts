@@ -13,7 +13,8 @@
     "name": "barrierts",
     "private": true,
     "scripts": {
-        "dev": "concurrently -k \"tsc -w\" \"nodemon ./dist/server.js\""
+        "dev": "concurrently -k \"tsc -w\" \"nodemon ./dist/server.js\"",
+        "start": "node ./dist/server.js --unhandled-rejections=strict"
     },
     "version": "1.0.0"
 }

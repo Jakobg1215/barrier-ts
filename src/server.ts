@@ -144,3 +144,5 @@ const server = net.createServer(socket => {
 });
 
 server.listen(25565);
+
+server.on("listening", () => { console.log("Server is now on!"); });
