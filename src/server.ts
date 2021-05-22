@@ -143,6 +143,6 @@ const server = net.createServer(socket => {
     socket.on("error", err => console.log(err));
 });
 
-server.listen(25565);
-
-server.on("listening", () => { console.log("Server is now on!"); });
+server.listen(25565, () => {
+    console.log("Server is now on!");
+});
