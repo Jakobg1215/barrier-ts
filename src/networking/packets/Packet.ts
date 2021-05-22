@@ -1,6 +1,7 @@
 export default class Packet {
     private buffer: Buffer;
     private offset: number;
+    public static readonly id: number;
     public constructor(buffer: Buffer = Buffer.alloc(0), offset: number = 0) {
         this.buffer = buffer;
         this.offset = offset;
