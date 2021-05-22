@@ -27,7 +27,7 @@ const server = net.createServer(socket => {
                                 },
                                 players: {
                                     max: 20,
-                                    online: 12
+                                    online: 0
                                 }
                             }));
                             socket.write(Response.buildPacket(0x00));
@@ -104,7 +104,7 @@ const server = net.createServer(socket => {
                             },
                             players: {
                                 max: 20,
-                                online: 12
+                                online: 0
                             }
                         }));
                         socket.write(Response.buildPacket(0x00));
