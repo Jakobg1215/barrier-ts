@@ -1,171 +1,188 @@
 export default class Packet {
-    private buffer: Buffer;
-    private offset: number;
-    public static readonly id: number;
-    public constructor(buffer: Buffer = Buffer.alloc(0), offset: number = 0) {
-        this.buffer = buffer;
-        this.offset = offset;
+    private bytes;
+    private offset = 0;
+    public constructor(data = Buffer.alloc(0)) {
+        this.bytes = data;
     }
-    public readBoolean(): boolean {
-        return this.readByte() ? true : false;
+    public readBoolean() {
+        if (this.readByte()) return true;
+        return false;
     }
-    public readByte(): number {
-        return this.buffer.readInt8(this.addOffset(1));
+    public readByte() {
+        return this.bytes.readInt8(this.addOffset(1));
     }
-    public readUnsignedByte(): number {
-        return this.buffer.readUInt8(this.addOffset(1));
+    public readUnsignedByte() {
+        return this.bytes.readUInt8(this.addOffset(1));
     }
-    public readShort(): number {
-        return this.buffer.readInt16BE(this.addOffset(2));
+    public readShort() {
+        return this.bytes.readInt16BE(this.addOffset(2));
     }
-    public readUnsignedShort(): number {
-        return this.buffer.readUInt16BE(this.addOffset(2));
+    public readUnsignedShort() {
+        return this.bytes.readUInt16BE(this.addOffset(2));
     }
-    public readInt(): number {
-        return this.buffer.readInt32BE(this.addOffset(4));
+    public readInt() {
+        return this.bytes.readInt32BE(this.addOffset(4));
     }
-    public readLong(): bigint {
-        return this.buffer.readBigInt64BE(this.addOffset(8));
+    public readLong() {
+        return this.bytes.readBigInt64BE(this.addOffset(8));
     }
-    public readUnsignedLong(): bigint {
-        return this.buffer.readBigUInt64BE(this.addOffset(8));
+    public readFloat() {
+        return this.bytes.readFloatBE(this.addOffset(4));
     }
-    public readFloat(): number {
-        return this.buffer.readFloatBE(this.addOffset(4));
+    public readDouble() {
+        return this.bytes.readDoubleBE(this.addOffset(8));
     }
-    public readDouble(): number {
-        return this.buffer.readDoubleBE(this.addOffset(8));
+    public readString() {
+        return this.bytes.slice(this.offset, this.offset += this.readVarInt()).toString();
     }
-    public readString(): string {
-        return this.buffer.slice(this.offset + 1, this.addOffset(this.readVarInt(), true)).toString("utf-8");
+    public readChat() { }
+    public readIdentifier() {
+        return this.readString();
     }
-    public readVarInt(): number {
-        let i = 0;
-        let j = 0;
-        while (true) {
-            let k = this.readUnsignedByte();
-            i |= (k & 127) << j++ * 7;
-            if (j > 5) throw new Error("VarInt too big");
-            if ((k & 128) != 128) break;
-        }
-        return i;
+    public readVarInt() {
+        let numRead = 0;
+        let result = 0;
+        let read;
+        do {
+            read = this.readUnsignedByte();
+            let value = (read & 0b01111111);
+            result |= (value << (7 * numRead));
+
+            numRead++;
+            if (numRead > 5) {
+                throw new Error("VarInt is too big");
+            }
+        } while ((read & 0b10000000) != 0);
+
+        return result;
     }
-    public readVarLong(): number {
-        let i = 0;
-        let j = 0;
-        while (true) {
-            let k = this.readUnsignedByte();
-            i |= (k & 127) << j++ * 7;
-            if (j > 10) throw new Error("VarLong too big");
-            if ((k & 128) != 128) break;
-        }
-        return i;
+    public readVarLong() {
+        let numRead = 0;
+        let result = 0;
+        let read;
+        do {
+            read = this.readUnsignedByte();
+            let value = (read & 0b01111111);
+            result |= (value << (7 * numRead));
+
+            numRead++;
+            if (numRead > 10) {
+                throw new Error("VarLong is too big");
+            }
+        } while ((read & 0b10000000) != 0);
+
+        return result;
     }
-    public readUUID(): string {
+    public readEntityMetadata() { }
+    public readNBTTag() { }
+    public readPosition() { }
+    public readAngle() {
+        return this.readUnsignedByte();
+    }
+    public readUUID() {
         return `${Number(this.readLong()).toString()}${Number(this.readLong()).toString()}`;
     }
+    public readOptionalX() { }
+    public readArrayofX() { }
+    public readXEnum() { }
+    public readByteArray() { }
 
-    public writeBoolean(value: boolean): void {
+    public writeBoolean(value: boolean) {
         value ? this.writeByte(1) : this.writeByte(0);
     }
-    public writeByte(value: number): void {
+    public writeByte(value: number) {
         const buf = Buffer.alloc(1);
         buf.writeInt8(value);
-        this.buffer = Buffer.concat([this.buffer, buf]);
+        this.bytes = Buffer.concat([this.bytes, buf]);
     }
-    public writeUnsignedByte(value: number): void {
+    public writeUnsignedByte(value: number) {
         const buf = Buffer.alloc(1);
         buf.writeUInt8(value);
-        this.buffer = Buffer.concat([this.buffer, buf]);
+        this.bytes = Buffer.concat([this.bytes, buf]);
     }
-    public writeShort(value: number): void {
+    public writeShort(value: number) {
         const buf = Buffer.alloc(2);
         buf.writeInt16BE(value);
-        this.buffer = Buffer.concat([this.buffer, buf]);
+        this.bytes = Buffer.concat([this.bytes, buf]);
     }
-    public writeUnsignedShort(value: number): void {
+    public writeUnsignedShort(value: number) {
         const buf = Buffer.alloc(2);
         buf.writeUInt16BE(value);
-        this.buffer = Buffer.concat([this.buffer, buf]);
+        this.bytes = Buffer.concat([this.bytes, buf]);
     }
-    public writeInt(value: number): void {
+    public writeInt(value: number) {
         const buf = Buffer.alloc(4);
         buf.writeInt32BE(value);
-        this.buffer = Buffer.concat([this.buffer, buf]);
+        this.bytes = Buffer.concat([this.bytes, buf]);
     }
-    public writeLong(value: bigint): void {
+    public writeLong(value: bigint) {
         const buf = Buffer.alloc(8);
         buf.writeBigInt64BE(value);
-        this.buffer = Buffer.concat([this.buffer, buf]);
+        this.bytes = Buffer.concat([this.bytes, buf]);
     }
-    public writeUnsignedLong(value: bigint): void {
+    public writeUnsignedLong(value: bigint) {
         const buf = Buffer.alloc(8);
         buf.writeBigUInt64BE(value);
-        this.buffer = Buffer.concat([this.buffer, buf]);
+        this.bytes = Buffer.concat([this.bytes, buf]);
     }
     public writeFloat(value: number): void {
         const buf = Buffer.alloc(4);
         buf.writeFloatBE(value);
-        this.buffer = Buffer.concat([this.buffer, buf]);
+        this.bytes = Buffer.concat([this.bytes, buf]);
     }
     public writeDouble(value: number): void {
         const buf = Buffer.alloc(8);
         buf.writeDoubleBE(value);
-        this.buffer = Buffer.concat([this.buffer, buf]);
+        this.bytes = Buffer.concat([this.bytes, buf]);
     }
-    public writeString(value: string): void {
+    public writeString(value: string) {
         this.writeVarInt(Buffer.byteLength(value, "utf-8"));
         const buf = Buffer.alloc(Buffer.byteLength(value, "utf-8"));
         buf.write(value, "utf-8");
-        this.buffer = Buffer.concat([this.buffer, buf]);
+        this.bytes = Buffer.concat([this.bytes, buf]);
     }
-    public writeVarInt(value: number): void {
-        while (true) {
-            if ((value & 4294967168) === 0) {
-                this.writeUnsignedByte(value);
-                return;
-            }
-            this.writeUnsignedByte(value & 127 | 128);
+    public writeChat() { }
+    public writeIdentifier() { }
+    public writeVarInt(value: number) {
+        do {
+            let temp = (value & 0b01111111);
             value >>>= 7;
-        }
-    }
-    public writeVarLong(value: number): void {
-        while (true) {
-            if ((value & 4294967168) === 0) {
-                this.writeUnsignedByte(value);
-                return;
+            if (value != 0) {
+                temp |= 0b10000000;
             }
-            this.writeUnsignedByte(value & 127 | 128);
-            value >>>= 7;
-        }
+            this.writeUnsignedByte(temp);
+        } while (value != 0);
     }
-    public writeUUID(value: string): void {
+    public writeVarLong() { }
+    public writeEntityMetadata() { }
+    public writeSlot() { }
+    public writeNBTTag() { }
+    public writePosition() { }
+    public writeAngle(value: number) {
+        this.writeUnsignedByte(value);
+    }
+    public writeUUID(value: string) {
         const uuid = value.split("").filter((value: string) => value !== "-").join("");
         this.writeLong(BigInt(parseInt(uuid.slice(0, 17))));
         this.writeLong(BigInt(parseInt(uuid.slice(18, 36))));
     }
-
-    public addOffset(size: number, retval: boolean = false): number {
-        if (retval) return this.offset += size;
-        return (this.offset += size) - size;
-    }
-
+    public writeOptionalX() { }
+    public writeArrayofX() { }
+    public writeXEnum() { }
+    public writeByteArray() { }
     public buildPacket(id: number): Buffer {
         const pkId = new Packet();
         pkId.writeVarInt(id);
         const pkLength = new Packet();
-        pkLength.writeVarInt((pkId.buffer.byteLength + this.buffer.byteLength));
-        const pk = Buffer.concat([pkLength.buffer, pkId.buffer])
-        return Buffer.concat([pk, this.buffer]);
+        pkLength.writeVarInt((pkId.bytes.byteLength + this.bytes.byteLength));
+        const pk = Buffer.concat([pkLength.bytes, pkId.bytes])
+        return Buffer.concat([pk, this.bytes]);
     }
     public append(data: Buffer): void {
-        this.buffer = Buffer.concat([this.buffer, data]);
-        this.addOffset(data.byteLength, true);
+        this.bytes = Buffer.concat([this.bytes, data]);
+        this.offset += data.byteLength;
     }
-    public getBuffer(): Buffer {
-        return this.buffer;
-    }
-    public getOffset(): number {
-        return this.offset;
+    private addOffset(offset: number) {
+        return (this.offset += offset) - offset;
     }
 }
