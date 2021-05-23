@@ -83,10 +83,26 @@ export default class Packet {
     public readUUID() {
         return `${Number(this.readLong()).toString()}${Number(this.readLong()).toString()}`;
     }
-    public readOptionalX() { }
-    public readArrayofX() { }
+    public readOptionalX(X: Function) {
+        try {
+            X();
+        } catch { }
+    }
+    public readArrayofX(length: number, X: Function) {
+        const xs: any[] = [];
+        for (let index = 0; index < length; index++) {
+            xs.push(X());
+        }
+        return xs;
+    }
     public readXEnum() { }
-    public readByteArray() { }
+    public readByteArray(length: number) {
+        const bytes: number[] = [];
+        for (let index = 0; index < length; index++) {
+            bytes.push(this.readByte());
+        }
+        return bytes;
+    }
 
     public writeBoolean(value: boolean) {
         value ? this.writeByte(1) : this.writeByte(0);
