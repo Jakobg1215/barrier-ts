@@ -1,4 +1,4 @@
-import ChatMessagePacket from "./packets/both/ChatMessagePacket";
+import ChatMessagePacket from "./packets/Play/both/ChatMessagePacket";
 
 export {
     ChatMessagePacket
