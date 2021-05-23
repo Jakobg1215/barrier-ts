@@ -1,4 +1,5 @@
 export default class Packet {
+    public static readonly id: number;
     private bytes;
     private offset = 0;
     public constructor(data = Buffer.alloc(0)) {
