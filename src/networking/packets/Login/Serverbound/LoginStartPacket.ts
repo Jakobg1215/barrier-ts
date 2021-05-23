@@ -6,7 +6,6 @@ export default class LoginStartPacket extends Packet {
 
     public Name!: string;
 
-
     public decrypt() {
         this.Name = this.readString();
     }

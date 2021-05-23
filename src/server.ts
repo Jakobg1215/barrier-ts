@@ -43,6 +43,6 @@ export default class Server {
 }
 
 const server = new Server();
-(async()=>{
+(async () => {
     await server.listen();
 })();
