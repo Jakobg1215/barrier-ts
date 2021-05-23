@@ -1,8 +1,8 @@
 import Packet from "../../Packet";
 import { StatusServerbound } from "../../../types/PacketIds";
 
-export default class RequestPacket extends Packet {
-    public static readonly id = StatusServerbound.Request;
+export default class PingPacket extends Packet {
+    public static readonly id = StatusServerbound.Ping;
 
     public Payload!: bigint;
 

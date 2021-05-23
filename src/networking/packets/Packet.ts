@@ -34,7 +34,7 @@ export default class Packet {
         return this.bytes.readDoubleBE(this.addOffset(8));
     }
     public readString() {
-        return this.bytes.slice(this.offset, this.offset += this.readVarInt()).toString();
+        return this.bytes.slice(this.offset + 1, this.addOffset(this.readVarInt(), true)).toString("utf-8");
     }
     public readChat() { }
     public readIdentifier() {
@@ -48,13 +48,11 @@ export default class Packet {
             read = this.readUnsignedByte();
             let value = (read & 0b01111111);
             result |= (value << (7 * numRead));
-
             numRead++;
             if (numRead > 5) {
                 throw new Error("VarInt is too big");
             }
         } while ((read & 0b10000000) != 0);
-
         return result;
     }
     public readVarLong() {
@@ -179,12 +177,16 @@ export default class Packet {
         this.writeUnsignedByte(value);
     }
     public writeUUID(value: string) {
-        const uuid = value.split("").filter((value: string) => value !== "-").join("");
-        this.writeLong(BigInt(parseInt(uuid.slice(0, 17))));
-        this.writeLong(BigInt(parseInt(uuid.slice(18, 36))));
+        const uuid = new Packet(Buffer.from(Buffer.from(value.split("").filter(value => value !== "-").join(""), "hex")));
+        this.writeLong(uuid.readLong());
+        this.writeLong(uuid.readLong());
     }
     public writeOptionalX() { }
-    public writeArrayofX() { }
+    public writeArrayofX(length: number, X: any, value: any[]) {
+        for (let index = 0; index < length; index++) {
+            X(value[index]);
+        }
+    }
     public writeXEnum() { }
     public writeByteArray() { }
     public buildPacket(id: number): Buffer {
@@ -199,7 +201,16 @@ export default class Packet {
         this.bytes = Buffer.concat([this.bytes, data]);
         this.offset += data.byteLength;
     }
-    private addOffset(offset: number) {
+    public getBytes() {
+        return this.bytes;
+    }
+    public getOffset() {
+        return this.offset;
+    }
+    public decrypt() { }
+    public encrypt() { }
+    private addOffset(offset: number, retval: boolean = false) {
+        if (retval) return (this.offset += offset);
         return (this.offset += offset) - offset;
     }
 }

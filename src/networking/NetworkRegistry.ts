@@ -1,100 +1,128 @@
 import Packet from "./packets/Packet";
-import { ConnectionStates } from "./types/ConnectionState"
+import { ConnectionStates } from "./types/ConnectionState";
 import * as Packets from "./Packets";
+import * as Handlers from "./Handlers";
+import Handler from "./handlers/Handler";
 
 export default class NetworkRegistry {
-    private HandshakingServerboundPackets: Map<number, typeof Packet> = new Map();
-    private StatusClientboundPackets: Map<number, typeof Packet> = new Map();
-    private StatusServerboundPackets: Map<number, typeof Packet> = new Map();
-    private LoginClientboundPackets: Map<number, typeof Packet> = new Map();
-    private LoginServerboundPackets: Map<number, typeof Packet> = new Map();
-    private PlayClientboundPackets: Map<number, typeof Packet> = new Map();
-    private PlayServerboundPackets: Map<number, typeof Packet> = new Map();
+    private HandshakingPackets: Map<number, typeof Packet> = new Map();
+    private StatusPackets: Map<number, typeof Packet> = new Map();
+    private LoginPackets: Map<number, typeof Packet> = new Map();
+    private PlayPackets: Map<number, typeof Packet> = new Map();
+    private HandshakeHandlers: Map<number, Handler<any>> = new Map();
+    private StatusHandlers: Map<number, Handler<any>> = new Map();
+    private LoginHandlers: Map<number, Handler<any>> = new Map();
+    private PlayHandlers: Map<number, Handler<any>> = new Map();
 
     public async registerNetwork() {
         await this.registerPackets();
+        await this.registerHandlers();
     }
-    public getPacket(state: number, serverbound: boolean, id: number) {
+
+    public getPacket(state: number, id: number) {
         switch (state) {
             case ConnectionStates.Handshaking:
-                return this.HandshakingServerboundPackets.get(id);
+                return this.HandshakingPackets.get(id);
             case ConnectionStates.Status:
-                if (serverbound) return this.StatusServerboundPackets.get(id);
-                return this.StatusClientboundPackets.get(id);
+                return this.StatusPackets.get(id);
             case ConnectionStates.Login:
-                if (serverbound) return this.LoginServerboundPackets.get(id);
-                return this.LoginClientboundPackets.get(id);
+                return this.LoginPackets.get(id);
             case ConnectionStates.Play:
-                if (serverbound) return this.PlayServerboundPackets.get(id);
-                return this.PlayClientboundPackets.get(id);
+                return this.PlayPackets.get(id);
             default:
                 throw new Error(`unknown state: ${state}`);
         }
     }
-    private async registerPackets() {
-        Packets.HandshakingServerboundPackets.forEach(packet => {
-            this.registerPacket(packet, true, ConnectionStates.Handshaking);
-        });
-        Packets.StatusClientboundPackets.forEach(packet => {
-            this.registerPacket(packet, false, ConnectionStates.Status);
-        });
-        Packets.StatusServerboundPackets.forEach(packet => {
-            this.registerPacket(packet, true, ConnectionStates.Status);
-        });
-        Packets.LoginClientboundPackets.forEach(packet => {
-            this.registerPacket(packet, false, ConnectionStates.Login);
-        });
-        Packets.LoginServerboundPackets.forEach(packet => {
-            this.registerPacket(packet, true, ConnectionStates.Login);
-        });
-        Packets.PlayClientboundPackets.forEach(packet => {
-            this.registerPacket(packet, false, ConnectionStates.Play);
-        });
-        Packets.PlayServerboundPackets.forEach(packet => {
-            this.registerPacket(packet, true, ConnectionStates.Play);
-        });
-    }
-    private registerPacket(packet: typeof Packet, serverbound: boolean, state: number) {
+
+    public getHandler(state: number, id: number) {
         switch (state) {
             case ConnectionStates.Handshaking:
-                if (this.HandshakingServerboundPackets.has(packet.id))
+                return this.HandshakeHandlers.get(id);
+            case ConnectionStates.Status:
+                return this.StatusHandlers.get(id);
+            case ConnectionStates.Login:
+                return this.LoginHandlers.get(id);
+            case ConnectionStates.Play:
+                return this.PlayHandlers.get(id);
+            default:
+                throw new Error(`unknown state: ${state}`);
+        }
+    }
+
+    private async registerPackets() {
+        Packets.HandshakingPackets.forEach(packet => {
+            this.registerPacket(packet, ConnectionStates.Handshaking);
+        });
+        Packets.StatusPackets.forEach(packet => {
+            this.registerPacket(packet, ConnectionStates.Status);
+        });
+        Packets.LoginPackets.forEach(packet => {
+            this.registerPacket(packet, ConnectionStates.Login);
+        });
+        Packets.PlayPackets.forEach(packet => {
+            this.registerPacket(packet, ConnectionStates.Play);
+        });
+    }
+
+    private registerPacket(packet: typeof Packet, state: number) {
+        switch (state) {
+            case ConnectionStates.Handshaking:
+                if (this.HandshakingPackets.has(packet.id))
                     throw new Error(`Packet ${packet.name} is trying to use id ${packet.id} which already exists!`);
-                this.HandshakingServerboundPackets.set(packet.id, packet);
+                this.HandshakingPackets.set(packet.id, packet);
                 break;
             case ConnectionStates.Status:
-                if (serverbound) {
-                    if (this.StatusServerboundPackets.has(packet.id))
-                        throw new Error(`Packet ${packet.name} is trying to use id ${packet.id} which already exists!`);
-                    this.StatusServerboundPackets.set(packet.id, packet);
-                    break;
-                }
-                if (this.StatusClientboundPackets.has(packet.id))
+                if (this.StatusPackets.has(packet.id))
                     throw new Error(`Packet ${packet.name} is trying to use id ${packet.id} which already exists!`);
-                this.StatusClientboundPackets.set(packet.id, packet);
+                this.StatusPackets.set(packet.id, packet);
                 break;
             case ConnectionStates.Login:
-                if (serverbound) {
-                    if (this.LoginServerboundPackets.has(packet.id))
-                        throw new Error(`Packet ${packet.name} is trying to use id ${packet.id} which already exists!`);
-                    this.LoginServerboundPackets.set(packet.id, packet);
-                    break;
-                }
-                if (this.LoginClientboundPackets.has(packet.id))
+                if (this.LoginPackets.has(packet.id))
                     throw new Error(`Packet ${packet.name} is trying to use id ${packet.id} which already exists!`);
-                this.LoginClientboundPackets.set(packet.id, packet);
+                this.LoginPackets.set(packet.id, packet);
                 break;
             case ConnectionStates.Play:
-                if (serverbound) {
-                    if (this.PlayServerboundPackets.has(packet.id))
-                        throw new Error(`Packet ${packet.name} is trying to use id ${packet.id} which already exists!`);
-                    this.PlayServerboundPackets.set(packet.id, packet);
-                    break;
-                }
-                if (this.PlayClientboundPackets.has(packet.id))
+                if (this.PlayPackets.has(packet.id))
                     throw new Error(`Packet ${packet.name} is trying to use id ${packet.id} which already exists!`);
-                this.PlayClientboundPackets.set(packet.id, packet);
+                this.PlayPackets.set(packet.id, packet);
+                break;
+
+        }
+    }
+
+    private async registerHandlers() {
+        Handlers.HandshakeHandlers.forEach(handler => {
+            this.registerHandler(handler, ConnectionStates.Handshaking);
+        });
+        Handlers.StatusHandlers.forEach(handler => {
+            this.registerHandler(handler, ConnectionStates.Status);
+        });
+        Handlers.LoginHandlers.forEach(handler => {
+            this.registerHandler(handler, ConnectionStates.Login);
+        });
+        Handlers.PlayHandlers.forEach(handler => {
+            this.registerHandler(handler, ConnectionStates.Play);
+        });
+    }
+
+    private registerHandler(handler: Handler<any>, state: number) {
+        switch (state) {
+            case ConnectionStates.Handshaking:
+                if (this.HandshakeHandlers.has(handler.id)) throw new Error(`Handler with id ${handler.id} already exists!`);
+                this.HandshakeHandlers.set(handler.id, handler);
+                break;
+            case ConnectionStates.Status:
+                if (this.StatusHandlers.has(handler.id)) throw new Error(`Handler with id ${handler.id} already exists!`);
+                this.StatusHandlers.set(handler.id, handler);
+                break;
+            case ConnectionStates.Login:
+                if (this.LoginHandlers.has(handler.id)) throw new Error(`Handler with id ${handler.id} already exists!`);
+                this.LoginHandlers.set(handler.id, handler);
+                break;
+            case ConnectionStates.Play:
+                if (this.PlayHandlers.has(handler.id)) throw new Error(`Handler with id ${handler.id} already exists!`);
+                this.PlayHandlers.set(handler.id, handler);
                 break;
         }
-
     }
 }

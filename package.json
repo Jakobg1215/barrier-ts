@@ -3,6 +3,7 @@
     "description": "A Minecraft Java server writen in TypeScript.",
     "devDependencies": {
         "@types/node": "^15.6.0",
+        "@types/uuid": "^8.3.0",
         "concurrently": "^6.1.0",
         "nodemon": "^2.0.7"
     },
@@ -17,5 +18,8 @@
         "build": "tsc",
         "start": "node ./dist/server.js --unhandled-rejections=strict"
     },
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "dependencies": {
+        "uuid": "^8.3.2"
+    }
 }

@@ -1,48 +1,34 @@
 import ChatMessagePacket from "./packets/Play/serverbound/ChatMessagePacket";
 import HandshakePacket from "./packets/Handshaking/Serverbound/HandshakePacket";
 import Packet from "./packets/Packet";
-import ResponsePacket from "./packets/Status/Clientbound/ResponsePacket";
 import RequestPacket from "./packets/Status/Serverbound/RequestPacket";
-import DisconnectPacket from "./packets/Login/Clientbound/DisconnectPacket";
 import LoginStartPacket from "./packets/Login/Serverbound/LoginStartPacket";
-import SpawnEntityPacket from "./packets/Play/clientbound/SpawnEntityPacket";
+import PingPacket from "./packets/Status/Serverbound/PingPacket";
+import KeepAlivePacket from "./packets/Play/serverbound/KeepAlivePacket";
 
-const HandshakingServerboundPackets: typeof Packet[] = [];
-const StatusClientboundPackets: typeof Packet[] = [];
-const StatusServerboundPackets: typeof Packet[] = [];
-const LoginClientboundPackets: typeof Packet[] = [];
-const LoginServerboundPackets: typeof Packet[] = [];
-const PlayClientboundPackets: typeof Packet[] = [];
-const PlayServerboundPackets: typeof Packet[] = [];
+const HandshakingPackets: typeof Packet[] = [];
+const StatusPackets: typeof Packet[] = [];
+const LoginPackets: typeof Packet[] = [];
+const PlayPackets: typeof Packet[] = [];
 
-// Handshaking Serverbound Packets
-HandshakingServerboundPackets.push(HandshakePacket);
+// Handshaking Packets
+HandshakingPackets.push(HandshakePacket);
 
-// Status Clientbound Packets
-StatusClientboundPackets.push(ResponsePacket);
+// Status Packets
+StatusPackets.push(RequestPacket);
+StatusPackets.push(PingPacket);
 
-// Status Serverbound Packets
-StatusServerboundPackets.push(RequestPacket);
+// Login Packets
+LoginPackets.push(LoginStartPacket);
 
-// Login Clientbound Packets
-LoginClientboundPackets.push(DisconnectPacket);
-
-// Login Serverbound Packets
-LoginServerboundPackets.push(LoginStartPacket);
-
-// Play Clientbound Packets
-PlayClientboundPackets.push(SpawnEntityPacket);
-
-// Play Serverbound Packets
-PlayServerboundPackets.push(ChatMessagePacket);
+// Play Packets
+PlayPackets.push(ChatMessagePacket);
+PlayPackets.push(KeepAlivePacket);
 
 
 export {
-    HandshakingServerboundPackets,
-    StatusClientboundPackets,
-    StatusServerboundPackets,
-    LoginClientboundPackets,
-    LoginServerboundPackets,
-    PlayClientboundPackets,
-    PlayServerboundPackets
+    HandshakingPackets,
+    StatusPackets,
+    LoginPackets,
+    PlayPackets
 };
