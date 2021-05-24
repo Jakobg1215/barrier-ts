@@ -1,10 +1,10 @@
-import Server from "../../../server"
-import Connection from "../../Connection";
-import HandshakePacket from "../../packets/Handshaking/Serverbound/HandshakePacket";
-import { HandshakingServerbound, StatusClientbound, LoginServerbound } from "../../types/PacketIds";
-import Handler from "../Handler";
+import type Connection from "../../Connection";
 import { ConnectionStates } from "../../types/ConnectionState";
+import type Handler from "../Handler";
+import type HandshakePacket from "../../packets/Handshaking/Serverbound/HandshakePacket";
+import { HandshakingServerbound, StatusClientbound, LoginServerbound } from "../../types/PacketIds";
 import ResponsePacket from "../../packets/Status/Clientbound/ResponsePacket";
+import type Server from "../../../server"
 
 export default class HandshakeHandler implements Handler<HandshakePacket> {
     public id = HandshakingServerbound.Handshake;

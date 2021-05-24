@@ -1,9 +1,9 @@
-import Server from "../../../server"
-import Connection from "../../Connection";
+import type Connection from "../../Connection";
+import type Handler from "../Handler";
+import type PingPacket from "../../packets/Status/Serverbound/PingPacket";
 import PongPacket from "../../packets/Status/Clientbound/PongPacket";
-import PingPacket from "../../packets/Status/Serverbound/PingPacket";
+import type Server from "../../../server"
 import { StatusServerbound, StatusClientbound } from "../../types/PacketIds";
-import Handler from "../Handler";
 
 export default class PingHandler implements Handler<PingPacket> {
     public id = StatusServerbound.Ping;

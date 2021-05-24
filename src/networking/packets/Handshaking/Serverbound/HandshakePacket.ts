@@ -1,5 +1,5 @@
-import Packet from "../../Packet";
 import { HandshakingServerbound } from "../../../types/PacketIds";
+import Packet from "../../Packet";
 
 export default class HandshakePacket extends Packet {
     public static readonly id = HandshakingServerbound.Handshake;

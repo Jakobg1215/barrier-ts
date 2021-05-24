@@ -81,19 +81,6 @@ export default class Packet {
     public readUUID() {
         return `${Number(this.readLong()).toString()}${Number(this.readLong()).toString()}`;
     }
-    public readOptionalX(X: Function) {
-        try {
-            X();
-        } catch { }
-    }
-    public readArrayofX(length: number, X: Function) {
-        const xs: any[] = [];
-        for (let index = 0; index < length; index++) {
-            xs.push(X());
-        }
-        return xs;
-    }
-    public readXEnum() { }
     public readByteArray(length: number) {
         const bytes: number[] = [];
         for (let index = 0; index < length; index++) {
@@ -181,13 +168,6 @@ export default class Packet {
         this.writeLong(uuid.readLong());
         this.writeLong(uuid.readLong());
     }
-    public writeOptionalX() { }
-    public writeArrayofX(length: number, X: any, value: any[]) {
-        for (let index = 0; index < length; index++) {
-            X(value[index]);
-        }
-    }
-    public writeXEnum() { }
     public writeByteArray() { }
     public buildPacket(id: number): Buffer {
         const pkId = new Packet();

@@ -1,6 +1,6 @@
 import type { Socket } from "net";
-import Packet from "./packets/Packet";
-import { ConnectionStates } from "./types/ConnectionState"
+import { ConnectionStates } from "./types/ConnectionState";
+import type Packet from "./packets/Packet";
 
 export default class Connection {
     public uuid = "";

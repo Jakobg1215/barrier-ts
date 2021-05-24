@@ -1,8 +1,8 @@
-import net from "net";
 import Connection from "./networking/Connection";
+import KeepAlivePacket from "./networking/packets/Play/clientbound/KeepAlivePacket";
+import net from "net";
 import NetworkRegistry from "./networking/NetworkRegistry";
 import Packet from "./networking/packets/Packet";
-import KeepAlivePacket from "./networking/packets/Play/clientbound/KeepAlivePacket";
 
 export default class Server {
     private server: net.Server;

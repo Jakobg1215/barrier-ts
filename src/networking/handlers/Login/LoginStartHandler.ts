@@ -1,28 +1,28 @@
-import { v4 as uuidv4 } from 'uuid';
+import type Connection from "../../Connection";
+import { ConnectionStates } from '../../types/ConnectionState';
 import fs from "fs";
-import path from "path";
-import Server from "../../../server"
-import Connection from "../../Connection";
-import LoginSuccessPacket from "../../packets/Login/Clientbound/LoginSuccessPacket";
-import LoginStartPacket from "../../packets/Login/Serverbound/LoginStartPacket";
+import type Handler from "../Handler";
 import JoinGamePacket from '../../packets/Play/clientbound/JoinGamePacket';
 import { LoginServerbound, LoginClientbound, PlayClientbound } from "../../types/PacketIds";
-import Handler from "../Handler";
-import PlayerPositionAndLookPacket from '../../packets/Play/clientbound/PlayerPositionAndLookPacket';
-import { ConnectionStates } from '../../types/ConnectionState';
+import type LoginStartPacket from "../../packets/Login/Serverbound/LoginStartPacket";
+import LoginSuccessPacket from "../../packets/Login/Clientbound/LoginSuccessPacket";
 import Packet from '../../packets/Packet';
+import path from "path";
+import PlayerPositionAndLookPacket from '../../packets/Play/clientbound/PlayerPositionAndLookPacket';
+import type Server from "../../../server";
+import { v4 as uuidv4 } from "uuid";
 
 export default class LoginStartHandler implements Handler<LoginStartPacket> {
     public id = LoginServerbound.LoginStart;
 
     public handle(packet: LoginStartPacket, _server: Server, connection: Connection) {
-        connection.state = ConnectionStates.Play;
         connection.name = packet.Name;
         connection.uuid = uuidv4();
         const LoginSuccess = new LoginSuccessPacket();
         LoginSuccess.UUID = connection.uuid;
         LoginSuccess.Username = packet.Name;
         connection.sendPacket(LoginSuccess, LoginClientbound.LoginSuccess);
+        connection.state = ConnectionStates.Play;
         const JoinGame = new JoinGamePacket();
         JoinGame.EntityID = 0;
         JoinGame.Ishardcore = false;

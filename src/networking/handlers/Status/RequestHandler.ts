@@ -1,9 +1,9 @@
-import Server from "../../../server"
-import Connection from "../../Connection";
+import type Connection from "../../Connection";
+import type Handler from "../Handler";
+import type RequestPacket from "../../packets/Status/Serverbound/RequestPacket";
 import ResponsePacket from "../../packets/Status/Clientbound/ResponsePacket";
-import RequestPacket from "../../packets/Status/Serverbound/RequestPacket";
+import type Server from "../../../server"
 import { StatusServerbound, StatusClientbound } from "../../types/PacketIds";
-import Handler from "../Handler";
 
 export default class RequestHandler implements Handler<RequestPacket> {
     public id = StatusServerbound.Request;

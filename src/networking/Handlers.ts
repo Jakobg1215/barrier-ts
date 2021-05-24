@@ -1,7 +1,7 @@
-import Handler from "./handlers/Handler";
+import type Handler from "./handlers/Handler";
 import HandshakeHandler from "./handlers/Handshaking/HandshakeHandler";
-import LoginStartHandler from "./handlers/Login/LoginStartHandler";
 import KeepAliveHandler from "./handlers/Play/KeepAliveHandler";
+import LoginStartHandler from "./handlers/Login/LoginStartHandler";
 import PingHandler from "./handlers/Status/PingHandler";
 import RequestHandler from "./handlers/Status/RequestHandler";
 

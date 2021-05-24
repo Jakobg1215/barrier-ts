@@ -1,9 +1,8 @@
-import Server from "../../../server"
-import Connection from "../../Connection";
-import KeepAlivePacket from "../../packets/Play/clientbound/KeepAlivePacket";
+import type Connection from "../../Connection";
+import type Handler from "../Handler";
+import type KeepAlivePacket from "../../packets/Play/clientbound/KeepAlivePacket";
 import { PlayServerbound } from "../../types/PacketIds";
-import Handler from "../Handler";
-
+import type Server from "../../../server"
 
 export default class KeepAliveHandler implements Handler<KeepAlivePacket> {
     public id = PlayServerbound.KeepAlive;

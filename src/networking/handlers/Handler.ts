@@ -1,6 +1,6 @@
-import Server from "../../server";
-import Connection from "../Connection";
-import Packet from "../packets/Packet";
+import type Connection from "../Connection";
+import type Packet from "../packets/Packet";
+import type Server from "../../server";
 
 export default interface Handler<packet extends Packet> {
     id: number;

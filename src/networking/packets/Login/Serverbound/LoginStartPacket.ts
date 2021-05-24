@@ -1,5 +1,5 @@
-import Packet from "../../Packet";
 import { LoginServerbound } from "../../../types/PacketIds";
+import Packet from "../../Packet";
 
 export default class LoginStartPacket extends Packet {
     public static readonly id = LoginServerbound.LoginStart;
