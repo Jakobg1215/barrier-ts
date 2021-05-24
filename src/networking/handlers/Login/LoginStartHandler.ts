@@ -54,7 +54,6 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
                 connection.sendRaw(pk.buildPacket(PlayClientbound.ChunkData));
             }
         }
-        console.log("chunk");
         const PlayerPositionAndLook = new PlayerPositionAndLookPacket();
         PlayerPositionAndLook.X = 0;
         PlayerPositionAndLook.Y = 4;
