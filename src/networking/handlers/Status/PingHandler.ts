@@ -1,4 +1,4 @@
-import type Connection from "../../Connection";
+import type PlayerConnection from "../../players/PlayerConnection";
 import type Handler from "../Handler";
 import type PingPacket from "../../packets/Status/Serverbound/PingPacket";
 import PongPacket from "../../packets/Status/Clientbound/PongPacket";
@@ -8,9 +8,9 @@ import { StatusServerbound, StatusClientbound } from "../../types/PacketIds";
 export default class PingHandler implements Handler<PingPacket> {
     public id = StatusServerbound.Ping;
 
-    public handle(packet: PingPacket, _server: Server, connection: Connection) {
+    public async handle(packet: PingPacket, _server: Server, player: PlayerConnection) {
         const pk = new PongPacket();
         pk.Payload = packet.Payload;
-        connection.sendPacket(pk, StatusClientbound.Pong);
+        await player.sendPacket(pk, StatusClientbound.Pong);
     }
 }

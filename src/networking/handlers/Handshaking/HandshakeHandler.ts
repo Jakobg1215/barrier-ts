@@ -1,4 +1,4 @@
-import type Connection from "../../Connection";
+import type PlayerConnection from "../../players/PlayerConnection";
 import { ConnectionStates } from "../../types/ConnectionState";
 import type Handler from "../Handler";
 import type HandshakePacket from "../../packets/Handshaking/Serverbound/HandshakePacket";
@@ -9,8 +9,8 @@ import type Server from "../../../server"
 export default class HandshakeHandler implements Handler<HandshakePacket> {
     public id = HandshakingServerbound.Handshake;
 
-    public handle(packet: HandshakePacket, server: Server, connection: Connection) {
-        connection.state = packet.NextState;
+    public async handle(packet: HandshakePacket, server: Server, player: PlayerConnection) {
+        player.setState(packet.NextState);
         if (packet.NextState === ConnectionStates.Status) {
             const pk = new ResponsePacket();
             pk.JSONResponse = JSON.stringify({
@@ -26,7 +26,7 @@ export default class HandshakeHandler implements Handler<HandshakePacket> {
                     text: "Hello world"
                 },
             });
-            connection.sendPacket(pk, StatusClientbound.Response);
+            await player.sendPacket(pk, StatusClientbound.Response);
         }
         if (packet.NextState === ConnectionStates.Login) {
             try {
@@ -42,7 +42,7 @@ export default class HandshakeHandler implements Handler<HandshakePacket> {
                 }
                 const pk = new pack(packet.getBytes().slice(packet.getOffset()));
                 pk.decrypt();
-                hander.handle(pk, server, connection);
+                hander.handle(pk, server, player);
             } catch { }
         }
     }

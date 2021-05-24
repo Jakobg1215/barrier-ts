@@ -1,4 +1,4 @@
-import type Connection from "../../Connection";
+import type PlayerConnection from "../../players/PlayerConnection";
 import { ConnectionStates } from '../../types/ConnectionState';
 import fs from "fs";
 import type Handler from "../Handler";
@@ -15,14 +15,14 @@ import { v4 as uuidv4 } from "uuid";
 export default class LoginStartHandler implements Handler<LoginStartPacket> {
     public id = LoginServerbound.LoginStart;
 
-    public handle(packet: LoginStartPacket, _server: Server, connection: Connection) {
-        connection.name = packet.Name;
-        connection.uuid = uuidv4();
+    public async handle(packet: LoginStartPacket, _server: Server, player: PlayerConnection) {
+        player.setName(packet.Name);
+        player.setUUID(uuidv4());
         const LoginSuccess = new LoginSuccessPacket();
-        LoginSuccess.UUID = connection.uuid;
+        LoginSuccess.UUID = player.getUUID();
         LoginSuccess.Username = packet.Name;
-        connection.sendPacket(LoginSuccess, LoginClientbound.LoginSuccess);
-        connection.state = ConnectionStates.Play;
+        await player.sendPacket(LoginSuccess, LoginClientbound.LoginSuccess);
+        player.setState(ConnectionStates.Play);
         const JoinGame = new JoinGamePacket();
         JoinGame.EntityID = 0;
         JoinGame.Ishardcore = false;
@@ -43,7 +43,7 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         JoinGame.Enablerespawnscreen = true;
         JoinGame.IsDebug = false;
         JoinGame.IsFlat = true;
-        connection.sendPacket(JoinGame, PlayClientbound.JoinGame);
+        await player.sendPacket(JoinGame, PlayClientbound.JoinGame);
         for (let x = -5; x < 5; x++) {
             for (let z = -5; z < 5; z++) {
                 const chunk = fs.readFileSync(path.join(__dirname, "../../../../NBT/chunk.nbt"));
@@ -51,7 +51,7 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
                 pk.writeInt(x);
                 pk.writeInt(z);
                 pk.append(chunk.slice(11));
-                connection.sendRaw(pk.buildPacket(PlayClientbound.ChunkData));
+                player.sendRaw(pk.buildPacket(PlayClientbound.ChunkData));
             }
         }
         const PlayerPositionAndLook = new PlayerPositionAndLookPacket();
@@ -62,6 +62,6 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         PlayerPositionAndLook.Pitch = 0;
         PlayerPositionAndLook.Flags = 0;
         PlayerPositionAndLook.TeleportID = 0;
-        connection.sendPacket(PlayerPositionAndLook, PlayClientbound.PlayerPositionAndLook);
+        await player.sendPacket(PlayerPositionAndLook, PlayClientbound.PlayerPositionAndLook);
     }
 }

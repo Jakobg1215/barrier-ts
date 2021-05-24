@@ -1,4 +1,4 @@
-import type Connection from "../../Connection";
+import type PlayerConnection from "../../players/PlayerConnection";
 import type Handler from "../Handler";
 import type RequestPacket from "../../packets/Status/Serverbound/RequestPacket";
 import ResponsePacket from "../../packets/Status/Clientbound/ResponsePacket";
@@ -8,7 +8,7 @@ import { StatusServerbound, StatusClientbound } from "../../types/PacketIds";
 export default class RequestHandler implements Handler<RequestPacket> {
     public id = StatusServerbound.Request;
 
-    public handle(_packet: RequestPacket, _server: Server, connection: Connection) {
+    public async handle(_packet: RequestPacket, _server: Server, player: PlayerConnection) {
         const pk = new ResponsePacket();
         pk.JSONResponse = JSON.stringify({
             version: {
@@ -23,6 +23,6 @@ export default class RequestHandler implements Handler<RequestPacket> {
                 text: "Hello world"
             },
         });
-        connection.sendPacket(pk, StatusClientbound.Response);
+        await player.sendPacket(pk, StatusClientbound.Response);
     }
 }
