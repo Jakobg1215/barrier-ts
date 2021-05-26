@@ -1,6 +1,6 @@
 import type PlayerConnection from "../../players/PlayerConnection";
 import type Handler from "../Handler";
-import type KeepAlivePacket from "../../packets/Play/clientbound/KeepAlivePacket";
+import type KeepAlivePacket from "../../packets/Play/serverbound/KeepAlivePacket";
 import { PlayServerbound } from "../../types/PacketIds";
 import type Server from "../../../server"
 

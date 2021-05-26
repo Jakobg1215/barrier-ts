@@ -68,7 +68,7 @@ export enum PlayClientbound {
     MapData = 0x25,
     TradeList = 0x26,
     EntityPosition = 0x27,
-    EntityPositionandRotation = 0x28,
+    EntityPositionAndRotation = 0x28,
     EntityRotation = 0x29,
     EntityMovement = 0x2A,
     VehicleMove = 0x2B,
@@ -119,7 +119,7 @@ export enum PlayClientbound {
     EntityProperties = 0x58,
     EntityEffect = 0x59,
     DeclareRecipes = 0x5A,
-    Tags = 0x5B    
+    Tags = 0x5B
 }
 
 export enum PlayServerbound {

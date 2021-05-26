@@ -13,6 +13,10 @@ export default class Server {
         return this.networkRegistry;
     }
 
+    public getPlayerManager() {
+        return this.playerManager;
+    }
+
     public async listen(port = 25565) {
         await this.networkRegistry.registerNetwork();
         this.server.listen(port, () => {

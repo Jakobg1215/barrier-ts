@@ -42,7 +42,7 @@ export default class HandshakeHandler implements Handler<HandshakePacket> {
                 }
                 const pk = new pack(packet.getBytes().slice(packet.getOffset()));
                 pk.decrypt();
-                hander.handle(pk, server, player);
+                await hander.handle(pk, server, player);
             } catch { }
         }
     }

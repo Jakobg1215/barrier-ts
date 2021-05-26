@@ -4,6 +4,7 @@ import KeepAlivePacket from "./packets/Play/serverbound/KeepAlivePacket";
 import LoginStartPacket from "./packets/Login/Serverbound/LoginStartPacket";
 import type Packet from "./packets/Packet";
 import PingPacket from "./packets/Status/Serverbound/PingPacket";
+import PlayerBlockPlacementPacket from "./packets/Play/serverbound/PlayerBlockPlacementPacket";
 import PlayerPositionAndRotationPacket from "./packets/Play/serverbound/PlayerPositionAndRotationPacket";
 import PlayerPositionPacket from "./packets/Play/serverbound/PlayerPositionPacket";
 import PlayerRotationPacket from "./packets/Play/serverbound/PlayerRotationPacket";
@@ -27,6 +28,7 @@ LoginPackets.push(LoginStartPacket);
 // Play Packets
 PlayPackets.push(ChatMessagePacket);
 PlayPackets.push(KeepAlivePacket);
+PlayPackets.push(PlayerBlockPlacementPacket);
 PlayPackets.push(PlayerPositionAndRotationPacket);
 PlayPackets.push(PlayerPositionPacket);
 PlayPackets.push(PlayerRotationPacket);

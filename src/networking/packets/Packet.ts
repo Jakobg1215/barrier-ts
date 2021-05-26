@@ -74,7 +74,15 @@ export default class Packet {
     }
     public readEntityMetadata() { }
     public readNBTTag() { }
-    public readPosition() { }
+    public readPosition() {
+        let val = Number(this.readLong().toString());
+        console.log(val);
+        return {
+            x: 0,
+            y: 0,
+            z: 0
+        };
+    }
     public readAngle() {
         return this.readUnsignedByte();
     }
