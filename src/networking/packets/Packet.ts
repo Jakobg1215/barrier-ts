@@ -29,6 +29,9 @@ export default class Packet {
     public readLong() {
         return this.bytes.readBigInt64BE(this.addOffset(8));
     }
+    public readFloat() {
+        return this.bytes.readFloatBE(this.addOffset(4));
+    }
     public readDouble() {
         return this.bytes.readDoubleBE(this.addOffset(8));
     }
@@ -53,6 +56,7 @@ export default class Packet {
         } while ((read & 0b10000000) != 0);
         return result;
     }
+    // FIXME: This does not read a long, only to a Int.
     public readVarLong() {
         let numRead = 0;
         let result = 0;
