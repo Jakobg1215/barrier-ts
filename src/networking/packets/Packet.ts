@@ -1,3 +1,4 @@
+import type Chat from "../../types/Chat";
 import Slot from "../../types/Slot";
 
 export default class Packet {
@@ -85,7 +86,7 @@ export default class Packet {
         return slot;
     }
     public readPosition() {
-        let val = Number(this.readLong().toString());
+        let val = this.bytes.readBigUInt64BE(this.addOffset(8));
         console.log(val);
         return {
             x: 0,
@@ -158,7 +159,9 @@ export default class Packet {
         buf.write(value, "utf-8");
         this.bytes = Buffer.concat([this.bytes, buf]);
     }
-    public writeChat() { }
+    public writeChat(chat: Chat) {
+        this.writeString(chat.toJSON());
+    }
     public writeIdentifier() { }
     public writeVarInt(value: number) {
         do {
@@ -183,7 +186,11 @@ export default class Packet {
         this.writeLong(uuid.readLong());
         this.writeLong(uuid.readLong());
     }
-    public writeByteArray() { }
+    public writeByteArray(length: number, bytes: number[]) {
+        for (let index = 0; index < length; index++) {   
+            this.writeByte(bytes[index]);
+        }
+    }
     public buildPacket(id: number): Buffer {
         const pkId = new Packet();
         pkId.writeVarInt(id);
