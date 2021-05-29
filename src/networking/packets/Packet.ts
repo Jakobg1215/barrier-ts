@@ -1,3 +1,5 @@
+import Slot from "../../types/Slot";
+
 export default class Packet {
     public static readonly id: number;
     private bytes;
@@ -27,16 +29,12 @@ export default class Packet {
     public readLong() {
         return this.bytes.readBigInt64BE(this.addOffset(8));
     }
-    public readFloat() {
-        return this.bytes.readFloatBE(this.addOffset(4));
-    }
     public readDouble() {
         return this.bytes.readDoubleBE(this.addOffset(8));
     }
     public readString() {
         return this.bytes.slice(this.offset + 1, this.addOffset(this.readVarInt(), true)).toString("utf-8");
     }
-    public readChat() { }
     public readIdentifier() {
         return this.readString();
     }
@@ -70,10 +68,18 @@ export default class Packet {
             }
         } while ((read & 0b10000000) != 0);
 
-        return result;
+        return BigInt(result);
     }
-    public readEntityMetadata() { }
-    public readNBTTag() { }
+    public readSlot() {
+        const slot = new Slot();
+        slot.Present = this.readBoolean();
+        if (slot.Present) {
+            slot.ItemID = this.readVarInt()
+            slot.ItemCount = this.readByte();
+            slot.NBT = this.bytes.slice(this.offset);
+        }
+        return slot;
+    }
     public readPosition() {
         let val = Number(this.readLong().toString());
         console.log(val);
@@ -82,9 +88,6 @@ export default class Packet {
             y: 0,
             z: 0
         };
-    }
-    public readAngle() {
-        return this.readUnsignedByte();
     }
     public readUUID() {
         return `${Number(this.readLong()).toString()}${Number(this.readLong()).toString()}`;
@@ -197,7 +200,7 @@ export default class Packet {
     }
     public decrypt() { }
     public encrypt() { }
-    private addOffset(offset: number, retval: boolean = false) {
+    public addOffset(offset: number, retval: boolean = false) {
         if (retval) return (this.offset += offset);
         return (this.offset += offset) - offset;
     }
