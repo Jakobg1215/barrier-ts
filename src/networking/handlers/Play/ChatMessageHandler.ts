@@ -37,7 +37,6 @@ export default class ChatMessageHandler implements Handler<ChatMessagePacket> {
             SpawnPlayer.Yaw = 0;
             SpawnPlayer.Pitch = 0;
             player.sendPacket(SpawnPlayer, PlayClientbound.SpawnPlayer);
-
         }
     }
 }

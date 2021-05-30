@@ -3,8 +3,10 @@ import PlayerManager from "./networking/players/PlayerManager";
 import net from "net";
 import NetworkRegistry from "./networking/NetworkRegistry";
 import Packet from "./networking/packets/Packet";
+import World from "./world/World";
 
 export default class Server {
+    private world = new World();
     private server = new net.Server().close();
     private networkRegistry = new NetworkRegistry();
     private playerManager = new PlayerManager();
@@ -15,6 +17,10 @@ export default class Server {
 
     public getPlayerManager() {
         return this.playerManager;
+    }
+
+    public getWorld() {
+        return this.world;
     }
 
     public async listen(port = 25565) {
@@ -40,11 +46,11 @@ export default class Server {
         const packetId = incomePacket.readVarInt();
         const packet = this.networkRegistry.getPacket(player.getState(), packetId);
         if (!packet) {
-            return console.log(`Packet 0x${packetId.toString(16)} for state ${player.getState()} isn't implemented`);
+            return console.log(`Packet 0x${packetId.toString(16)} for state ${player.getState()} isn't implemented. Entiteid: ${player.getID()}`);
         }
         const hander = this.networkRegistry.getHandler(player.getState(), packetId);
         if (!hander) {
-            return console.log(`Packet handler 0x${packetId.toString(16)} for state ${player.getState()} isn't implemented`);
+            return console.log(`Packet handler 0x${packetId.toString(16)} for state ${player.getState()} isn't implemented. Entiteid: ${player.getID()}`);
         }
         const pk = new packet(incomePacket.getBytes().slice(incomePacket.getOffset()));
         pk.decrypt();

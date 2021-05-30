@@ -11,11 +11,14 @@ import path from "path";
 import PlayerPositionAndLookPacket from '../../packets/Play/clientbound/PlayerPositionAndLookPacket';
 import type Server from "../../../server";
 import { v4 as uuidv4 } from "uuid";
+import PlayerInfoPacket from "../../packets/Play/clientbound/PlayerInfoPacket";
+import { PlayerInfoPlayer } from "../../types/PacketFieldArguments";
+import SpawnPlayerPacket from "../../packets/Play/clientbound/SpawnPlayerPacket";
 
 export default class LoginStartHandler implements Handler<LoginStartPacket> {
     public id = LoginServerbound.LoginStart;
 
-    public async handle(packet: LoginStartPacket, _server: Server, player: PlayerConnection) {
+    public async handle(packet: LoginStartPacket, server: Server, player: PlayerConnection) {
         player.setName(packet.Name);
         player.setUUID(uuidv4());
         const LoginSuccess = new LoginSuccessPacket();
@@ -23,8 +26,10 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         LoginSuccess.Username = packet.Name;
         await player.sendPacket(LoginSuccess, LoginClientbound.LoginSuccess);
         player.setState(ConnectionStates.Play);
+
         const JoinGame = new JoinGamePacket();
-        JoinGame.EntityID = 0;
+        player.setid(server.getWorld().getId());
+        JoinGame.EntityID = player.getID();
         JoinGame.Ishardcore = false;
         JoinGame.Gamemode = 1;
         JoinGame.PreviousGamemode = 1;
@@ -44,8 +49,9 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         JoinGame.IsDebug = false;
         JoinGame.IsFlat = true;
         await player.sendPacket(JoinGame, PlayClientbound.JoinGame);
-        for (let x = -5; x < 5; x++) {
-            for (let z = -5; z < 5; z++) {
+
+        for (let x = -2; x < 2; x++) {
+            for (let z = -2; z < 2; z++) {
                 const chunk = fs.readFileSync(path.join(__dirname, "../../../../NBT/chunk.nbt"));
                 const pk = new Packet();
                 pk.writeInt(x);
@@ -54,6 +60,7 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
                 player.sendRaw(pk.buildPacket(PlayClientbound.ChunkData));
             }
         }
+
         const PlayerPositionAndLook = new PlayerPositionAndLookPacket();
         PlayerPositionAndLook.X = 0;
         PlayerPositionAndLook.Y = 4;
@@ -63,5 +70,42 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         PlayerPositionAndLook.Flags = 0;
         PlayerPositionAndLook.TeleportID = 0;
         await player.sendPacket(PlayerPositionAndLook, PlayClientbound.PlayerPositionAndLook);
+
+        await player.sendOnlinePlayers(server);
+
+        const PlayerInfo = new PlayerInfoPacket();
+        PlayerInfo.Action = 0;
+        PlayerInfo.NumberOfPlayers = 1;
+        const playerfield = class Player implements PlayerInfoPlayer {
+            public UUID = player.getUUID();
+            public Name = player.getName();
+            public NumberOfProperties = 0;
+            public Gamemode = 1;
+            public Ping = 0;
+            public HasDisplayName = true;
+            public DisplayName = JSON.stringify({ text: player.getName() });
+        }
+        PlayerInfo.Player = [
+            new playerfield()
+        ];
+        server.getPlayerManager().getConnections().forEach(async conn => {
+            if (conn.getUUID() === player.getUUID()) return;
+            await conn.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
+        });
+        await player.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
+
+        server.getPlayerManager().getConnections().forEach(async conn => {
+            if (conn.getUUID() === player.getUUID()) return;
+            const SpawnPlayer = new SpawnPlayerPacket();
+            SpawnPlayer.EntityID = player.getID();
+            SpawnPlayer.PlayerUUID = player.getUUID();
+            SpawnPlayer.X = player.getPosition()[0];
+            SpawnPlayer.Y = player.getPosition()[1];
+            SpawnPlayer.Z = player.getPosition()[2];
+            SpawnPlayer.Yaw = player.getRotation()[0];
+            SpawnPlayer.Pitch = player.getRotation()[0];
+            await conn.sendPacket(SpawnPlayer, PlayClientbound.SpawnPlayer);
+        });
+
     }
 }

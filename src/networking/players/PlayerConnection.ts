@@ -1,15 +1,21 @@
 import type { Socket } from "net";
 import { ConnectionStates } from "../types/ConnectionState";
 import type Packet from "../packets/Packet";
+import type Server from "../../server";
+import PlayerInfoPacket from "../packets/Play/clientbound/PlayerInfoPacket";
+import { PlayClientbound } from "../types/PacketIds";
+import type { PlayerInfoPlayer } from "../types/PacketFieldArguments";
+import SpawnPlayerPacket from "../packets/Play/clientbound/SpawnPlayerPacket";
 
 export default class PlayerConnection {
     private connection: Socket;
     private connectionState = ConnectionStates.Handshaking;
-    private username = "";
-    private UUID = "";
+    private username!: string;
+    private UUID!: string;
     private position = [0, 4, 0];
     private rotation = [0, 0];
     private onGround = true;
+    private id!: number;
 
     public constructor(socket: Socket) {
         this.connection = socket;
@@ -22,6 +28,39 @@ export default class PlayerConnection {
 
     public sendRaw(data: Buffer) {
         this.connection.write(data);
+    }
+
+    public async sendOnlinePlayers(server: Server) {
+        server.getPlayerManager().getConnections().forEach(async conn => {
+            if (conn.getUUID() === this.UUID) return;
+            if (conn.getState() < 3) return;
+            const PlayerInfo = new PlayerInfoPacket();
+            PlayerInfo.Action = 0;
+            PlayerInfo.NumberOfPlayers = 1;
+            const playerfield = class Player implements PlayerInfoPlayer {
+                public UUID = conn.getUUID();
+                public Name = conn.getName();
+                public NumberOfProperties = 0;
+                public Gamemode = 1;
+                public Ping = 0;
+                public HasDisplayName = true;
+                public DisplayName = JSON.stringify({ text: conn.getName() });
+            }
+            PlayerInfo.Player = [
+                new playerfield()
+            ];
+            console.log(PlayerInfo.Player[0].UUID);
+            await this.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
+            const SpawnPlayer = new SpawnPlayerPacket();
+            SpawnPlayer.EntityID = conn.getID();
+            SpawnPlayer.PlayerUUID = conn.getUUID();
+            SpawnPlayer.X = conn.getPosition()[0];
+            SpawnPlayer.Y = conn.getPosition()[1];
+            SpawnPlayer.Z = conn.getPosition()[2];
+            SpawnPlayer.Yaw = conn.getRotation()[0];
+            SpawnPlayer.Pitch = conn.getRotation()[0];
+            await this.sendPacket(SpawnPlayer, PlayClientbound.SpawnPlayer);
+        });
     }
 
     public setState(state: ConnectionStates) {
@@ -73,5 +112,13 @@ export default class PlayerConnection {
 
     public getOnGround() {
         return this.onGround;
+    }
+
+    public setid(id: number) {
+        this.id = id
+    }
+
+    public getID() {
+        return this.id;
     }
 }
