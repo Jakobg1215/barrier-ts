@@ -1,5 +1,5 @@
-import Packet from "../../Packet";
-import { StatusServerbound } from "../../../types/PacketIds";
+import Packet from '../../Packet';
+import { StatusServerbound } from '../../../types/PacketIds';
 
 export default class PingPacket extends Packet {
     public static readonly id = StatusServerbound.Ping;

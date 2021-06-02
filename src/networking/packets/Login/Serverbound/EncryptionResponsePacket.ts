@@ -1,5 +1,5 @@
-import { LoginServerbound } from "../../../types/PacketIds";
-import Packet from "../../Packet";
+import { LoginServerbound } from '../../../types/PacketIds';
+import Packet from '../../Packet';
 
 export default class EncryptionResponsePacket extends Packet {
     public static readonly id = LoginServerbound.EncryptionResponse;

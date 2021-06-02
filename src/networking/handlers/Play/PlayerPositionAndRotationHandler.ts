@@ -1,9 +1,9 @@
-import type PlayerConnection from "../../players/PlayerConnection";
-import type Handler from "../Handler";
-import PlayerPositionAndRotationPacket from "../../packets/Play/serverbound/PlayerPositionAndRotationPacket";
-import { PlayServerbound } from "../../types/PacketIds";
-import type Server from "../../../server"
-import Packet from "../../packets/Packet";
+import type PlayerConnection from '../../players/PlayerConnection';
+import type Handler from '../Handler';
+import PlayerPositionAndRotationPacket from '../../packets/Play/serverbound/PlayerPositionAndRotationPacket';
+import { PlayServerbound } from '../../types/PacketIds';
+import type Server from '../../../server';
+import Packet from '../../packets/Packet';
 
 export default class PlayerPositionAndRotationHandler implements Handler<PlayerPositionAndRotationPacket> {
     public id = PlayServerbound.PlayerPositionAndRotation;
@@ -21,7 +21,7 @@ export default class PlayerPositionAndRotationHandler implements Handler<PlayerP
         }
         yaw = Math.round(yaw / (360 / 255));
         if (yaw < 0) yaw = 255 + yaw;
-        let pitch = packet.Pitch > 0 ? packet.Pitch * 65 / 90 : 255 - Math.abs(packet.Pitch) * 65 / 90;
+        let pitch = packet.Pitch > 0 ? (packet.Pitch * 65) / 90 : 255 - (Math.abs(packet.Pitch) * 65) / 90;
         player.setRotation({ yaw: yaw, pitch: pitch });
         const pozrotpk = new Packet();
         const lokpk = new Packet();
@@ -40,11 +40,14 @@ export default class PlayerPositionAndRotationHandler implements Handler<PlayerP
         pozrotpk.writeAngle(yaw);
         pozrotpk.writeAngle(pitch);
         pozrotpk.writeBoolean(packet.OnGround);
-        server.getPlayerManager().getConnections().forEach(conn => {
-            if (conn.getID() === player.getID()) return;
-            conn.sendRaw(pozrotpk.buildPacket(0x28));
-            conn.sendRaw(lokpk.buildPacket(0x3A));
-        });
+        server
+            .getPlayerManager()
+            .getConnections()
+            .forEach(conn => {
+                if (conn.getID() === player.getID()) return;
+                conn.sendRaw(pozrotpk.buildPacket(0x28));
+                conn.sendRaw(lokpk.buildPacket(0x3a));
+            });
         player.setPosition({ X: packet.X, Y: packet.FeetY, Z: packet.Z });
     }
 }

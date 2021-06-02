@@ -1,9 +1,9 @@
-import type PlayerConnection from "../../players/PlayerConnection";
-import type Handler from "../Handler";
-import PlayerPositionPacket from "../../packets/Play/serverbound/PlayerPositionPacket";
-import { PlayServerbound } from "../../types/PacketIds";
-import type Server from "../../../server"
-import Packet from "../../packets/Packet";
+import type PlayerConnection from '../../players/PlayerConnection';
+import type Handler from '../Handler';
+import PlayerPositionPacket from '../../packets/Play/serverbound/PlayerPositionPacket';
+import { PlayServerbound } from '../../types/PacketIds';
+import type Server from '../../../server';
+import Packet from '../../packets/Packet';
 
 export default class PlayerPositionHandler implements Handler<PlayerPositionPacket> {
     public id = PlayServerbound.PlayerPosition;
@@ -22,10 +22,13 @@ export default class PlayerPositionHandler implements Handler<PlayerPositionPack
             pozpk.writeShort(0);
         }
         pozpk.writeBoolean(packet.OnGround);
-        server.getPlayerManager().getConnections().forEach(conn => {
-            if (conn.getID() === player.getID()) return;
-            conn.sendRaw(pozpk.buildPacket(0x27));
-        });
+        server
+            .getPlayerManager()
+            .getConnections()
+            .forEach(conn => {
+                if (conn.getID() === player.getID()) return;
+                conn.sendRaw(pozpk.buildPacket(0x27));
+            });
         player.setPosition({ X: packet.X, Y: packet.FeetY, Z: packet.Z });
     }
 }

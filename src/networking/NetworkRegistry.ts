@@ -1,8 +1,8 @@
-import { ConnectionStates } from "./types/ConnectionState";
-import type Handler from "./handlers/Handler";
-import * as Handlers from "./Handlers";
-import type Packet from "./packets/Packet";
-import * as Packets from "./Packets";
+import { ConnectionStates } from './types/ConnectionState';
+import type Handler from './handlers/Handler';
+import * as Handlers from './Handlers';
+import type Packet from './packets/Packet';
+import * as Packets from './Packets';
 
 export default class NetworkRegistry {
     private HandshakingPackets: Map<number, typeof Packet> = new Map();
@@ -86,7 +86,6 @@ export default class NetworkRegistry {
                     throw new Error(`Packet ${packet.name} is trying to use id ${packet.id} which already exists!`);
                 this.PlayPackets.set(packet.id, packet);
                 break;
-
         }
     }
 
@@ -108,15 +107,18 @@ export default class NetworkRegistry {
     private registerHandler(handler: Handler<any>, state: number) {
         switch (state) {
             case ConnectionStates.Handshaking:
-                if (this.HandshakeHandlers.has(handler.id)) throw new Error(`Handler with id ${handler.id} already exists!`);
+                if (this.HandshakeHandlers.has(handler.id))
+                    throw new Error(`Handler with id ${handler.id} already exists!`);
                 this.HandshakeHandlers.set(handler.id, handler);
                 break;
             case ConnectionStates.Status:
-                if (this.StatusHandlers.has(handler.id)) throw new Error(`Handler with id ${handler.id} already exists!`);
+                if (this.StatusHandlers.has(handler.id))
+                    throw new Error(`Handler with id ${handler.id} already exists!`);
                 this.StatusHandlers.set(handler.id, handler);
                 break;
             case ConnectionStates.Login:
-                if (this.LoginHandlers.has(handler.id)) throw new Error(`Handler with id ${handler.id} already exists!`);
+                if (this.LoginHandlers.has(handler.id))
+                    throw new Error(`Handler with id ${handler.id} already exists!`);
                 this.LoginHandlers.set(handler.id, handler);
                 break;
             case ConnectionStates.Play:

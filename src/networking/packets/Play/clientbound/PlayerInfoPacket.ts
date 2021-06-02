@@ -1,6 +1,6 @@
-import Packet from "../../Packet";
-import { PlayClientbound } from "../../../types/PacketIds";
-import { PlayerInfoPlayer } from "../../../types/PacketFieldArguments";
+import Packet from '../../Packet';
+import { PlayClientbound } from '../../../types/PacketIds';
+import { PlayerInfoPlayer } from '../../../types/PacketFieldArguments';
 
 export default class PlayerInfoPacket extends Packet {
     public static readonly id = PlayClientbound.PlayerInfo;
@@ -16,9 +16,13 @@ export default class PlayerInfoPacket extends Packet {
             this.writeUUID(this.Player[playerindex].UUID);
             switch (this.Action) {
                 case 0:
-                    this.writeString(this.Player[playerindex].Name ?? "UknownPlayer");
+                    this.writeString(this.Player[playerindex].Name ?? 'UknownPlayer');
                     this.writeVarInt(this.Player[playerindex].NumberOfProperties ?? 0);
-                    for (let propertyindex = 0; propertyindex < (this.Player[playerindex].NumberOfProperties ?? 0); propertyindex++) {
+                    for (
+                        let propertyindex = 0;
+                        propertyindex < (this.Player[playerindex].NumberOfProperties ?? 0);
+                        propertyindex++
+                    ) {
                         this.writeString(this.Player[playerindex].Property![propertyindex].Name);
                         this.writeString(this.Player[playerindex].Property![propertyindex].Value);
                         this.writeBoolean(this.Player[playerindex].Property![propertyindex].IsSigned);

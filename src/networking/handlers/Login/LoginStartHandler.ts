@@ -1,19 +1,19 @@
-import type PlayerConnection from "../../players/PlayerConnection";
+import type PlayerConnection from '../../players/PlayerConnection';
 import { ConnectionStates } from '../../types/ConnectionState';
-import fs from "fs";
-import type Handler from "../Handler";
+import fs from 'fs';
+import type Handler from '../Handler';
 import JoinGamePacket from '../../packets/Play/clientbound/JoinGamePacket';
-import { LoginServerbound, LoginClientbound, PlayClientbound } from "../../types/PacketIds";
-import type LoginStartPacket from "../../packets/Login/Serverbound/LoginStartPacket";
-import LoginSuccessPacket from "../../packets/Login/Clientbound/LoginSuccessPacket";
+import { LoginServerbound, LoginClientbound, PlayClientbound } from '../../types/PacketIds';
+import type LoginStartPacket from '../../packets/Login/Serverbound/LoginStartPacket';
+import LoginSuccessPacket from '../../packets/Login/Clientbound/LoginSuccessPacket';
 import Packet from '../../packets/Packet';
-import path from "path";
+import path from 'path';
 import PlayerPositionAndLookPacket from '../../packets/Play/clientbound/PlayerPositionAndLookPacket';
-import type Server from "../../../server";
-import { v4 as uuidv4 } from "uuid";
-import PlayerInfoPacket from "../../packets/Play/clientbound/PlayerInfoPacket";
-import { PlayerInfoPlayer } from "../../types/PacketFieldArguments";
-import SpawnPlayerPacket from "../../packets/Play/clientbound/SpawnPlayerPacket";
+import type Server from '../../../server';
+import { v4 as uuidv4 } from 'uuid';
+import PlayerInfoPacket from '../../packets/Play/clientbound/PlayerInfoPacket';
+import { PlayerInfoPlayer } from '../../types/PacketFieldArguments';
+import SpawnPlayerPacket from '../../packets/Play/clientbound/SpawnPlayerPacket';
 
 export default class LoginStartHandler implements Handler<LoginStartPacket> {
     public id = LoginServerbound.LoginStart;
@@ -34,13 +34,9 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         JoinGame.Gamemode = 1;
         JoinGame.PreviousGamemode = 1;
         JoinGame.WorldCount = 3;
-        JoinGame.WorldNames = [
-            "minecraft:overworld",
-            "minecraft:the_nether",
-            "minecraft:the_end"
-        ];
-        JoinGame.DimensionCodec = fs.readFileSync(path.join(__dirname, "../../../../NBT/Dimension Codec.nbt"));
-        JoinGame.WorldName = "minecraft:the_end";
+        JoinGame.WorldNames = ['minecraft:overworld', 'minecraft:the_nether', 'minecraft:the_end'];
+        JoinGame.DimensionCodec = fs.readFileSync(path.join(__dirname, '../../../../NBT/Dimension Codec.nbt'));
+        JoinGame.WorldName = 'minecraft:the_end';
         JoinGame.Hashedseed = 0n;
         JoinGame.MaxPlayers = 100;
         JoinGame.ViewDistance = 10;
@@ -52,7 +48,7 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
 
         for (let x = -10; x < 10; x++) {
             for (let z = -10; z < 10; z++) {
-                const chunk = fs.readFileSync(path.join(__dirname, "../../../../NBT/chunk.nbt"));
+                const chunk = fs.readFileSync(path.join(__dirname, '../../../../NBT/chunk.nbt'));
                 const pk = new Packet();
                 pk.writeInt(x);
                 pk.writeInt(z);
@@ -82,30 +78,34 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
             public Ping = 0;
             public HasDisplayName = true;
             public DisplayName = JSON.stringify({ text: player.getName() });
-        }
-        PlayerInfo.Player = [
-            new playerfield()
-        ];
+        };
+        PlayerInfo.Player = [new playerfield()];
 
         await player.sendOnlinePlayers(server);
 
-        server.getPlayerManager().getConnections().forEach(async conn => {
-            if (conn.getUUID() === player.getUUID()) return;
-            await conn.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
-        });
+        server
+            .getPlayerManager()
+            .getConnections()
+            .forEach(async conn => {
+                if (conn.getUUID() === player.getUUID()) return;
+                await conn.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
+            });
         await player.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
 
-        server.getPlayerManager().getConnections().forEach(async conn => {
-            if (conn.getUUID() === player.getUUID()) return;
-            const SpawnPlayer = new SpawnPlayerPacket();
-            SpawnPlayer.EntityID = player.getID();
-            SpawnPlayer.PlayerUUID = player.getUUID();
-            SpawnPlayer.X = player.getPosition()[0];
-            SpawnPlayer.Y = player.getPosition()[1];
-            SpawnPlayer.Z = player.getPosition()[2];
-            SpawnPlayer.Yaw = player.getRotation()[0];
-            SpawnPlayer.Pitch = player.getRotation()[0];
-            await conn.sendPacket(SpawnPlayer, PlayClientbound.SpawnPlayer);
-        });
+        server
+            .getPlayerManager()
+            .getConnections()
+            .forEach(async conn => {
+                if (conn.getUUID() === player.getUUID()) return;
+                const SpawnPlayer = new SpawnPlayerPacket();
+                SpawnPlayer.EntityID = player.getID();
+                SpawnPlayer.PlayerUUID = player.getUUID();
+                SpawnPlayer.X = player.getPosition()[0];
+                SpawnPlayer.Y = player.getPosition()[1];
+                SpawnPlayer.Z = player.getPosition()[2];
+                SpawnPlayer.Yaw = player.getRotation()[0];
+                SpawnPlayer.Pitch = player.getRotation()[0];
+                await conn.sendPacket(SpawnPlayer, PlayClientbound.SpawnPlayer);
+            });
     }
 }

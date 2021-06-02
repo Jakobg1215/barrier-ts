@@ -1,6 +1,6 @@
-import Packet from "../../Packet";
-import { PlayServerbound } from "../../../types/PacketIds";
-import type Slot from "../../../../types/Slot";
+import Packet from '../../Packet';
+import { PlayServerbound } from '../../../types/PacketIds';
+import type Slot from '../../../../types/Slot';
 
 export default class ClickWindowPacket extends Packet {
     public static readonly id = PlayServerbound.ClickWindow;
@@ -8,7 +8,7 @@ export default class ClickWindowPacket extends Packet {
     public WindowID!: number;
     public Slot!: number;
     public Button!: number;
-    public ActionNumber!: number
+    public ActionNumber!: number;
     public Mode!: number;
     public Clickeditem!: Slot;
 

@@ -5,7 +5,8 @@
         "@types/node": "^15.6.0",
         "@types/uuid": "^8.3.0",
         "concurrently": "^6.1.0",
-        "nodemon": "^2.0.7"
+        "nodemon": "^2.0.7",
+        "prettier": "^2.3.0"
     },
     "files": [
         "./dist/*"
@@ -14,8 +15,9 @@
     "name": "barrierts",
     "private": true,
     "scripts": {
-        "dev": "concurrently -k \"tsc -w\" \"nodemon ./dist/server.js\"",
         "build": "tsc",
+        "dev": "concurrently -k \"tsc -w\" \"nodemon ./dist/server.js\"",
+        "prettier": "prettier ./src --config ./.prettierrc --write",
         "start": "node ./dist/server.js --unhandled-rejections=strict"
     },
     "version": "1.0.0",

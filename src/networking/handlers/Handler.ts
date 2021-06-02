@@ -1,6 +1,6 @@
-import type PlayerConnection from "../players/PlayerConnection";
-import type Packet from "../packets/Packet";
-import type Server from "../../server";
+import type PlayerConnection from '../players/PlayerConnection';
+import type Packet from '../packets/Packet';
+import type Server from '../../server';
 
 export default interface Handler<packet extends Packet> {
     id: number;

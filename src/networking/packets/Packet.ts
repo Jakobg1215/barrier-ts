@@ -1,5 +1,5 @@
-import type Chat from "../../types/Chat";
-import Slot from "../../types/Slot";
+import type Chat from '../../types/Chat';
+import Slot from '../../types/Slot';
 
 export default class Packet {
     public static readonly id: number;
@@ -37,7 +37,7 @@ export default class Packet {
         return this.bytes.readDoubleBE(this.addOffset(8));
     }
     public readString() {
-        return this.bytes.slice(this.offset + 1, this.addOffset(this.readVarInt(), true)).toString("utf-8");
+        return this.bytes.slice(this.offset + 1, this.addOffset(this.readVarInt(), true)).toString('utf-8');
     }
     public readIdentifier() {
         return this.readString();
@@ -48,11 +48,11 @@ export default class Packet {
         let read;
         do {
             read = this.readUnsignedByte();
-            let value = (read & 0b01111111);
-            result |= (value << (7 * numRead));
+            let value = read & 0b01111111;
+            result |= value << (7 * numRead);
             numRead++;
             if (numRead > 5) {
-                throw new Error("VarInt is too big");
+                throw new Error('VarInt is too big');
             }
         } while ((read & 0b10000000) != 0);
         return result;
@@ -64,12 +64,12 @@ export default class Packet {
         let read;
         do {
             read = this.readUnsignedByte();
-            let value = (read & 0b01111111);
-            result |= (value << (7 * numRead));
+            let value = read & 0b01111111;
+            result |= value << (7 * numRead);
 
             numRead++;
             if (numRead > 10) {
-                throw new Error("VarLong is too big");
+                throw new Error('VarLong is too big');
             }
         } while ((read & 0b10000000) != 0);
 
@@ -79,7 +79,7 @@ export default class Packet {
         const slot = new Slot();
         slot.Present = this.readBoolean();
         if (slot.Present) {
-            slot.ItemID = this.readVarInt()
+            slot.ItemID = this.readVarInt();
             slot.ItemCount = this.readByte();
             slot.NBT = this.bytes.slice(this.offset);
         }
@@ -91,7 +91,7 @@ export default class Packet {
         return {
             x: 0,
             y: 0,
-            z: 0
+            z: 0,
         };
     }
     public readUUID() {
@@ -154,18 +154,18 @@ export default class Packet {
         this.bytes = Buffer.concat([this.bytes, buf]);
     }
     public writeString(value: string) {
-        this.writeVarInt(Buffer.byteLength(value, "utf-8"));
-        const buf = Buffer.alloc(Buffer.byteLength(value, "utf-8"));
-        buf.write(value, "utf-8");
+        this.writeVarInt(Buffer.byteLength(value, 'utf-8'));
+        const buf = Buffer.alloc(Buffer.byteLength(value, 'utf-8'));
+        buf.write(value, 'utf-8');
         this.bytes = Buffer.concat([this.bytes, buf]);
     }
     public writeChat(chat: Chat) {
         this.writeString(chat.toJSON());
     }
-    public writeIdentifier() { }
+    public writeIdentifier() {}
     public writeVarInt(value: number) {
         do {
-            let temp = (value & 0b01111111);
+            let temp = value & 0b01111111;
             value >>>= 7;
             if (value != 0) {
                 temp |= 0b10000000;
@@ -173,21 +173,31 @@ export default class Packet {
             this.writeUnsignedByte(temp);
         } while (value != 0);
     }
-    public writeVarLong() { }
-    public writeEntityMetadata() { }
-    public writeSlot() { }
-    public writeNBTTag() { }
-    public writePosition() { }
+    public writeVarLong() {}
+    public writeEntityMetadata() {}
+    public writeSlot() {}
+    public writeNBTTag() {}
+    public writePosition() {}
     public writeAngle(value: number) {
         this.writeUnsignedByte(value);
     }
     public writeUUID(value: string) {
-        const uuid = new Packet(Buffer.from(Buffer.from(value.split("").filter(value => value !== "-").join(""), "hex")));
+        const uuid = new Packet(
+            Buffer.from(
+                Buffer.from(
+                    value
+                        .split('')
+                        .filter(value => value !== '-')
+                        .join(''),
+                    'hex',
+                ),
+            ),
+        );
         this.writeLong(uuid.readLong());
         this.writeLong(uuid.readLong());
     }
     public writeByteArray(length: number, bytes: number[]) {
-        for (let index = 0; index < length; index++) {   
+        for (let index = 0; index < length; index++) {
             this.writeByte(bytes[index]);
         }
     }
@@ -195,8 +205,8 @@ export default class Packet {
         const pkId = new Packet();
         pkId.writeVarInt(id);
         const pkLength = new Packet();
-        pkLength.writeVarInt((pkId.bytes.byteLength + this.bytes.byteLength));
-        const pk = Buffer.concat([pkLength.bytes, pkId.bytes])
+        pkLength.writeVarInt(pkId.bytes.byteLength + this.bytes.byteLength);
+        const pk = Buffer.concat([pkLength.bytes, pkId.bytes]);
         return Buffer.concat([pk, this.bytes]);
     }
     public append(data: Buffer): void {
@@ -209,8 +219,8 @@ export default class Packet {
     public getOffset() {
         return this.offset;
     }
-    public decrypt() { }
-    public encrypt() { }
+    public decrypt() {}
+    public encrypt() {}
     public addOffset(offset: number, retval: boolean = false) {
         if (retval) return (this.offset += offset);
         return (this.offset += offset) - offset;

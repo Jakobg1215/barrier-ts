@@ -1,10 +1,10 @@
-import type { Socket } from "net";
-import { ConnectionStates } from "../types/ConnectionState";
-import type Packet from "../packets/Packet";
-import type Server from "../../server";
-import PlayerInfoPacket from "../packets/Play/clientbound/PlayerInfoPacket";
-import { PlayClientbound } from "../types/PacketIds";
-import type { PlayerInfoPlayer } from "../types/PacketFieldArguments";
+import type { Socket } from 'net';
+import { ConnectionStates } from '../types/ConnectionState';
+import type Packet from '../packets/Packet';
+import type Server from '../../server';
+import PlayerInfoPacket from '../packets/Play/clientbound/PlayerInfoPacket';
+import { PlayClientbound } from '../types/PacketIds';
+import type { PlayerInfoPlayer } from '../types/PacketFieldArguments';
 
 export default class PlayerConnection {
     private connection: Socket;
@@ -46,10 +46,13 @@ export default class PlayerConnection {
             public Ping = 0;
             public HasDisplayName = true;
             public DisplayName!: string;
-        }
-        server.getPlayerManager().getConnections().forEach(async conn => {
-            PlayerInfo.Player.push(new playerfield(conn.username, conn.UUID));
-        });
+        };
+        server
+            .getPlayerManager()
+            .getConnections()
+            .forEach(async conn => {
+                PlayerInfo.Player.push(new playerfield(conn.username, conn.UUID));
+            });
         PlayerInfo.NumberOfPlayers = PlayerInfo.Player.length;
         await this.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
     }
@@ -78,7 +81,7 @@ export default class PlayerConnection {
         return this.UUID;
     }
 
-    public setPosition(position?: { X?: number, Y?: number, Z?: number }) {
+    public setPosition(position?: { X?: number; Y?: number; Z?: number }) {
         this.position[0] = position?.X ?? this.position[0];
         this.position[1] = position?.Y ?? this.position[1];
         this.position[2] = position?.Z ?? this.position[3];
@@ -88,7 +91,7 @@ export default class PlayerConnection {
         return this.position;
     }
 
-    public setRotation(rotation?: { yaw: number, pitch: number }) {
+    public setRotation(rotation?: { yaw: number; pitch: number }) {
         this.rotation[0] = rotation?.yaw ?? this.rotation[0];
         this.rotation[1] = rotation?.pitch ?? this.rotation[1];
     }
@@ -106,7 +109,7 @@ export default class PlayerConnection {
     }
 
     public setid(id: number) {
-        this.id = id
+        this.id = id;
     }
 
     public getID() {

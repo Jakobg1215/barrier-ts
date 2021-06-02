@@ -1,5 +1,5 @@
-import Packet from "../../Packet";
-import { PlayServerbound } from "../../../types/PacketIds";
+import Packet from '../../Packet';
+import { PlayServerbound } from '../../../types/PacketIds';
 
 export default class UpdateCommandBlockPacket extends Packet {
     public static readonly id = PlayServerbound.UpdateCommandBlock;

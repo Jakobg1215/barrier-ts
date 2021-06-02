@@ -1,6 +1,6 @@
-import Packet from "../packets/Packet";
-import KeepAlivePacket from "../packets/Play/clientbound/KeepAlivePacket";
-import type PlayerConnection from "./PlayerConnection";
+import Packet from '../packets/Packet';
+import KeepAlivePacket from '../packets/Play/clientbound/KeepAlivePacket';
+import type PlayerConnection from './PlayerConnection';
 
 export default class PlayerManager {
     private connections: Map<string, PlayerConnection> = new Map();
@@ -11,7 +11,7 @@ export default class PlayerManager {
                 if (player.getState() === 3) {
                     const pk = new KeepAlivePacket();
                     pk.KeepAliveID = BigInt(Math.floor(Math.random() * (10000 - -10000)) + -10000);
-                    player.sendPacket(pk, 0x1F);
+                    player.sendPacket(pk, 0x1f);
                 }
             });
         }, 1000);
