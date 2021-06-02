@@ -4,6 +4,8 @@ import net from "net";
 import NetworkRegistry from "./networking/NetworkRegistry";
 import Packet from "./networking/packets/Packet";
 import World from "./world/World";
+import PlayerInfoPacket from "./networking/packets/Play/clientbound/PlayerInfoPacket";
+import { PlayerInfoPlayer } from "./networking/types/PacketFieldArguments";
 
 export default class Server {
     private world = new World();
@@ -33,7 +35,21 @@ export default class Server {
             connection.on("data", async data => {
                 await this.incomingdata(data, player);
             });
-            connection.on("close", () => {
+            connection.on("close", async () => {
+                const player = this.playerManager.getConnections().get(connection.remoteAddress!);
+                if (player?.getState() === 3) {
+                    const PlayerInfo = new PlayerInfoPacket();
+                    PlayerInfo.Action = 4;
+                    PlayerInfo.NumberOfPlayers = 1;
+                    const uuid = player?.getUUID() ?? "";
+                    const playerfield = class Player implements PlayerInfoPlayer {
+                        public UUID = uuid;
+                    }
+                    PlayerInfo.Player = [
+                        new playerfield()
+                    ];
+                    await this.playerManager.sendPacketAll(PlayerInfo, 0x32);
+                }
                 this.playerManager.removeConnection(connection.remoteAddress!);
             });
             connection.on("error", () => { });

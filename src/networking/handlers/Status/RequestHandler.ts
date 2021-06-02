@@ -8,7 +8,7 @@ import { StatusServerbound, StatusClientbound } from "../../types/PacketIds";
 export default class RequestHandler implements Handler<RequestPacket> {
     public id = StatusServerbound.Request;
 
-    public async handle(_packet: RequestPacket, _server: Server, player: PlayerConnection) {
+    public async handle(_packet: RequestPacket, server: Server, player: PlayerConnection) {
         const pk = new ResponsePacket();
         pk.JSONResponse = JSON.stringify({
             version: {
@@ -17,7 +17,7 @@ export default class RequestHandler implements Handler<RequestPacket> {
             },
             players: {
                 max: 100,
-                online: 5
+                online: server.getPlayerManager().getConnections().size - 1
             },
             description: {
                 text: "Hello world"

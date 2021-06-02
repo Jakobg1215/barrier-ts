@@ -12,6 +12,7 @@ export default class Chat {
         if (options?.strikethrough) Object.assign(newText, { strikethrough: options.strikethrough });
         if (options?.underlined) Object.assign(newText, { underlined: options.underlined });
         Object.assign(this.json, newText);
+        return this;
     }
     public toJSON() {
         return JSON.stringify(this.json);

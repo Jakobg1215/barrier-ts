@@ -87,7 +87,7 @@ export default class Packet {
     }
     public readPosition() {
         let val = this.bytes.readBigUInt64BE(this.addOffset(8));
-        console.log(val);
+        val;
         return {
             x: 0,
             y: 0,

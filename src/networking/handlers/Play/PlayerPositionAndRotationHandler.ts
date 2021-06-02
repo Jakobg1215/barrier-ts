@@ -21,24 +21,30 @@ export default class PlayerPositionAndRotationHandler implements Handler<PlayerP
         }
         yaw = Math.round(yaw / (360 / 255));
         if (yaw < 0) yaw = 255 + yaw;
-        player.setRotation({ yaw: yaw, pitch: 0 });
+        let pitch = packet.Pitch > 0 ? packet.Pitch * 65 / 90 : 255 - Math.abs(packet.Pitch) * 65 / 90;
+        player.setRotation({ yaw: yaw, pitch: pitch });
         const pozrotpk = new Packet();
         const lokpk = new Packet();
         lokpk.writeVarInt(player.getID());
         lokpk.writeAngle(yaw);
         pozrotpk.writeVarInt(player.getID());
-        pozrotpk.writeShort((packet.X * 32 - player.getPosition()[0] * 32) * 128);
-        pozrotpk.writeShort((packet.FeetY * 32 - player.getPosition()[1] * 32) * 128);
-        pozrotpk.writeShort((packet.Z * 32 - player.getPosition()[2] * 32) * 128);
+        try {
+            pozrotpk.writeShort((packet.X * 32 - player.getPosition()[0] * 32) * 128);
+            pozrotpk.writeShort((packet.FeetY * 32 - player.getPosition()[1] * 32) * 128);
+            pozrotpk.writeShort((packet.Z * 32 - player.getPosition()[2] * 32) * 128);
+        } catch {
+            pozrotpk.writeShort(0);
+            pozrotpk.writeShort(0);
+            pozrotpk.writeShort(0);
+        }
         pozrotpk.writeAngle(yaw);
-        pozrotpk.writeAngle(0);
+        pozrotpk.writeAngle(pitch);
         pozrotpk.writeBoolean(packet.OnGround);
         server.getPlayerManager().getConnections().forEach(conn => {
             if (conn.getID() === player.getID()) return;
             conn.sendRaw(pozrotpk.buildPacket(0x28));
             conn.sendRaw(lokpk.buildPacket(0x3A));
         });
-
         player.setPosition({ X: packet.X, Y: packet.FeetY, Z: packet.Z });
     }
 }

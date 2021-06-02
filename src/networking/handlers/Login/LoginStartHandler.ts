@@ -50,8 +50,8 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         JoinGame.IsFlat = true;
         await player.sendPacket(JoinGame, PlayClientbound.JoinGame);
 
-        for (let x = -2; x < 2; x++) {
-            for (let z = -2; z < 2; z++) {
+        for (let x = -10; x < 10; x++) {
+            for (let z = -10; z < 10; z++) {
                 const chunk = fs.readFileSync(path.join(__dirname, "../../../../NBT/chunk.nbt"));
                 const pk = new Packet();
                 pk.writeInt(x);
@@ -71,8 +71,6 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         PlayerPositionAndLook.TeleportID = 0;
         await player.sendPacket(PlayerPositionAndLook, PlayClientbound.PlayerPositionAndLook);
 
-        await player.sendOnlinePlayers(server);
-
         const PlayerInfo = new PlayerInfoPacket();
         PlayerInfo.Action = 0;
         PlayerInfo.NumberOfPlayers = 1;
@@ -88,6 +86,9 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         PlayerInfo.Player = [
             new playerfield()
         ];
+
+        await player.sendOnlinePlayers(server);
+
         server.getPlayerManager().getConnections().forEach(async conn => {
             if (conn.getUUID() === player.getUUID()) return;
             await conn.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
@@ -106,6 +107,5 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
             SpawnPlayer.Pitch = player.getRotation()[0];
             await conn.sendPacket(SpawnPlayer, PlayClientbound.SpawnPlayer);
         });
-
     }
 }

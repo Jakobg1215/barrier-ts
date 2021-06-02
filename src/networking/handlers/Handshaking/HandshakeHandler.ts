@@ -20,7 +20,7 @@ export default class HandshakeHandler implements Handler<HandshakePacket> {
                 },
                 players: {
                     max: 100,
-                    online: 5
+                    online: server.getPlayerManager().getConnections().size - 1
                 },
                 description: {
                     text: "Hello world"
