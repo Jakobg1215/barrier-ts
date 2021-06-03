@@ -1,6 +1,7 @@
 import type Chat from '../../types/Chat';
 import Slot from '../../types/Slot';
-import Vector3 from '../../types/Vector3';
+import Position from '../../types/Position';
+import NBT from '../../types/NBT';
 
 export default class Packet {
     public static readonly id: number;
@@ -82,13 +83,13 @@ export default class Packet {
         if (slot.Present) {
             slot.ItemID = this.readVarInt();
             slot.ItemCount = this.readByte();
-            slot.NBT = this.bytes.slice(this.offset);
+            slot.NBT = new NBT(this.bytes.slice(this.offset)).readNBT();
         }
         return slot;
     }
     public readPosition() {
         new Packet(this.bytes.slice(this.offset, this.addOffset(8, true)));
-        return new Vector3();
+        return new Position();
     }
     public readUUID() {
         return `${Number(this.readLong()).toString()}${Number(this.readLong()).toString()}`;
@@ -175,7 +176,7 @@ export default class Packet {
     public writeEntityMetadata() {}
     public writeSlot() {}
     public writeNBTTag() {}
-    public writePosition(value: Vector3) {
+    public writePosition(value: Position) {
         value;
     }
     public writeAngle(value: number) {

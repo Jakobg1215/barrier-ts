@@ -13,9 +13,9 @@ export default class PlayerPositionHandler implements Handler<PlayerPositionPack
         const pozpk = new Packet();
         pozpk.writeVarInt(player.getID());
         try {
-            pozpk.writeShort((packet.X * 32 - player.getPosition()[0] * 32) * 128);
-            pozpk.writeShort((packet.FeetY * 32 - player.getPosition()[1] * 32) * 128);
-            pozpk.writeShort((packet.Z * 32 - player.getPosition()[2] * 32) * 128);
+            pozpk.writeShort((packet.X * 32 - player.getPosition().getX() * 32) * 128);
+            pozpk.writeShort((packet.FeetY * 32 - player.getPosition().getY() * 32) * 128);
+            pozpk.writeShort((packet.Z * 32 - player.getPosition().getZ() * 32) * 128);
         } catch {
             pozpk.writeShort(0);
             pozpk.writeShort(0);

@@ -19,6 +19,5 @@ export default class ClickWindowPacket extends Packet {
         this.ActionNumber = this.readShort();
         this.Mode = this.readVarInt();
         this.Clickeditem = this.readSlot();
-        this.Clickeditem.NBT?.readNBT();
     }
 }

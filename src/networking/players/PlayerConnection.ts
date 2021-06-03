@@ -5,14 +5,16 @@ import type Server from '../../server';
 import PlayerInfoPacket from '../packets/Play/clientbound/PlayerInfoPacket';
 import { PlayClientbound } from '../types/PacketIds';
 import type { PlayerInfoPlayer } from '../types/PacketFieldArguments';
+import Position from '../../types/Position';
+import Rotation from '../../types/Rotation';
 
 export default class PlayerConnection {
     private connection: Socket;
     private connectionState = ConnectionStates.Handshaking;
     private username!: string;
     private UUID!: string;
-    private position = [0, 4, 0];
-    private rotation = [0, 0];
+    private position = new Position(0, 4, 0);
+    private rotation = new Rotation(0, 0);
     private onGround = true;
     private id!: number;
 
@@ -82,9 +84,9 @@ export default class PlayerConnection {
     }
 
     public setPosition(position?: { X?: number; Y?: number; Z?: number }) {
-        this.position[0] = position?.X ?? this.position[0];
-        this.position[1] = position?.Y ?? this.position[1];
-        this.position[2] = position?.Z ?? this.position[3];
+        this.position.setX(position?.X ?? this.position.getX());
+        this.position.setY(position?.Y ?? this.position.getY());
+        this.position.setZ(position?.Z ?? this.position.getZ());
     }
 
     public getPosition() {
@@ -92,8 +94,8 @@ export default class PlayerConnection {
     }
 
     public setRotation(rotation?: { yaw: number; pitch: number }) {
-        this.rotation[0] = rotation?.yaw ?? this.rotation[0];
-        this.rotation[1] = rotation?.pitch ?? this.rotation[1];
+        this.rotation.setYaw(rotation?.yaw ?? this.rotation.getYaw());
+        this.rotation.setPitch(rotation?.pitch ?? this.rotation.getPitch());
     }
 
     public getRotation() {

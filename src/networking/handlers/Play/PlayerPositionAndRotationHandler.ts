@@ -29,9 +29,9 @@ export default class PlayerPositionAndRotationHandler implements Handler<PlayerP
         lokpk.writeAngle(yaw);
         pozrotpk.writeVarInt(player.getID());
         try {
-            pozrotpk.writeShort((packet.X * 32 - player.getPosition()[0] * 32) * 128);
-            pozrotpk.writeShort((packet.FeetY * 32 - player.getPosition()[1] * 32) * 128);
-            pozrotpk.writeShort((packet.Z * 32 - player.getPosition()[2] * 32) * 128);
+            pozrotpk.writeShort((packet.X * 32 - player.getPosition().getX() * 32) * 128);
+            pozrotpk.writeShort((packet.FeetY * 32 - player.getPosition().getY() * 32) * 128);
+            pozrotpk.writeShort((packet.Z * 32 - player.getPosition().getZ() * 32) * 128);
         } catch {
             pozrotpk.writeShort(0);
             pozrotpk.writeShort(0);

@@ -1,11 +1,11 @@
 import Packet from '../../Packet';
 import { PlayServerbound } from '../../../types/PacketIds';
-import type Vector3 from '../../../../types/Vector3';
+import type Position from '../../../../types/Position';
 
 export default class UpdateSignPacket extends Packet {
     public static readonly id = PlayServerbound.UpdateSign;
 
-    public Location!: Vector3;
+    public Location!: Position;
     public Line1!: string;
     public Line2!: string;
     public Line3!: string;

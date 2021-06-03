@@ -17,7 +17,7 @@ export default class NBT {
         while (true) {
             switch (this.readByte()) {
                 case 0:
-                    return;
+                    return this;
                 case 1:
                     this.roots.set(this.readRootName(), this.readByte());
                     break;

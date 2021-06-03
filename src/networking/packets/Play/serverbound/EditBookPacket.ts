@@ -13,6 +13,5 @@ export default class EditBookPacket extends Packet {
         this.Newbook = this.readSlot();
         this.Issigning = this.readBoolean();
         this.Hand = this.readVarInt();
-        this.Newbook.NBT?.readNBT();
     }
 }

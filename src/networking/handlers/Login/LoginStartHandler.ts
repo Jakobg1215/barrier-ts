@@ -36,7 +36,7 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         JoinGame.WorldCount = 3;
         JoinGame.WorldNames = ['minecraft:overworld', 'minecraft:the_nether', 'minecraft:the_end'];
         JoinGame.DimensionCodec = fs.readFileSync(path.join(__dirname, '../../../../NBT/Dimension Codec.nbt'));
-        JoinGame.WorldName = 'minecraft:the_end';
+        JoinGame.WorldName = 'minecraft:overworld';
         JoinGame.Hashedseed = 0n;
         JoinGame.MaxPlayers = 100;
         JoinGame.ViewDistance = 10;
@@ -100,11 +100,11 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
                 const SpawnPlayer = new SpawnPlayerPacket();
                 SpawnPlayer.EntityID = player.getID();
                 SpawnPlayer.PlayerUUID = player.getUUID();
-                SpawnPlayer.X = player.getPosition()[0];
-                SpawnPlayer.Y = player.getPosition()[1];
-                SpawnPlayer.Z = player.getPosition()[2];
-                SpawnPlayer.Yaw = player.getRotation()[0];
-                SpawnPlayer.Pitch = player.getRotation()[0];
+                SpawnPlayer.X = player.getPosition().getX();
+                SpawnPlayer.Y = player.getPosition().getY();
+                SpawnPlayer.Z = player.getPosition().getZ();
+                SpawnPlayer.Yaw = player.getRotation().getYaw();
+                SpawnPlayer.Pitch = player.getRotation().getPitch();
                 await conn.sendPacket(SpawnPlayer, PlayClientbound.SpawnPlayer);
             });
     }

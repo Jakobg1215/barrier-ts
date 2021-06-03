@@ -1,11 +1,11 @@
 import Packet from '../../Packet';
 import { PlayServerbound } from '../../../types/PacketIds';
-import type Vector3 from '../../../../types/Vector3';
+import type Position from '../../../../types/Position';
 
 export default class UpdateJigsawBlockPacket extends Packet {
     public static readonly id = PlayServerbound.UpdateJigsawBlock;
 
-    public Location!: Vector3;
+    public Location!: Position;
     public Name!: string;
     public Target!: string;
     public Pool!: string;
