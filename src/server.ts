@@ -77,7 +77,11 @@ export default class Server {
             );
         }
         const pk = new packet(incomePacket.getBytes().slice(incomePacket.getOffset()));
-        pk.decrypt();
+        try {
+            pk.decrypt();
+        } catch (error) {
+            console.log(`Packet 0x${packetId.toString(16)} failed with the error ${error}`);
+        }
         await hander.handle(pk, this, player);
     }
 }

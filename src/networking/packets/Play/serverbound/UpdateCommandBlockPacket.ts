@@ -1,10 +1,11 @@
 import Packet from '../../Packet';
 import { PlayServerbound } from '../../../types/PacketIds';
+import type Vector3 from '../../../../types/Vector3';
 
 export default class UpdateCommandBlockPacket extends Packet {
     public static readonly id = PlayServerbound.UpdateCommandBlock;
 
-    public Location!: object;
+    public Location!: Vector3;
     public Command!: string;
     public Mode!: number;
     public Flags!: number;

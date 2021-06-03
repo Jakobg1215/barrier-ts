@@ -1,5 +1,6 @@
 import type Chat from '../../types/Chat';
 import Slot from '../../types/Slot';
+import Vector3 from '../../types/Vector3';
 
 export default class Packet {
     public static readonly id: number;
@@ -86,13 +87,8 @@ export default class Packet {
         return slot;
     }
     public readPosition() {
-        let val = this.bytes.readBigUInt64BE(this.addOffset(8));
-        val;
-        return {
-            x: 0,
-            y: 0,
-            z: 0,
-        };
+        new Packet(this.bytes.slice(this.offset, this.addOffset(8, true)));
+        return new Vector3();
     }
     public readUUID() {
         return `${Number(this.readLong()).toString()}${Number(this.readLong()).toString()}`;
@@ -162,7 +158,9 @@ export default class Packet {
     public writeChat(chat: Chat) {
         this.writeString(chat.toJSON());
     }
-    public writeIdentifier() {}
+    public writeIdentifier(value: string) {
+        this.writeString(value);
+    }
     public writeVarInt(value: number) {
         do {
             let temp = value & 0b01111111;
@@ -177,7 +175,9 @@ export default class Packet {
     public writeEntityMetadata() {}
     public writeSlot() {}
     public writeNBTTag() {}
-    public writePosition() {}
+    public writePosition(value: Vector3) {
+        value;
+    }
     public writeAngle(value: number) {
         this.writeUnsignedByte(value);
     }

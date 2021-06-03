@@ -15,3 +15,9 @@ interface PlayerInfoPlayerProperty {
     IsSigned: boolean;
     Signature?: string;
 }
+
+export interface StatisticsStatistic {
+    CategoryID: number;
+    StatisticID: number;
+    Value: number;
+}

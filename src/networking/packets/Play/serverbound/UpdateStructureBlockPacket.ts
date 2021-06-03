@@ -1,10 +1,11 @@
 import Packet from '../../Packet';
 import { PlayServerbound } from '../../../types/PacketIds';
+import type Vector3 from '../../../../types/Vector3';
 
 export default class UpdateStructureBlockPacket extends Packet {
     public static readonly id = PlayServerbound.UpdateStructureBlock;
 
-    public Location!: object;
+    public Location!: Vector3;
     public Action!: number;
     public Mode!: number;
     public Name!: string;
