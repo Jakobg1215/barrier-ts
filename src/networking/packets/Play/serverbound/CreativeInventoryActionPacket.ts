@@ -11,5 +11,6 @@ export default class CreativeInventoryActionPacket extends Packet {
     public decrypt() {
         this.Slot = this.readShort();
         this.ClickedItem = this.readSlot();
+        this.ClickedItem.NBT?.readNBT();
     }
 }
