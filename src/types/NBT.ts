@@ -16,35 +16,37 @@ export default class NBT {
     public readNBT() {
         while (true) {
             switch (this.readByte()) {
-                case 0:
+                case tagType.end:
                     return this;
-                case 1:
+                case tagType.byte:
                     this.roots.set(this.readRootName(), this.readByte());
                     break;
-                case 2:
+                case tagType.short:
                     this.roots.set(this.readRootName(), this.readShort());
                     break;
-                case 3:
+                case tagType.int:
                     this.roots.set(this.readRootName(), this.readInt());
                     break;
-                case 4:
+                case tagType.long:
                     this.roots.set(this.readRootName(), this.readLong());
                     break;
-                case 5:
+                case tagType.float:
                     this.roots.set(this.readRootName(), this.data.readFloatBE(this.addOffset(4)));
                     break;
-                case 6:
+                case tagType.double:
                     this.roots.set(this.readRootName(), this.data.readDoubleBE(this.addOffset(8)));
                     break;
-                case 7:
+                case tagType.bytearray: {
                     const bytesName = this.readRootName();
                     const bytes: number[] = [];
-                    for (let index = 0; index < this.readInt(); index++) {
+                    const length = this.readInt();
+                    for (let index = 0; index < length; index++) {
                         bytes.push(this.readByte());
                     }
                     this.roots.set(bytesName, bytes);
                     break;
-                case 8:
+                }
+                case tagType.string:
                     this.roots.set(
                         this.readRootName(),
                         this.data
@@ -52,31 +54,35 @@ export default class NBT {
                             .toString(),
                     );
                     break;
-                case 9:
+                case tagType.list:
                     this.roots.set(this.readRootName(), this.readList());
                     break;
-                case 10:
+                case tagType.compound:
                     const compound = new NBT(this.data.slice(this.offset - 1));
                     compound.readNBT();
                     this.addOffset(compound.offset - 1, true);
                     this.roots.set(compound.name, compound);
                     break;
-                case 11:
+                case tagType.intarray: {
                     const intsName = this.readRootName();
                     const ints: number[] = [];
-                    for (let index = 0; index < this.readInt(); index++) {
+                    const legnth = this.readInt();
+                    for (let index = 0; index < legnth; index++) {
                         ints.push(this.readInt());
                     }
                     this.roots.set(intsName, ints);
                     break;
-                case 12:
+                }
+                case tagType.longarray: {
                     const longsName = this.readRootName();
                     const longs: bigint[] = [];
-                    for (let index = 0; index < this.readInt(); index++) {
+                    const legnth = this.readInt();
+                    for (let index = 0; index < legnth; index++) {
                         longs.push(this.readLong());
                     }
                     this.roots.set(longsName, longs);
                     break;
+                }
             }
         }
     }
@@ -86,46 +92,48 @@ export default class NBT {
         const type = this.readByte();
         const length = this.readInt();
         switch (type) {
-            case 1:
+            case tagType.byte:
                 for (let index = 0; index < length; index++) {
                     entries.push(this.readByte());
                 }
                 return entries;
-            case 2:
+            case tagType.short:
                 for (let index = 0; index < length; index++) {
                     entries.push(this.readShort());
                 }
                 return entries;
-            case 3:
+            case tagType.int:
                 for (let index = 0; index < length; index++) {
                     entries.push(this.readInt);
                 }
                 return entries;
-            case 4:
+            case tagType.long:
                 for (let index = 0; index < length; index++) {
                     entries.push(this.readLong());
                 }
                 return entries;
-            case 5:
+            case tagType.float:
                 for (let index = 0; index < length; index++) {
                     entries.push(this.roots.set(this.readRootName(), this.data.readFloatBE(this.addOffset(4))));
                 }
                 return entries;
-            case 6:
+            case tagType.double:
                 for (let index = 0; index < length; index++) {
                     entries.push(this.roots.set(this.readRootName(), this.data.readDoubleBE(this.addOffset(8))));
                 }
                 return entries;
-            case 7:
+            case tagType.bytearray: {
                 for (let index = 0; index < length; index++) {
                     const bytes: number[] = [];
-                    for (let index = 0; index < this.readInt(); index++) {
+                    const length = this.readInt();
+                    for (let index = 0; index < length; index++) {
                         bytes.push(this.readByte());
                     }
                     entries.push(bytes);
                 }
                 return entries;
-            case 8:
+            }
+            case tagType.string:
                 for (let index = 0; index < length; index++) {
                     entries.push(
                         this.data
@@ -134,12 +142,12 @@ export default class NBT {
                     );
                 }
                 return entries;
-            case 9:
+            case tagType.list:
                 for (let index = 0; index < length; index++) {
                     entries.push(this.readList());
                 }
                 return entries;
-            case 10:
+            case tagType.compound:
                 for (let index = 0; index < length; index++) {
                     const compound = new NBT(this.data.slice(this.offset), true);
                     compound.readNBT();
@@ -147,24 +155,28 @@ export default class NBT {
                     entries.push(compound);
                 }
                 return entries;
-            case 11:
+            case tagType.intarray: {
                 for (let index = 0; index < length; index++) {
                     const ints: number[] = [];
-                    for (let index = 0; index < this.readInt(); index++) {
+                    const length = this.readInt();
+                    for (let index = 0; index < length; index++) {
                         ints.push(this.readInt());
                     }
                     entries.push(ints);
                 }
                 return entries;
-            case 12:
+            }
+            case tagType.longarray: {
                 for (let index = 0; index < length; index++) {
                     const longs: bigint[] = [];
-                    for (let index = 0; index < this.readInt(); index++) {
+                    const length = this.readInt();
+                    for (let index = 0; index < length; index++) {
                         longs.push(this.readLong());
                     }
                     entries.push(longs);
                 }
                 return entries;
+            }
             default:
                 return entries;
         }
@@ -194,4 +206,20 @@ export default class NBT {
         if (retval) return (this.offset += offset);
         return (this.offset += offset) - offset;
     }
+}
+
+enum tagType {
+    end,
+    byte,
+    short,
+    int,
+    long,
+    float,
+    double,
+    bytearray,
+    string,
+    list,
+    compound,
+    intarray,
+    longarray,
 }

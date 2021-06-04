@@ -87,6 +87,7 @@ export default class Packet {
         }
         return slot;
     }
+    // TODO: Make this read the postion
     public readPosition() {
         new Packet(this.bytes.slice(this.offset, this.addOffset(8, true)));
         return new Position();
