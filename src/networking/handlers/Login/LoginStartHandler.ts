@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 import PlayerInfoPacket from '../../packets/Play/clientbound/PlayerInfoPacket';
 import { PlayerInfoPlayer } from '../../types/PacketFieldArguments';
 import SpawnPlayerPacket from '../../packets/Play/clientbound/SpawnPlayerPacket';
+import EntityTeleportPacket from '../../packets/Play/clientbound/EntityTeleport';
 
 export default class LoginStartHandler implements Handler<LoginStartPacket> {
     public id = LoginServerbound.LoginStart;
@@ -81,8 +82,6 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         };
         PlayerInfo.Player = [new playerfield()];
 
-        await player.sendOnlinePlayers(server);
-
         server
             .getPlayerManager()
             .getConnections()
@@ -90,7 +89,8 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
                 if (conn.getUUID() === player.getUUID()) return;
                 await conn.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
             });
-        await player.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
+
+        await player.sendOnlinePlayers(server);
 
         server
             .getPlayerManager()
@@ -106,6 +106,15 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
                 SpawnPlayer.Yaw = player.getRotation().getYaw();
                 SpawnPlayer.Pitch = player.getRotation().getPitch();
                 await conn.sendPacket(SpawnPlayer, PlayClientbound.SpawnPlayer);
+                const tppacket = new EntityTeleportPacket();
+                tppacket.EntityID = player.getID();
+                tppacket.X = player.getPosition().getX();
+                tppacket.Y = player.getPosition().getY();
+                tppacket.Z = player.getPosition().getZ();
+                tppacket.Yaw = player.getRotation().getYaw();
+                tppacket.Pitch = player.getRotation().getPitch();
+                tppacket.OnGround = player.getOnGround();
+                await conn.sendPacket(tppacket, PlayClientbound.EntityTeleport);
             });
     }
 }

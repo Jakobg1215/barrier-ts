@@ -6,6 +6,7 @@ import Packet from './networking/packets/Packet';
 import World from './world/World';
 import PlayerInfoPacket from './networking/packets/Play/clientbound/PlayerInfoPacket';
 import { PlayerInfoPlayer } from './networking/types/PacketFieldArguments';
+import DestroyEntitiesPacket from './networking/packets/Play/clientbound/DestroyEntitesPacket';
 
 export default class Server {
     private world = new World();
@@ -40,6 +41,10 @@ export default class Server {
                 connection.on('close', async () => {
                     const player = this.playerManager.getConnections().get(connection.remoteAddress!);
                     if (player?.getState() === 3) {
+                        const DestroyEntity = new DestroyEntitiesPacket();
+                        DestroyEntity.Count = 1;
+                        DestroyEntity.EntityIDs = [player.getID()];
+                        //await this.getPlayerManager().sendPacketAll(DestroyEntity, 0x36);
                         const PlayerInfo = new PlayerInfoPacket();
                         PlayerInfo.Action = 4;
                         PlayerInfo.NumberOfPlayers = 1;
@@ -48,7 +53,7 @@ export default class Server {
                             public UUID = uuid;
                         };
                         PlayerInfo.Player = [new playerfield()];
-                        await this.playerManager.sendPacketAll(PlayerInfo, 0x32);
+                        //await this.playerManager.sendPacketAll(PlayerInfo, 0x32);
                     }
                     this.playerManager.removeConnection(connection.remoteAddress!);
                 });

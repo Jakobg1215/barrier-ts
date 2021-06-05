@@ -15,9 +15,10 @@ export default class PlayerInfoPacket extends Packet {
         for (let playerindex = 0; playerindex < this.NumberOfPlayers; playerindex++) {
             this.writeUUID(this.Player[playerindex].UUID);
             switch (this.Action) {
-                case 0:
+                case Action.addplayer: {
                     this.writeString(this.Player[playerindex].Name ?? 'UknownPlayer');
                     this.writeVarInt(this.Player[playerindex].NumberOfProperties ?? 0);
+                    /*
                     for (
                         let propertyindex = 0;
                         propertyindex < (this.Player[playerindex].NumberOfProperties ?? 0);
@@ -29,7 +30,7 @@ export default class PlayerInfoPacket extends Packet {
                         if (this.Player[playerindex].Property![propertyindex].IsSigned) {
                             this.writeString(this.Player[playerindex].Property![propertyindex].Signature!);
                         }
-                    }
+                    }*/
                     this.writeVarInt(this.Player[playerindex].Gamemode ?? 1);
                     this.writeVarInt(this.Player[playerindex].Ping ?? 1000);
                     this.writeBoolean(this.Player[playerindex].HasDisplayName ?? false);
@@ -37,21 +38,30 @@ export default class PlayerInfoPacket extends Packet {
                         this.writeString(this.Player[playerindex].DisplayName!);
                     }
                     break;
-                case 1:
+                }
+                case Action.updategamemode:
                     this.writeVarInt(this.Player[playerindex].Gamemode ?? 1);
                     break;
-                case 2:
+                case Action.updatelatency:
                     this.writeVarInt(this.Player[playerindex].Ping ?? 1000);
                     break;
-                case 3:
+                case Action.updatedisplayname:
                     this.writeBoolean(this.Player[playerindex].HasDisplayName ?? false);
                     if (this.Player[playerindex].HasDisplayName) {
                         this.writeString(this.Player[playerindex].DisplayName!);
                     }
                     break;
-                case 4:
+                case Action.removeplayer:
                     break;
             }
         }
     }
+}
+
+enum Action {
+    addplayer,
+    updategamemode,
+    updatelatency,
+    updatedisplayname,
+    removeplayer,
 }

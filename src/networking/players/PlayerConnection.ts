@@ -1,12 +1,14 @@
 import type { Socket } from 'net';
 import { ConnectionStates } from '../types/ConnectionState';
-import type Packet from '../packets/Packet';
+import Packet from '../packets/Packet';
 import type Server from '../../server';
 import PlayerInfoPacket from '../packets/Play/clientbound/PlayerInfoPacket';
 import { PlayClientbound } from '../types/PacketIds';
 import type { PlayerInfoPlayer } from '../types/PacketFieldArguments';
 import Position from '../../types/Position';
 import Rotation from '../../types/Rotation';
+import SpawnPlayerPacket from '../packets/Play/clientbound/SpawnPlayerPacket';
+import EntityTeleportPacket from '../packets/Play/clientbound/EntityTeleport';
 
 export default class PlayerConnection {
     private connection: Socket;
@@ -57,6 +59,46 @@ export default class PlayerConnection {
             });
         PlayerInfo.NumberOfPlayers = PlayerInfo.Player.length;
         await this.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
+
+        server
+            .getPlayerManager()
+            .getConnections()
+            .forEach(async conn => {
+                if (conn.UUID === this.UUID) return;
+                let yaw = Math.round(conn.rotation.getYaw());
+                while (yaw > 360 || yaw < -360) {
+                    if (yaw > 360) {
+                        yaw -= 360;
+                    }
+                    if (yaw < -360) {
+                        yaw += 360;
+                    }
+                }
+                yaw = Math.round(yaw / (360 / 255));
+                if (yaw < 0) yaw = 255 + yaw;
+                let pitch =
+                    conn.rotation.getPitch() > 0
+                        ? (conn.rotation.getPitch() * 65) / 90
+                        : 255 - (Math.abs(conn.rotation.getPitch()) * 65) / 90;
+                const SpawnPlayer = new SpawnPlayerPacket();
+                SpawnPlayer.EntityID = conn.id;
+                SpawnPlayer.PlayerUUID = conn.UUID;
+                SpawnPlayer.X = conn.position.getX();
+                SpawnPlayer.Y = conn.position.getY();
+                SpawnPlayer.Z = conn.position.getZ();
+                SpawnPlayer.Yaw = yaw;
+                SpawnPlayer.Pitch = pitch;
+                await this.sendPacket(SpawnPlayer, PlayClientbound.SpawnPlayer);
+                const tppacket = new EntityTeleportPacket();
+                tppacket.EntityID = conn.id;
+                tppacket.X = conn.position.getX();
+                tppacket.Y = conn.position.getY();
+                tppacket.Z = conn.position.getZ();
+                tppacket.Yaw = yaw;
+                tppacket.Pitch = pitch;
+                tppacket.OnGround = conn.onGround;
+                await this.sendPacket(tppacket, PlayClientbound.EntityTeleport);
+            });
     }
 
     public setState(state: ConnectionStates) {
