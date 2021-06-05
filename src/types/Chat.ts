@@ -14,6 +14,21 @@ export default class Chat {
         Object.assign(this.json, newText);
         return this;
     }
+    public translate(translation: string, text?: string[], options?: textOptions) {
+        const newText = {};
+        Object.assign(newText, { translate: translation });
+        if (text) Object.assign(newText, { with: text });
+        if (options?.bold) Object.assign(newText, { bold: options.bold });
+        if (options?.color) Object.assign(newText, { color: options.color });
+        if (options?.font) Object.assign(newText, { font: options.font });
+        if (options?.insertion) Object.assign(newText, { insertion: options.insertion });
+        if (options?.italic) Object.assign(newText, { italic: options.italic });
+        if (options?.obfuscated) Object.assign(newText, { obfuscated: options.obfuscated });
+        if (options?.strikethrough) Object.assign(newText, { strikethrough: options.strikethrough });
+        if (options?.underlined) Object.assign(newText, { underlined: options.underlined });
+        Object.assign(this.json, newText);
+        return this;
+    }
     public toJSON() {
         return JSON.stringify(this.json);
     }
