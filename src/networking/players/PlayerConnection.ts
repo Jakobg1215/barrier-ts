@@ -1,14 +1,14 @@
 import type { Socket } from 'net';
-import { ConnectionStates } from '../types/ConnectionState';
-import Packet from '../packets/Packet';
+
 import type Server from '../../server';
-import PlayerInfoPacket from '../packets/Play/clientbound/PlayerInfoPacket';
-import { PlayClientbound } from '../types/PacketIds';
-import type { PlayerInfoPlayer } from '../types/PacketFieldArguments';
 import Position from '../../types/Position';
 import Rotation from '../../types/Rotation';
+import Packet from '../packets/Packet';
+import PlayerInfoPacket from '../packets/Play/clientbound/PlayerInfoPacket';
 import SpawnPlayerPacket from '../packets/Play/clientbound/SpawnPlayerPacket';
-import EntityTeleportPacket from '../packets/Play/clientbound/EntityTeleport';
+import { ConnectionStates } from '../types/ConnectionState';
+import type { PlayerInfoPlayer } from '../types/PacketFieldArguments';
+import { PlayClientbound } from '../types/PacketIds';
 
 export default class PlayerConnection {
     private connection: Socket;
@@ -89,15 +89,6 @@ export default class PlayerConnection {
                 SpawnPlayer.Yaw = yaw;
                 SpawnPlayer.Pitch = pitch;
                 await this.sendPacket(SpawnPlayer, PlayClientbound.SpawnPlayer);
-                const tppacket = new EntityTeleportPacket();
-                tppacket.EntityID = conn.id;
-                tppacket.X = conn.position.getX();
-                tppacket.Y = conn.position.getY();
-                tppacket.Z = conn.position.getZ();
-                tppacket.Yaw = yaw;
-                tppacket.Pitch = pitch;
-                tppacket.OnGround = conn.onGround;
-                await this.sendPacket(tppacket, PlayClientbound.EntityTeleport);
             });
     }
 

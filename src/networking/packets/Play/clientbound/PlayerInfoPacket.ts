@@ -1,6 +1,6 @@
-import Packet from '../../Packet';
-import { PlayClientbound } from '../../../types/PacketIds';
 import { PlayerInfoPlayer } from '../../../types/PacketFieldArguments';
+import { PlayClientbound } from '../../../types/PacketIds';
+import Packet from '../../Packet';
 
 export default class PlayerInfoPacket extends Packet {
     public static readonly id = PlayClientbound.PlayerInfo;

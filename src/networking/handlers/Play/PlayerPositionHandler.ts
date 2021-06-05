@@ -1,34 +1,28 @@
-import type PlayerConnection from '../../players/PlayerConnection';
-import type Handler from '../Handler';
-import PlayerPositionPacket from '../../packets/Play/serverbound/PlayerPositionPacket';
-import { PlayServerbound } from '../../types/PacketIds';
 import type Server from '../../../server';
-import Packet from '../../packets/Packet';
+import EntityPositionPacket from '../../packets/Play/clientbound/EntityPositionPacket';
+import PlayerPositionPacket from '../../packets/Play/serverbound/PlayerPositionPacket';
+import type PlayerConnection from '../../players/PlayerConnection';
+import { PlayClientbound, PlayServerbound } from '../../types/PacketIds';
+import type Handler from '../Handler';
 
 export default class PlayerPositionHandler implements Handler<PlayerPositionPacket> {
     public id = PlayServerbound.PlayerPosition;
 
-    public handle(packet: PlayerPositionPacket, server: Server, player: PlayerConnection) {
+    public async handle(packet: PlayerPositionPacket, server: Server, player: PlayerConnection) {
         player.setOnGround(packet.OnGround);
-        const pozpk = new Packet();
-        pozpk.writeVarInt(player.getID());
+        const EntityPosition = new EntityPositionPacket();
+        EntityPosition.EntityID = player.getID();
         try {
-            pozpk.writeShort((packet.X * 32 - player.getPosition().getX() * 32) * 128);
-            pozpk.writeShort((packet.FeetY * 32 - player.getPosition().getY() * 32) * 128);
-            pozpk.writeShort((packet.Z * 32 - player.getPosition().getZ() * 32) * 128);
+            EntityPosition.DeltaX = (packet.X * 32 - player.getPosition().getX() * 32) * 128;
+            EntityPosition.DeltaY = (packet.FeetY * 32 - player.getPosition().getY() * 32) * 128;
+            EntityPosition.DeltaZ = (packet.Z * 32 - player.getPosition().getZ() * 32) * 128;
         } catch {
-            pozpk.writeShort(0);
-            pozpk.writeShort(0);
-            pozpk.writeShort(0);
+            EntityPosition.DeltaX = 0;
+            EntityPosition.DeltaY = 0;
+            EntityPosition.DeltaZ = 0;
         }
-        pozpk.writeBoolean(packet.OnGround);
-        server
-            .getPlayerManager()
-            .getConnections()
-            .forEach(conn => {
-                if (conn.getID() === player.getID()) return;
-                conn.sendRaw(pozpk.buildPacket(0x27));
-            });
+        EntityPosition.OnGround = packet.OnGround;
+        await server.getPlayerManager().sendPacketAll(EntityPosition, PlayClientbound.EntityPosition, [player.getID()]);
         player.setPosition({ X: packet.X, Y: packet.FeetY, Z: packet.Z });
     }
 }

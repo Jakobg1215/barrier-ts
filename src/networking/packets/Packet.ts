@@ -1,7 +1,7 @@
 import type Chat from '../../types/Chat';
-import Slot from '../../types/Slot';
-import Position from '../../types/Position';
 import NBT from '../../types/NBT';
+import Position from '../../types/Position';
+import Slot from '../../types/Slot';
 
 export default class Packet {
     public static readonly id: number;

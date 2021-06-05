@@ -1,5 +1,5 @@
-import Packet from '../../Packet';
 import { PlayServerbound } from '../../../types/PacketIds';
+import Packet from '../../Packet';
 
 export default class QueryEntityNBTPacket extends Packet {
     public static readonly id = PlayServerbound.QueryEntityNBT;

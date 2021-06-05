@@ -1,12 +1,13 @@
-import PlayerConnection from './networking/players/PlayerConnection';
-import PlayerManager from './networking/players/PlayerManager';
 import net from 'net';
+
 import NetworkRegistry from './networking/NetworkRegistry';
 import Packet from './networking/packets/Packet';
-import World from './world/World';
-import PlayerInfoPacket from './networking/packets/Play/clientbound/PlayerInfoPacket';
-import { PlayerInfoPlayer } from './networking/types/PacketFieldArguments';
 import DestroyEntitiesPacket from './networking/packets/Play/clientbound/DestroyEntitesPacket';
+import PlayerInfoPacket from './networking/packets/Play/clientbound/PlayerInfoPacket';
+import PlayerConnection from './networking/players/PlayerConnection';
+import PlayerManager from './networking/players/PlayerManager';
+import { PlayerInfoPlayer } from './networking/types/PacketFieldArguments';
+import World from './world/World';
 
 export default class Server {
     private world = new World();

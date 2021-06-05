@@ -1,6 +1,6 @@
-import Packet from '../../Packet';
-import { PlayServerbound } from '../../../types/PacketIds';
 import type Position from '../../../../types/Position';
+import { PlayServerbound } from '../../../types/PacketIds';
+import Packet from '../../Packet';
 
 export default class UpdateStructureBlockPacket extends Packet {
     public static readonly id = PlayServerbound.UpdateStructureBlock;

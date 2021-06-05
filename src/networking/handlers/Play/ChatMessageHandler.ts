@@ -1,10 +1,10 @@
-import type ChatMessagePacketS from '../../packets/Play/serverbound/ChatMessagePacket';
-import ChatMessagePacketC from '../../packets/Play/clientbound/ChatMessagePacket';
-import type PlayerConnection from '../../players/PlayerConnection';
-import type Handler from '../Handler';
-import { PlayServerbound, PlayClientbound } from '../../types/PacketIds';
 import type Server from '../../../server';
 import Chat from '../../../types/Chat';
+import ChatMessagePacketC from '../../packets/Play/clientbound/ChatMessagePacket';
+import type ChatMessagePacketS from '../../packets/Play/serverbound/ChatMessagePacket';
+import type PlayerConnection from '../../players/PlayerConnection';
+import { PlayClientbound, PlayServerbound } from '../../types/PacketIds';
+import type Handler from '../Handler';
 
 export default class ChatMessageHandler implements Handler<ChatMessagePacketS> {
     public id = PlayServerbound.ChatMessage;

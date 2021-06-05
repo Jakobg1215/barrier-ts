@@ -1,6 +1,6 @@
-import Packet from '../../Packet';
-import { PlayClientbound } from '../../../types/PacketIds';
 import type Position from '../../../../types/Position';
+import { PlayClientbound } from '../../../types/PacketIds';
+import Packet from '../../Packet';
 
 export default class BlockBreakAnimationPacket extends Packet {
     public static readonly id = PlayClientbound.BlockBreakAnimation;

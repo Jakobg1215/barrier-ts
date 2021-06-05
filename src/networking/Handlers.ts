@@ -1,13 +1,13 @@
-import ChatMessageHandler from './handlers/Play/ChatMessageHandler';
 import type Handler from './handlers/Handler';
 import HandshakeHandler from './handlers/Handshaking/HandshakeHandler';
-import KeepAliveHandler from './handlers/Play/KeepAliveHandler';
 import LoginStartHandler from './handlers/Login/LoginStartHandler';
-import PingHandler from './handlers/Status/PingHandler';
+import ChatMessageHandler from './handlers/Play/ChatMessageHandler';
+import KeepAliveHandler from './handlers/Play/KeepAliveHandler';
 import PlayerBlockPlacementHandler from './handlers/Play/PlayerBlockPlacementHandler';
 import PlayerPositionAndRotationHandler from './handlers/Play/PlayerPositionAndRotationHandler';
 import PlayerPositionHandler from './handlers/Play/PlayerPositionHandler';
 import PlayerRotationHandler from './handlers/Play/PlayerRotationHandler';
+import PingHandler from './handlers/Status/PingHandler';
 import RequestHandler from './handlers/Status/RequestHandler';
 
 const HandshakeHandlers: Handler<any>[] = [];

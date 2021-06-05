@@ -1,5 +1,5 @@
-import Packet from '../../Packet';
 import { PlayClientbound } from '../../../types/PacketIds';
+import Packet from '../../Packet';
 
 export default class SpawnLivingEntityPacket extends Packet {
     public static readonly id = PlayClientbound.SpawnLivingEntity;

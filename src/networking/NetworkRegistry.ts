@@ -1,8 +1,8 @@
-import { ConnectionStates } from './types/ConnectionState';
-import type Handler from './handlers/Handler';
 import * as Handlers from './Handlers';
-import type Packet from './packets/Packet';
+import type Handler from './handlers/Handler';
 import * as Packets from './Packets';
+import type Packet from './packets/Packet';
+import { ConnectionStates } from './types/ConnectionState';
 
 export default class NetworkRegistry {
     private HandshakingPackets: Map<number, typeof Packet> = new Map();

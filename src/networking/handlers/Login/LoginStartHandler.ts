@@ -1,20 +1,21 @@
+import fs from 'fs';
+import path from 'path';
+
+import { v4 as uuidv4 } from 'uuid';
+
+import type Server from '../../../server';
+import LoginSuccessPacket from '../../packets/Login/Clientbound/LoginSuccessPacket';
+import type LoginStartPacket from '../../packets/Login/Serverbound/LoginStartPacket';
+import Packet from '../../packets/Packet';
+import JoinGamePacket from '../../packets/Play/clientbound/JoinGamePacket';
+import PlayerInfoPacket from '../../packets/Play/clientbound/PlayerInfoPacket';
+import PlayerPositionAndLookPacket from '../../packets/Play/clientbound/PlayerPositionAndLookPacket';
+import SpawnPlayerPacket from '../../packets/Play/clientbound/SpawnPlayerPacket';
 import type PlayerConnection from '../../players/PlayerConnection';
 import { ConnectionStates } from '../../types/ConnectionState';
-import fs from 'fs';
-import type Handler from '../Handler';
-import JoinGamePacket from '../../packets/Play/clientbound/JoinGamePacket';
-import { LoginServerbound, LoginClientbound, PlayClientbound } from '../../types/PacketIds';
-import type LoginStartPacket from '../../packets/Login/Serverbound/LoginStartPacket';
-import LoginSuccessPacket from '../../packets/Login/Clientbound/LoginSuccessPacket';
-import Packet from '../../packets/Packet';
-import path from 'path';
-import PlayerPositionAndLookPacket from '../../packets/Play/clientbound/PlayerPositionAndLookPacket';
-import type Server from '../../../server';
-import { v4 as uuidv4 } from 'uuid';
-import PlayerInfoPacket from '../../packets/Play/clientbound/PlayerInfoPacket';
 import { PlayerInfoPlayer } from '../../types/PacketFieldArguments';
-import SpawnPlayerPacket from '../../packets/Play/clientbound/SpawnPlayerPacket';
-import EntityTeleportPacket from '../../packets/Play/clientbound/EntityTeleport';
+import { LoginClientbound, LoginServerbound, PlayClientbound } from '../../types/PacketIds';
+import type Handler from '../Handler';
 
 export default class LoginStartHandler implements Handler<LoginStartPacket> {
     public id = LoginServerbound.LoginStart;
@@ -82,39 +83,19 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         };
         PlayerInfo.Player = [new playerfield()];
 
-        server
-            .getPlayerManager()
-            .getConnections()
-            .forEach(async conn => {
-                if (conn.getUUID() === player.getUUID()) return;
-                await conn.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
-            });
+        await server.getPlayerManager().sendPacketAll(PlayerInfo, PlayClientbound.PlayerInfo, [player.getID()]);
 
         await player.sendOnlinePlayers(server);
 
-        server
-            .getPlayerManager()
-            .getConnections()
-            .forEach(async conn => {
-                if (conn.getUUID() === player.getUUID()) return;
-                const SpawnPlayer = new SpawnPlayerPacket();
-                SpawnPlayer.EntityID = player.getID();
-                SpawnPlayer.PlayerUUID = player.getUUID();
-                SpawnPlayer.X = player.getPosition().getX();
-                SpawnPlayer.Y = player.getPosition().getY();
-                SpawnPlayer.Z = player.getPosition().getZ();
-                SpawnPlayer.Yaw = player.getRotation().getYaw();
-                SpawnPlayer.Pitch = player.getRotation().getPitch();
-                await conn.sendPacket(SpawnPlayer, PlayClientbound.SpawnPlayer);
-                const tppacket = new EntityTeleportPacket();
-                tppacket.EntityID = player.getID();
-                tppacket.X = player.getPosition().getX();
-                tppacket.Y = player.getPosition().getY();
-                tppacket.Z = player.getPosition().getZ();
-                tppacket.Yaw = player.getRotation().getYaw();
-                tppacket.Pitch = player.getRotation().getPitch();
-                tppacket.OnGround = player.getOnGround();
-                await conn.sendPacket(tppacket, PlayClientbound.EntityTeleport);
-            });
+        const SpawnPlayer = new SpawnPlayerPacket();
+        SpawnPlayer.EntityID = player.getID();
+        SpawnPlayer.PlayerUUID = player.getUUID();
+        SpawnPlayer.X = player.getPosition().getX();
+        SpawnPlayer.Y = player.getPosition().getY();
+        SpawnPlayer.Z = player.getPosition().getZ();
+        SpawnPlayer.Yaw = player.getRotation().getYaw();
+        SpawnPlayer.Pitch = player.getRotation().getPitch();
+
+        await server.getPlayerManager().sendPacketAll(SpawnPlayer, PlayClientbound.SpawnPlayer, [player.getID()]);
     }
 }

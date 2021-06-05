@@ -1,6 +1,6 @@
-import Packet from '../../Packet';
-import { PlayServerbound } from '../../../types/PacketIds';
 import type Slot from '../../../../types/Slot';
+import { PlayServerbound } from '../../../types/PacketIds';
+import Packet from '../../Packet';
 
 export default class EditBookPacket extends Packet {
     public static readonly id = PlayServerbound.EditBook;

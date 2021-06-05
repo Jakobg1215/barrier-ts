@@ -1,9 +1,9 @@
-import type PlayerConnection from '../../players/PlayerConnection';
-import type Handler from '../Handler';
-import type RequestPacket from '../../packets/Status/Serverbound/RequestPacket';
-import ResponsePacket from '../../packets/Status/Clientbound/ResponsePacket';
 import type Server from '../../../server';
-import { StatusServerbound, StatusClientbound } from '../../types/PacketIds';
+import ResponsePacket from '../../packets/Status/Clientbound/ResponsePacket';
+import type RequestPacket from '../../packets/Status/Serverbound/RequestPacket';
+import type PlayerConnection from '../../players/PlayerConnection';
+import { StatusClientbound, StatusServerbound } from '../../types/PacketIds';
+import type Handler from '../Handler';
 
 export default class RequestHandler implements Handler<RequestPacket> {
     public id = StatusServerbound.Request;

@@ -29,7 +29,11 @@ export default class PlayerManager {
         return this.connections;
     }
 
-    public async sendPacketAll(packet: Packet, id: number) {
-        this.connections.forEach(async player => await player.sendPacket(packet, id));
+    public async sendPacketAll(packet: Packet, id: number, exclude?: number[]) {
+        this.connections.forEach(async player => {
+            if (!exclude?.includes(player.getID())) {
+                await player.sendPacket(packet, id);
+            }
+        });
     }
 }
