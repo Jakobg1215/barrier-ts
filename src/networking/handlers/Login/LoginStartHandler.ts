@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 import type Server from '../../../server';
 import LoginSuccessPacket from '../../packets/Login/Clientbound/LoginSuccessPacket';
 import type LoginStartPacket from '../../packets/Login/Serverbound/LoginStartPacket';
-import Packet from '../../packets/Packet';
 import JoinGamePacket from '../../packets/Play/clientbound/JoinGamePacket';
 import PlayerInfoPacket from '../../packets/Play/clientbound/PlayerInfoPacket';
 import PlayerPositionAndLookPacket from '../../packets/Play/clientbound/PlayerPositionAndLookPacket';
@@ -48,16 +47,7 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         JoinGame.IsFlat = true;
         await player.sendPacket(JoinGame, PlayClientbound.JoinGame);
 
-        for (let x = -10; x < 10; x++) {
-            for (let z = -10; z < 10; z++) {
-                const chunk = fs.readFileSync(path.join(__dirname, '../../../../NBT/chunk.nbt'));
-                const pk = new Packet();
-                pk.writeInt(x);
-                pk.writeInt(z);
-                pk.append(chunk.slice(11));
-                player.sendRaw(pk.buildPacket(PlayClientbound.ChunkData));
-            }
-        }
+        await player.sendChunks();
 
         const PlayerPositionAndLook = new PlayerPositionAndLookPacket();
         PlayerPositionAndLook.X = 0;

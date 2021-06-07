@@ -1,4 +1,6 @@
+import fs from 'fs';
 import type { Socket } from 'net';
+import path from 'path';
 
 import type Server from '../../server';
 import Position from '../../types/Position';
@@ -29,67 +31,84 @@ export default class PlayerConnection {
         this.connection.write(packet.buildPacket(id));
     }
 
-    public sendRaw(data: Buffer) {
+    public async sendRaw(data: Buffer) {
         this.connection.write(data);
     }
 
     public async sendOnlinePlayers(server: Server) {
-        const PlayerInfo = new PlayerInfoPacket();
-        PlayerInfo.Action = 0;
-        PlayerInfo.Player = [];
-        const playerfield = class Player implements PlayerInfoPlayer {
-            public constructor(name: string, uuid: string) {
-                this.Name = name;
-                this.UUID = uuid;
-                this.DisplayName = JSON.stringify({ text: this.Name });
-            }
-            public Name!: string;
-            public UUID!: string;
-            public NumberOfProperties = 0;
-            public Gamemode = 1;
-            public Ping = 0;
-            public HasDisplayName = true;
-            public DisplayName!: string;
-        };
-        server
-            .getPlayerManager()
-            .getConnections()
-            .forEach(async conn => {
-                PlayerInfo.Player.push(new playerfield(conn.username, conn.UUID));
-            });
-        PlayerInfo.NumberOfPlayers = PlayerInfo.Player.length;
-        await this.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
-
-        server
-            .getPlayerManager()
-            .getConnections()
-            .forEach(async conn => {
-                if (conn.UUID === this.UUID) return;
-                let yaw = Math.round(conn.rotation.getYaw());
-                while (yaw > 360 || yaw < -360) {
-                    if (yaw > 360) {
-                        yaw -= 360;
-                    }
-                    if (yaw < -360) {
-                        yaw += 360;
-                    }
+        return Promise.resolve().then(async _v => {
+            const PlayerInfo = new PlayerInfoPacket();
+            PlayerInfo.Action = 0;
+            PlayerInfo.Player = [];
+            const playerfield = class Player implements PlayerInfoPlayer {
+                public constructor(name: string, uuid: string) {
+                    this.Name = name;
+                    this.UUID = uuid;
+                    this.DisplayName = JSON.stringify({ text: this.Name });
                 }
-                yaw = Math.round(yaw / (360 / 255));
-                if (yaw < 0) yaw = 255 + yaw;
-                let pitch =
-                    conn.rotation.getPitch() > 0
-                        ? (conn.rotation.getPitch() * 65) / 90
-                        : 255 - (Math.abs(conn.rotation.getPitch()) * 65) / 90;
-                const SpawnPlayer = new SpawnPlayerPacket();
-                SpawnPlayer.EntityID = conn.id;
-                SpawnPlayer.PlayerUUID = conn.UUID;
-                SpawnPlayer.X = conn.position.getX();
-                SpawnPlayer.Y = conn.position.getY();
-                SpawnPlayer.Z = conn.position.getZ();
-                SpawnPlayer.Yaw = yaw;
-                SpawnPlayer.Pitch = pitch;
-                await this.sendPacket(SpawnPlayer, PlayClientbound.SpawnPlayer);
-            });
+                public Name!: string;
+                public UUID!: string;
+                public NumberOfProperties = 0;
+                public Gamemode = 1;
+                public Ping = 0;
+                public HasDisplayName = true;
+                public DisplayName!: string;
+            };
+            server
+                .getPlayerManager()
+                .getConnections()
+                .forEach(async conn => {
+                    PlayerInfo.Player.push(new playerfield(conn.username, conn.UUID));
+                });
+            PlayerInfo.NumberOfPlayers = PlayerInfo.Player.length;
+            await this.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
+
+            server
+                .getPlayerManager()
+                .getConnections()
+                .forEach(async conn => {
+                    if (conn.UUID === this.UUID) return;
+                    let yaw = Math.round(conn.rotation.getYaw());
+                    while (yaw > 360 || yaw < -360) {
+                        if (yaw > 360) {
+                            yaw -= 360;
+                        }
+                        if (yaw < -360) {
+                            yaw += 360;
+                        }
+                    }
+                    yaw = Math.round(yaw / (360 / 255));
+                    if (yaw < 0) yaw = 255 + yaw;
+                    let pitch =
+                        conn.rotation.getPitch() > 0
+                            ? (conn.rotation.getPitch() * 65) / 90
+                            : 255 - (Math.abs(conn.rotation.getPitch()) * 65) / 90;
+                    const SpawnPlayer = new SpawnPlayerPacket();
+                    SpawnPlayer.EntityID = conn.id;
+                    SpawnPlayer.PlayerUUID = conn.UUID;
+                    SpawnPlayer.X = conn.position.getX();
+                    SpawnPlayer.Y = conn.position.getY();
+                    SpawnPlayer.Z = conn.position.getZ();
+                    SpawnPlayer.Yaw = yaw;
+                    SpawnPlayer.Pitch = pitch;
+                    await this.sendPacket(SpawnPlayer, PlayClientbound.SpawnPlayer);
+                });
+        });
+    }
+
+    public async sendChunks() {
+        return Promise.resolve().then(async _v => {
+            for (let x = -8; x < 8; x++) {
+                for (let z = -8; z < 8; z++) {
+                    const chunk = fs.readFileSync(path.join(__dirname, '../../../NBT/chunk.nbt'));
+                    const pk = new Packet();
+                    pk.writeInt(x);
+                    pk.writeInt(z);
+                    pk.append(chunk.slice(11));
+                    await this.sendRaw(pk.buildPacket(PlayClientbound.ChunkData));
+                }
+            }
+        });
     }
 
     public setState(state: ConnectionStates) {
