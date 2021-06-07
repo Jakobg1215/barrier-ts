@@ -23,7 +23,7 @@ export default class HandshakeHandler implements Handler<HandshakePacket> {
                     online: server.getPlayerManager().getConnections().size - 1,
                 },
                 description: {
-                    text: 'Hello world',
+                    text: 'Ha Ha Arrow Go BRRRRRRRRRRRR',
                 },
             });
             await player.sendPacket(pk, StatusClientbound.Response);

@@ -20,7 +20,7 @@ export default class RequestHandler implements Handler<RequestPacket> {
                 online: server.getPlayerManager().getConnections().size - 1,
             },
             description: {
-                text: 'Hello world',
+                text: 'Ha Ha Arrow Go BRRRRRRRRRRRR',
             },
         });
         await player.sendPacket(pk, StatusClientbound.Response);

@@ -5,7 +5,7 @@ import Slot from '../../types/Slot';
 
 export default class Packet {
     public static readonly id: number;
-    private bytes;
+    private bytes: Buffer;
     private offset = 0;
     public constructor(data = Buffer.alloc(0)) {
         this.bytes = data;
@@ -89,7 +89,7 @@ export default class Packet {
     }
     // TODO: Make this read the postion
     public readPosition() {
-        new Packet(this.bytes.slice(this.offset, this.addOffset(8, true)));
+        /*const poz =*/ this.bytes.slice(this.offset, this.addOffset(8, true));
         return new Position();
     }
     public readUUID() {

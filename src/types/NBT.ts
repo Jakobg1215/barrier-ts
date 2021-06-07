@@ -1,11 +1,11 @@
 export default class NBT {
-    public readonly name;
+    public readonly name: string;
     public readonly roots: Map<string, any> = new Map();
     private data: Buffer;
     private offset = 0;
     public constructor(data: Buffer = Buffer.alloc(0), list: boolean = false) {
         this.data = data;
-        if (!list) {
+        if (!(list || data.readInt8() === 0)) {
             this.readByte();
             this.name = this.readRootName();
         } else {

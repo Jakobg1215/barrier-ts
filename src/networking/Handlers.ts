@@ -2,8 +2,11 @@ import type Handler from './handlers/Handler';
 import HandshakeHandler from './handlers/Handshaking/HandshakeHandler';
 import LoginStartHandler from './handlers/Login/LoginStartHandler';
 import ChatMessageHandler from './handlers/Play/ChatMessageHandler';
+import CreativeInventoryActionHandler from './handlers/Play/CreativeInventoryActionHandler';
 import KeepAliveHandler from './handlers/Play/KeepAliveHandler';
+import PlayerAbilitiesHandler from './handlers/Play/PlayerAbilitiesHandler';
 import PlayerBlockPlacementHandler from './handlers/Play/PlayerBlockPlacementHandler';
+import PlayerMovementHandler from './handlers/Play/PlayerMovementHandler';
 import PlayerPositionAndRotationHandler from './handlers/Play/PlayerPositionAndRotationHandler';
 import PlayerPositionHandler from './handlers/Play/PlayerPositionHandler';
 import PlayerRotationHandler from './handlers/Play/PlayerRotationHandler';
@@ -27,8 +30,11 @@ LoginHandlers.push(new LoginStartHandler());
 
 // Play Handlers
 PlayHandlers.push(new ChatMessageHandler());
+PlayHandlers.push(new CreativeInventoryActionHandler());
 PlayHandlers.push(new KeepAliveHandler());
+PlayHandlers.push(new PlayerAbilitiesHandler());
 PlayHandlers.push(new PlayerBlockPlacementHandler());
+PlayHandlers.push(new PlayerMovementHandler());
 PlayHandlers.push(new PlayerPositionAndRotationHandler());
 PlayHandlers.push(new PlayerPositionHandler());
 PlayHandlers.push(new PlayerRotationHandler());

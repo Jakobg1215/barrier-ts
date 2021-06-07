@@ -98,9 +98,9 @@ export default class PlayerConnection {
 
     public async sendChunks() {
         return Promise.resolve().then(async _v => {
+            const chunk = fs.readFileSync(path.join(__dirname, '../../../NBT/chunk.nbt'));
             for (let x = -8; x < 8; x++) {
                 for (let z = -8; z < 8; z++) {
-                    const chunk = fs.readFileSync(path.join(__dirname, '../../../NBT/chunk.nbt'));
                     const pk = new Packet();
                     pk.writeInt(x);
                     pk.writeInt(z);

@@ -7,6 +7,7 @@ import PlayerInfoPacket from './networking/packets/Play/clientbound/PlayerInfoPa
 import PlayerConnection from './networking/players/PlayerConnection';
 import PlayerManager from './networking/players/PlayerManager';
 import { PlayerInfoPlayer } from './networking/types/PacketFieldArguments';
+import { PlayClientbound } from './networking/types/PacketIds';
 import World from './world/World';
 
 export default class Server {
@@ -41,11 +42,7 @@ export default class Server {
                 });
                 connection.on('close', async () => {
                     const player = this.playerManager.getConnections().get(connection.remoteAddress!);
-                    if (player?.getState() === 3) {
-                        const DestroyEntity = new DestroyEntitiesPacket();
-                        DestroyEntity.Count = 1;
-                        DestroyEntity.EntityIDs = [player.getID()];
-                        //await this.getPlayerManager().sendPacketAll(DestroyEntity, 0x36);
+                    if (player?.getState() === 4) {
                         const PlayerInfo = new PlayerInfoPacket();
                         PlayerInfo.Action = 4;
                         PlayerInfo.NumberOfPlayers = 1;
@@ -54,7 +51,11 @@ export default class Server {
                             public UUID = uuid;
                         };
                         PlayerInfo.Player = [new playerfield()];
-                        //await this.playerManager.sendPacketAll(PlayerInfo, 0x32);
+                        await this.playerManager.sendPacketAll(PlayerInfo, PlayClientbound.PlayerInfo);
+                        const DestroyEntity = new DestroyEntitiesPacket();
+                        DestroyEntity.Count = 1;
+                        DestroyEntity.EntityIDs = [player.getID()];
+                        await this.getPlayerManager().sendPacketAll(DestroyEntity, PlayClientbound.DestroyEntities);
                     }
                     this.playerManager.removeConnection(connection.remoteAddress!);
                 });
