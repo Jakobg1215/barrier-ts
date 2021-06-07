@@ -10,6 +10,7 @@ import JoinGamePacket from '../../packets/Play/clientbound/JoinGamePacket';
 import PlayerInfoPacket from '../../packets/Play/clientbound/PlayerInfoPacket';
 import PlayerPositionAndLookPacket from '../../packets/Play/clientbound/PlayerPositionAndLookPacket';
 import SpawnPlayerPacket from '../../packets/Play/clientbound/SpawnPlayerPacket';
+import TimeUpdatePacket from '../../packets/Play/clientbound/TimeUpdatePacket';
 import type PlayerConnection from '../../players/PlayerConnection';
 import { ConnectionStates } from '../../types/ConnectionState';
 import { PlayerInfoPlayer } from '../../types/PacketFieldArguments';
@@ -48,6 +49,11 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         await player.sendPacket(JoinGame, PlayClientbound.JoinGame);
 
         await player.sendChunks();
+
+        const timeupdate = new TimeUpdatePacket();
+        timeupdate.WorldAge = BigInt(server.getWorld().getworldage());
+        timeupdate.Timeofday = BigInt(server.getWorld().gettime());
+        await player.sendPacket(timeupdate, PlayClientbound.TimeUpdate);
 
         const PlayerPositionAndLook = new PlayerPositionAndLookPacket();
         PlayerPositionAndLook.X = 0;

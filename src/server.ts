@@ -11,24 +11,23 @@ import { PlayClientbound } from './networking/types/PacketIds';
 import World from './world/World';
 
 export default class Server {
-    private world = new World();
+    private world = new World(this);
     private server = new net.Server().close();
     private networkRegistry = new NetworkRegistry();
     private playerManager = new PlayerManager();
 
-    public getNetworkRegistry() {
-        return this.networkRegistry;
+    public constructor() {
+        this.listen();
+        setInterval(() => {
+            this.tick();
+        }, 50);
     }
 
-    public getPlayerManager() {
-        return this.playerManager;
+    private tick() {
+        this.world.tick();
     }
 
-    public getWorld() {
-        return this.world;
-    }
-
-    public async listen(port = 25565) {
+    private async listen(port = 25565) {
         await this.networkRegistry.registerNetwork();
         this.server
             .listen(port, () => {
@@ -91,9 +90,18 @@ export default class Server {
         }
         await hander.handle(pk, this, player);
     }
+
+    public getNetworkRegistry() {
+        return this.networkRegistry;
+    }
+
+    public getPlayerManager() {
+        return this.playerManager;
+    }
+
+    public getWorld() {
+        return this.world;
+    }
 }
 
-const server = new Server();
-(async () => {
-    await server.listen();
-})();
+new Server();
