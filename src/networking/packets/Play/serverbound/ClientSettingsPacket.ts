@@ -10,6 +10,15 @@ export default class ClientSettingsPacket extends Packet {
     public ChatColors!: boolean;
     public DisplayedSkinParts!: number;
     public MainHand!: number;
+    public Disabletextfiltering!: boolean;
 
-    public decrypt() {}
+    public decrypt() {
+        this.Locale = this.readString();
+        this.ViewDistance = this.readByte();
+        this.ChatMode = this.readVarInt();
+        this.ChatColors = this.readBoolean();
+        this.DisplayedSkinParts = this.readUnsignedByte();
+        this.MainHand = this.readVarInt();
+        this.Disabletextfiltering = this.readBoolean();
+    }
 }

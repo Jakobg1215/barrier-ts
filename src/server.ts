@@ -2,7 +2,7 @@ import net from 'net';
 
 import NetworkRegistry from './networking/NetworkRegistry';
 import Packet from './networking/packets/Packet';
-import DestroyEntitiesPacket from './networking/packets/Play/clientbound/DestroyEntitesPacket';
+import DestroyEntityPacket from './networking/packets/Play/clientbound/DestroyEntitesPacket';
 import PlayerInfoPacket from './networking/packets/Play/clientbound/PlayerInfoPacket';
 import PlayerConnection from './networking/players/PlayerConnection';
 import PlayerManager from './networking/players/PlayerManager';
@@ -51,10 +51,9 @@ export default class Server {
                         };
                         PlayerInfo.Player = [new playerfield()];
                         await this.playerManager.sendPacketAll(PlayerInfo, PlayClientbound.PlayerInfo);
-                        const DestroyEntity = new DestroyEntitiesPacket();
-                        DestroyEntity.Count = 1;
-                        DestroyEntity.EntityIDs = [player.getID()];
-                        await this.getPlayerManager().sendPacketAll(DestroyEntity, PlayClientbound.DestroyEntities);
+                        const DestroyEntity = new DestroyEntityPacket();
+                        DestroyEntity.EntityID = player.getID();
+                        await this.getPlayerManager().sendPacketAll(DestroyEntity, PlayClientbound.DestroyEntity);
                     }
                     this.playerManager.removeConnection(connection.remoteAddress!);
                 });

@@ -41,7 +41,7 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         JoinGame.WorldName = 'minecraft:overworld';
         JoinGame.Hashedseed = 0n;
         JoinGame.MaxPlayers = 100;
-        JoinGame.ViewDistance = 10;
+        JoinGame.ViewDistance = 8;
         JoinGame.ReducedDebugInfo = false;
         JoinGame.Enablerespawnscreen = true;
         JoinGame.IsDebug = false;
@@ -53,7 +53,7 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         const timeupdate = new TimeUpdatePacket();
         timeupdate.WorldAge = BigInt(server.getWorld().getworldage());
         timeupdate.Timeofday = BigInt(server.getWorld().gettime());
-        await player.sendPacket(timeupdate, PlayClientbound.TimeUpdate);
+        await player.sendPacket(timeupdate, PlayClientbound.TimeUpdate + 1);
 
         const PlayerPositionAndLook = new PlayerPositionAndLookPacket();
         PlayerPositionAndLook.X = 0;
@@ -63,7 +63,8 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         PlayerPositionAndLook.Pitch = 0;
         PlayerPositionAndLook.Flags = 0;
         PlayerPositionAndLook.TeleportID = 0;
-        await player.sendPacket(PlayerPositionAndLook, PlayClientbound.PlayerPositionAndLook);
+        PlayerPositionAndLook.DismountVehicle = false;
+        await player.sendPacket(PlayerPositionAndLook, PlayClientbound.PlayerPositionAndLook + 1);
 
         const PlayerInfo = new PlayerInfoPacket();
         PlayerInfo.Action = 0;

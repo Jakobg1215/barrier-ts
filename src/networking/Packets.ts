@@ -50,7 +50,6 @@ import UpdateSignPacket from './packets/Play/serverbound/UpdateSignPacket';
 import UpdateStructureBlockPacket from './packets/Play/serverbound/UpdateStructureBlockPacket';
 import UseItemPacket from './packets/Play/serverbound/UseItemPacket';
 import VehicleMovePacket from './packets/Play/serverbound/VehicleMovePacket';
-import WindowConfirmationPacket from './packets/Play/serverbound/WindowConfirmationPacket';
 import PingPacket from './packets/Status/Serverbound/PingPacket';
 import RequestPacket from './packets/Status/Serverbound/RequestPacket';
 
@@ -119,6 +118,5 @@ PlayPackets.push(UpdateSignPacket);
 PlayPackets.push(UpdateStructureBlockPacket);
 PlayPackets.push(UseItemPacket);
 PlayPackets.push(VehicleMovePacket);
-PlayPackets.push(WindowConfirmationPacket);
 
 export { HandshakingPackets, StatusPackets, LoginPackets, PlayPackets };

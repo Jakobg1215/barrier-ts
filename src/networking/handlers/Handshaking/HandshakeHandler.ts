@@ -16,7 +16,7 @@ export default class HandshakeHandler implements Handler<HandshakePacket> {
             pk.JSONResponse = JSON.stringify({
                 version: {
                     name: '1.16.5',
-                    protocol: 754,
+                    protocol: 755,
                 },
                 players: {
                     max: 100,

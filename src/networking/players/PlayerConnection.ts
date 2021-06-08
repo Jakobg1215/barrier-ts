@@ -61,7 +61,7 @@ export default class PlayerConnection {
                     PlayerInfo.Player.push(new playerfield(conn.username, conn.UUID));
                 });
             PlayerInfo.NumberOfPlayers = PlayerInfo.Player.length;
-            await this.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
+            await this.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo + 1);
 
             server
                 .getPlayerManager()
@@ -104,7 +104,7 @@ export default class PlayerConnection {
                     const pk = new Packet();
                     pk.writeInt(x);
                     pk.writeInt(z);
-                    pk.append(chunk.slice(11));
+                    pk.append(chunk);
                     await this.sendRaw(pk.buildPacket(PlayClientbound.ChunkData));
                 }
             }

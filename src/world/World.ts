@@ -29,7 +29,7 @@ export default class World {
             const timeupdate = new TimeUpdatePacket();
             timeupdate.WorldAge = BigInt(this.worldage);
             timeupdate.Timeofday = BigInt(this.time);
-            await this.server.getPlayerManager().sendPacketAll(timeupdate, PlayClientbound.TimeUpdate);
+            await this.server.getPlayerManager().sendPacketAll(timeupdate, PlayClientbound.TimeUpdate + 1);
         }
     }
 

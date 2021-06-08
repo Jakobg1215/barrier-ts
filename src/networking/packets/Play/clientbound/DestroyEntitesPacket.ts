@@ -1,16 +1,12 @@
 import { PlayClientbound } from '../../../types/PacketIds';
 import Packet from '../../Packet';
 
-export default class DestroyEntitiesPacket extends Packet {
-    public static readonly id = PlayClientbound.DestroyEntities;
+export default class DestroyEntityPacket extends Packet {
+    public static readonly id = PlayClientbound.DestroyEntity;
 
-    public Count!: number;
-    public EntityIDs!: number[];
+    public EntityID!: number;
 
     public encrypt() {
-        this.writeVarInt(this.Count);
-        for (let index = 0; index < this.EntityIDs.length; index++) {
-            this.writeVarInt(this.EntityIDs[index]);
-        }
+        this.writeVarInt(this.EntityID);
     }
 }

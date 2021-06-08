@@ -176,10 +176,8 @@ export default class Packet {
     public writeVarLong() {}
     public writeEntityMetadata() {}
     public writeSlot() {}
-    public writeNBTTag() {}
-    public writePosition(value: Position) {
-        value;
-    }
+    public writeNBTTag(_NBT: NBT) {}
+    public writePosition(_value: Position) {}
     public writeAngle(value: number) {
         this.writeUnsignedByte(value);
     }

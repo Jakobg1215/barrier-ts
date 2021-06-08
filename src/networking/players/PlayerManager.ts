@@ -1,5 +1,6 @@
 import Packet from '../packets/Packet';
 import KeepAlivePacket from '../packets/Play/clientbound/KeepAlivePacket';
+import { PlayClientbound } from '../types/PacketIds';
 import type PlayerConnection from './PlayerConnection';
 
 export default class PlayerManager {
@@ -11,7 +12,7 @@ export default class PlayerManager {
                 if (player.getState() === 3) {
                     const pk = new KeepAlivePacket();
                     pk.KeepAliveID = BigInt(Math.floor(Math.random() * (10000 - -10000)) + -10000);
-                    player.sendPacket(pk, 0x1f);
+                    player.sendPacket(pk, PlayClientbound.KeepAlive);
                 }
             });
         }, 1000);

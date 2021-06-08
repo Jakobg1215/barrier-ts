@@ -11,6 +11,7 @@ export default class PlayerPositionAndLookPacket extends Packet {
     public Pitch!: number;
     public Flags!: number;
     public TeleportID!: number;
+    public DismountVehicle!: boolean;
 
     public encrypt() {
         this.writeDouble(this.X);
@@ -20,5 +21,6 @@ export default class PlayerPositionAndLookPacket extends Packet {
         this.writeFloat(this.Pitch);
         this.writeByte(this.Flags);
         this.writeVarInt(this.TeleportID);
+        this.writeBoolean(this.DismountVehicle);
     }
 }

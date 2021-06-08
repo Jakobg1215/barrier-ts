@@ -13,7 +13,7 @@ export default class RequestHandler implements Handler<RequestPacket> {
         pk.JSONResponse = JSON.stringify({
             version: {
                 name: '1.16.5',
-                protocol: 754,
+                protocol: 755,
             },
             players: {
                 max: 100,
