@@ -1,10 +1,11 @@
 import type Server from '../../../server';
 import type HandshakePacket from '../../packets/Handshaking/Serverbound/HandshakePacket';
-import ResponsePacket from '../../packets/Status/Clientbound/ResponsePacket';
+import Packet from '../../packets/Packet';
 import type PlayerConnection from '../../players/PlayerConnection';
 import { ConnectionStates } from '../../types/ConnectionState';
-import { HandshakingServerbound, LoginServerbound, StatusClientbound } from '../../types/PacketIds';
+import { HandshakingServerbound, LoginServerbound } from '../../types/PacketIds';
 import type Handler from '../Handler';
+import RequestHandler from '../Status/RequestHandler';
 
 export default class HandshakeHandler implements Handler<HandshakePacket> {
     public id = HandshakingServerbound.Handshake;
@@ -12,21 +13,7 @@ export default class HandshakeHandler implements Handler<HandshakePacket> {
     public async handle(packet: HandshakePacket, server: Server, player: PlayerConnection) {
         player.setState(packet.NextState);
         if (packet.NextState === ConnectionStates.Status) {
-            const pk = new ResponsePacket();
-            pk.JSONResponse = JSON.stringify({
-                version: {
-                    name: '1.16.5',
-                    protocol: 755,
-                },
-                players: {
-                    max: 100,
-                    online: server.getPlayerManager().getConnections().size - 1,
-                },
-                description: {
-                    text: 'Ha Ha Arrow Go BRRRRRRRRRRRR',
-                },
-            });
-            await player.sendPacket(pk, StatusClientbound.Response);
+            new RequestHandler().handle(new Packet(), server, player);
         }
         if (packet.NextState === ConnectionStates.Login) {
             try {
