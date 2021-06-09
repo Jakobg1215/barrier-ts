@@ -2,7 +2,7 @@ import net from 'net';
 
 import NetworkRegistry from './networking/NetworkRegistry';
 import Packet from './networking/packets/Packet';
-import DestroyEntityPacket from './networking/packets/Play/clientbound/DestroyEntitesPacket';
+import DestroyEntityPacket from './networking/packets/Play/clientbound/DestroyEntityPacket';
 import PlayerInfoPacket from './networking/packets/Play/clientbound/PlayerInfoPacket';
 import PlayerConnection from './networking/players/PlayerConnection';
 import PlayerManager from './networking/players/PlayerManager';

@@ -27,7 +27,7 @@
     "private": true,
     "scripts": {
         "build": "tsc",
-        "dev": "concurrently -k \"tsc -w\" \"nodemon ./dist/server.js\"",
+        "dev": "concurrently -k \"tsc -w\" \"nodemon ./dist/server.js --delay 0.5\"",
         "prettier": "prettier ./src --config ./.prettierrc --write",
         "start": "node ./dist/server.js --unhandled-rejections=strict"
     },
