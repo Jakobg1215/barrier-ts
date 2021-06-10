@@ -8,6 +8,7 @@ import PlayerConnection from './networking/players/PlayerConnection';
 import PlayerManager from './networking/players/PlayerManager';
 import { PlayerInfoPlayer } from './networking/types/PacketFieldArguments';
 import { PlayClientbound } from './networking/types/PacketIds';
+import Config from './utils/Config';
 import World from './world/World';
 
 export default class Server {
@@ -15,9 +16,10 @@ export default class Server {
     private server = new net.Server().close();
     private networkRegistry = new NetworkRegistry();
     private playerManager = new PlayerManager();
+    private config = Config.getSettings();
 
     public constructor() {
-        this.listen();
+        this.listen(Number(this.config.port));
         setInterval(() => {
             this.tick();
         }, 50);
@@ -100,6 +102,10 @@ export default class Server {
 
     public getWorld() {
         return this.world;
+    }
+
+    public getConfig() {
+        return this.config;
     }
 }
 

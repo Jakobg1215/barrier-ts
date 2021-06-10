@@ -16,11 +16,11 @@ export default class RequestHandler implements Handler<RequestPacket> {
                 protocol: 755,
             },
             players: {
-                max: 100,
+                max: server.getConfig()['max-players'],
                 online: server.getPlayerManager().getConnections().size - 1,
             },
             description: {
-                text: 'Ha Ha Arrow Go BRRRRRRRRRRRR',
+                text: server.getConfig().motd,
             },
         });
         await player.sendPacket(pk, StatusClientbound.Response);
