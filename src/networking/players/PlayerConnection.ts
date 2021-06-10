@@ -13,7 +13,8 @@ import type { PlayerInfoPlayer } from '../types/PacketFieldArguments';
 import { PlayClientbound } from '../types/PacketIds';
 
 export default class PlayerConnection {
-    private connection: Socket;
+    private readonly connection: Socket;
+    private readonly ip: string | undefined;
     private connectionState = ConnectionStates.Handshaking;
     private username!: string;
     private UUID!: string;
@@ -24,6 +25,7 @@ export default class PlayerConnection {
 
     public constructor(socket: Socket) {
         this.connection = socket;
+        this.ip = this.connection.remoteAddress;
     }
 
     public async sendPacket(packet: Packet, id: number) {
@@ -168,5 +170,13 @@ export default class PlayerConnection {
 
     public getID() {
         return this.id;
+    }
+
+    public getConnection() {
+        return this.connection;
+    }
+
+    public getIP() {
+        return this.ip;
     }
 }
