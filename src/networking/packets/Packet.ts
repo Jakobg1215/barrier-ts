@@ -196,11 +196,33 @@ export default class Packet {
         this.writeLong(uuid.readLong());
         this.writeLong(uuid.readLong());
     }
-    public writeByteArray(length: number, bytes: number[]) {
-        for (let index = 0; index < length; index++) {
-            this.writeByte(bytes[index]);
-        }
+    public writeByteArray(bytes: Buffer) {
+        bytes.forEach(v => this.writeByte(v));
     }
+
+    public static fromUnsignedByte(value: number) {
+        const buf = Buffer.alloc(1);
+        buf.writeUInt8(value);
+        return buf;
+    }
+    public static fromVarInt(value: number) {
+        let buf = Buffer.alloc(0);
+        do {
+            let temp = value & 0b01111111;
+            value >>>= 7;
+            if (value != 0) {
+                temp |= 0b10000000;
+            }
+            buf = Buffer.concat([buf, this.fromUnsignedByte(temp)]);
+        } while (value != 0);
+        return buf;
+    }
+    public static fromString(value: string) {
+        const buf = Buffer.alloc(Buffer.byteLength(value, 'utf-8'));
+        buf.write(value, 'utf-8');
+        return Buffer.concat([this.fromVarInt(Buffer.byteLength(value, 'utf-8')), buf]);
+    }
+
     public buildPacket(id: number): Buffer {
         const pkId = new Packet();
         pkId.writeVarInt(id);

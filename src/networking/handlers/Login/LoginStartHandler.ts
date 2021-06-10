@@ -6,9 +6,11 @@ import { v4 as uuidv4 } from 'uuid';
 import type Server from '../../../server';
 import LoginSuccessPacket from '../../packets/Login/Clientbound/LoginSuccessPacket';
 import type LoginStartPacket from '../../packets/Login/Serverbound/LoginStartPacket';
+import Packet from '../../packets/Packet';
 import JoinGamePacket from '../../packets/Play/clientbound/JoinGamePacket';
 import PlayerInfoPacket from '../../packets/Play/clientbound/PlayerInfoPacket';
 import PlayerPositionAndLookPacket from '../../packets/Play/clientbound/PlayerPositionAndLookPacket';
+import PluginMessagePacket from '../../packets/Play/clientbound/PluginMessagePacket';
 import SpawnPlayerPacket from '../../packets/Play/clientbound/SpawnPlayerPacket';
 import TimeUpdatePacket from '../../packets/Play/clientbound/TimeUpdatePacket';
 import type PlayerConnection from '../../players/PlayerConnection';
@@ -54,6 +56,11 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         timeupdate.WorldAge = BigInt(server.getWorld().getworldage());
         timeupdate.Timeofday = BigInt(server.getWorld().gettime());
         await player.sendPacket(timeupdate, PlayClientbound.TimeUpdate + 1);
+
+        const PluginMessage = new PluginMessagePacket();
+        PluginMessage.Channel = 'minecraft:brand';
+        PluginMessage.Data = Packet.fromString(server.getConfig()['server-name']);
+        await player.sendPacket(PluginMessage, PlayClientbound.PluginMessage);
 
         const PlayerPositionAndLook = new PlayerPositionAndLookPacket();
         PlayerPositionAndLook.X = 0;

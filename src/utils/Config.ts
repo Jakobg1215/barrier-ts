@@ -7,9 +7,10 @@ export default class Config {
     public static getSettings() {
         if (!fs.existsSync(path.join(__dirname, '../../server.properties'))) Config.crateFile();
         const fileop = {
-            port: '25565',
+            port: 25565,
             motd: 'A Barrierts Server',
             'max-players': 10,
+            'server-name': 'vanilla',
         };
         fs.readFileSync(path.join(__dirname, '../../server.properties'))
             .toString()
@@ -33,6 +34,7 @@ export default class Config {
             comment: 'This is the Message of the Day for the server list.',
         });
         this.addSettings('max-players', { value: 10, comment: 'Right now this is visual only.' });
+        this.addSettings('server-name', { value: 'vanilla', comment: 'The name under the fps in the debug menu.' });
         fs.writeFileSync(path.join(__dirname, '../../server.properties'), this.settings);
     }
 

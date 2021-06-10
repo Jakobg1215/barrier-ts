@@ -13,7 +13,7 @@ export default class ChunkDataPacket extends Packet {
     public Biomeslength!: number;
     public Biomes!: number[];
     public Size!: number;
-    public Data!: number[];
+    public Data!: Buffer;
     public Numberofblockentities!: number;
     public Blockentities!: NBT[];
 
@@ -30,7 +30,7 @@ export default class ChunkDataPacket extends Packet {
             this.writeVarInt(this.Biomes[index]);
         }
         this.writeVarInt(this.Size);
-        this.writeByteArray(this.Size, this.Data);
+        this.writeByteArray(this.Data);
         this.writeVarInt(this.Numberofblockentities);
         for (let index = 0; index < this.Numberofblockentities; index++) {
             this.writeNBTTag(this.Blockentities[index]);

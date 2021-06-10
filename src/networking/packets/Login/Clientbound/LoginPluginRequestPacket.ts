@@ -6,11 +6,11 @@ export default class LoginPluginRequestPacket extends Packet {
 
     public MessageID!: number;
     public Channel!: string;
-    public Data!: number[];
+    public Data!: Buffer;
 
     public encrypt() {
         this.writeVarInt(this.MessageID);
         this.writeIdentifier(this.Channel);
-        this.writeByteArray(this.Data.length, this.Data);
+        this.writeByteArray(this.Data);
     }
 }

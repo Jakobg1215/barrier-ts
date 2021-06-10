@@ -6,15 +6,15 @@ export default class EncryptionRequestPacket extends Packet {
 
     public ServerID!: string;
     public PublicKeyLength!: number;
-    public PublicKey!: number[];
+    public PublicKey!: Buffer;
     public VerifyTokenLength!: number;
-    public VerifyToken!: number[];
+    public VerifyToken!: Buffer;
 
     public encrypt() {
         this.writeString(this.ServerID);
         this.writeVarInt(this.PublicKeyLength);
-        this.writeByteArray(this.PublicKeyLength, this.PublicKey);
+        this.writeByteArray(this.PublicKey);
         this.writeVarInt(this.VerifyTokenLength);
-        this.writeByteArray(this.VerifyTokenLength, this.VerifyToken);
+        this.writeByteArray(this.VerifyToken);
     }
 }
