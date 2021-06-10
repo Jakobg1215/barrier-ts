@@ -16,7 +16,7 @@ export default class RequestHandler implements Handler<RequestPacket> {
                 protocol: 755,
             },
             players: {
-                max: server.getConfig()['max-players'],
+                max: Number(server.getConfig()['max-players']),
                 online: server.getPlayerManager().getConnections().size - 1,
             },
             description: {
