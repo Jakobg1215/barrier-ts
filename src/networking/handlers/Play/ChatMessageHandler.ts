@@ -24,8 +24,51 @@ export default class ChatMessageHandler implements Handler<ChatMessagePacketS> {
                     message.JSONData = new Chat().translate('commands.op.success', [player.getName()]);
                     message.Position = 1;
                     message.Sender = player.getUUID();
-                    await server.getPlayerManager().sendPacketAll(message, PlayClientbound.ChatMessage);
+                    await player.sendPacket(message, PlayClientbound.ChatMessage);
                     break;
+                }
+                case 'gamemode': {
+                    let gamemode;
+                    const pk = new Packet();
+                    pk.writeUnsignedByte(3);
+                    switch (args[0].toLocaleLowerCase()) {
+                        case '0':
+                        case 'survival':
+                            pk.writeFloat(0);
+                            gamemode = 'Survival Mode';
+                            break;
+                        case '1':
+                        case 'creative':
+                            pk.writeFloat(1);
+                            gamemode = 'Creative Mode';
+                            break;
+                        case '2':
+                        case 'adventure':
+                            pk.writeFloat(2);
+                            gamemode = 'Adventure Mode';
+                            break;
+                        case '3':
+                        case 'spectator':
+                            pk.writeFloat(3);
+                            gamemode = 'Spectator Mode';
+                            break;
+                        default: {
+                            const message = new ChatMessagePacketC();
+                            message.JSONData = new Chat().addText(`Unknown gamemode; ${args[0]}`);
+                            message.Position = 1;
+                            message.Sender = player.getUUID();
+                            return await player.sendPacket(message, PlayClientbound.ChatMessage);
+                        }
+                    }
+                    await player.sendPacket(pk, PlayClientbound.ChangeGameState);
+                    const message = new ChatMessagePacketC();
+                    message.JSONData = new Chat().translate('commands.gamemode.success.self', [gamemode]);
+                    message.Position = 1;
+                    message.Sender = player.getUUID();
+                    await player.sendPacket(message, PlayClientbound.ChatMessage);
+                    break;
+                }
+                case 'test': {
                 }
                 default: {
                     const message = new ChatMessagePacketC();
@@ -34,7 +77,7 @@ export default class ChatMessageHandler implements Handler<ChatMessagePacketS> {
                     });
                     message.Position = 1;
                     message.Sender = player.getUUID();
-                    return await server.getPlayerManager().sendPacketAll(message, PlayClientbound.ChatMessage);
+                    return await player.sendPacket(message, PlayClientbound.ChatMessage);
                 }
             }
             return console.log(`${player.getName()} has executed the command ${command}`);
