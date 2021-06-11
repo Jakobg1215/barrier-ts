@@ -11,6 +11,9 @@ export default class World {
 
     public constructor(server: Server) {
         this.server = server;
+        setInterval(() => {
+            this.tick();
+        }, 50);
     }
 
     public getId() {
@@ -29,7 +32,7 @@ export default class World {
             const timeupdate = new TimeUpdatePacket();
             timeupdate.WorldAge = BigInt(this.worldage);
             timeupdate.Timeofday = BigInt(this.time);
-            await this.server.getPlayerManager().sendPacketAll(timeupdate, PlayClientbound.TimeUpdate + 1);
+            await this.server.getPlayerManager().sendPacketAll(timeupdate, PlayClientbound.TimeUpdate);
         }
     }
 

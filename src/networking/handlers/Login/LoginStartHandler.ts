@@ -42,8 +42,8 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         JoinGame.DimensionCodec = fs.readFileSync(path.join(__dirname, '../../../../NBT/Dimension Codec.nbt'));
         JoinGame.WorldName = 'minecraft:overworld';
         JoinGame.Hashedseed = 0n;
-        JoinGame.MaxPlayers = 100;
-        JoinGame.ViewDistance = 8;
+        JoinGame.MaxPlayers = server.getConfig()['max-players'];
+        JoinGame.ViewDistance = 10;
         JoinGame.ReducedDebugInfo = false;
         JoinGame.Enablerespawnscreen = true;
         JoinGame.IsDebug = false;
@@ -55,7 +55,7 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         const timeupdate = new TimeUpdatePacket();
         timeupdate.WorldAge = BigInt(server.getWorld().getworldage());
         timeupdate.Timeofday = BigInt(server.getWorld().gettime());
-        await player.sendPacket(timeupdate, PlayClientbound.TimeUpdate + 1);
+        await player.sendPacket(timeupdate, PlayClientbound.TimeUpdate);
 
         const PluginMessage = new PluginMessagePacket();
         PluginMessage.Channel = 'minecraft:brand';
@@ -71,7 +71,7 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         PlayerPositionAndLook.Flags = 0;
         PlayerPositionAndLook.TeleportID = 0;
         PlayerPositionAndLook.DismountVehicle = false;
-        await player.sendPacket(PlayerPositionAndLook, PlayClientbound.PlayerPositionAndLook + 1);
+        await player.sendPacket(PlayerPositionAndLook, PlayClientbound.PlayerPositionAndLook);
 
         const PlayerInfo = new PlayerInfoPacket();
         PlayerInfo.Action = 0;

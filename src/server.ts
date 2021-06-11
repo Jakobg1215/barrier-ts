@@ -20,13 +20,6 @@ export default class Server {
 
     public constructor() {
         this.listen(Number(this.config.port));
-        setInterval(() => {
-            this.tick();
-        }, 50);
-    }
-
-    private tick() {
-        this.world.tick();
     }
 
     private async listen(port = 25565) {
@@ -43,7 +36,7 @@ export default class Server {
                 });
                 connection.on('close', async () => {
                     const player = this.playerManager.getConnections().get(connection.remoteAddress!);
-                    if (player?.getState() === 4) {
+                    if (player?.getState() === 3) {
                         const PlayerInfo = new PlayerInfoPacket();
                         PlayerInfo.Action = 4;
                         PlayerInfo.NumberOfPlayers = 1;

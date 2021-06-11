@@ -12,13 +12,17 @@ export default class PlayerPositionHandler implements Handler<PlayerPositionPack
         player.setOnGround(packet.OnGround);
         const EntityPosition = new EntityPositionPacket();
         EntityPosition.EntityID = player.getID();
-        try {
-            EntityPosition.DeltaX = (packet.X * 32 - player.getPosition().getX() * 32) * 128;
-            EntityPosition.DeltaY = (packet.FeetY * 32 - player.getPosition().getY() * 32) * 128;
-            EntityPosition.DeltaZ = (packet.Z * 32 - player.getPosition().getZ() * 32) * 128;
-        } catch {
+
+        EntityPosition.DeltaX = (packet.X * 32 - player.getPosition().getX() * 32) * 128;
+        EntityPosition.DeltaY = (packet.FeetY * 32 - player.getPosition().getY() * 32) * 128;
+        EntityPosition.DeltaZ = (packet.Z * 32 - player.getPosition().getZ() * 32) * 128;
+        if (EntityPosition.DeltaX > 32767 || EntityPosition.DeltaX < -32767) {
             EntityPosition.DeltaX = 0;
+        }
+        if (EntityPosition.DeltaY > 32767 || EntityPosition.DeltaY < -32767) {
             EntityPosition.DeltaY = 0;
+        }
+        if (EntityPosition.DeltaZ > 32767 || EntityPosition.DeltaZ < -32767) {
             EntityPosition.DeltaZ = 0;
         }
         EntityPosition.OnGround = packet.OnGround;

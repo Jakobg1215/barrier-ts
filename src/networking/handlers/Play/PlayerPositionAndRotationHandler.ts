@@ -22,13 +22,16 @@ export default class PlayerPositionAndRotationHandler implements Handler<PlayerP
         EntityHeadLook.EntityID = player.getID();
         EntityHeadLook.HeadYaw = yaw;
         EntityPositionandRotation.EntityID = player.getID();
-        try {
-            EntityPositionandRotation.DeltaX = (packet.X * 32 - player.getPosition().getX() * 32) * 128;
-            EntityPositionandRotation.DeltaY = (packet.FeetY * 32 - player.getPosition().getY() * 32) * 128;
-            EntityPositionandRotation.DeltaZ = (packet.Z * 32 - player.getPosition().getZ() * 32) * 128;
-        } catch {
+        EntityPositionandRotation.DeltaX = (packet.X * 32 - player.getPosition().getX() * 32) * 128;
+        EntityPositionandRotation.DeltaY = (packet.FeetY * 32 - player.getPosition().getY() * 32) * 128;
+        EntityPositionandRotation.DeltaZ = (packet.Z * 32 - player.getPosition().getZ() * 32) * 128;
+        if (EntityPositionandRotation.DeltaX > 32767 || EntityPositionandRotation.DeltaX < -32767) {
             EntityPositionandRotation.DeltaX = 0;
+        }
+        if (EntityPositionandRotation.DeltaY > 32767 || EntityPositionandRotation.DeltaY < -32767) {
             EntityPositionandRotation.DeltaY = 0;
+        }
+        if (EntityPositionandRotation.DeltaZ > 32767 || EntityPositionandRotation.DeltaZ < -32767) {
             EntityPositionandRotation.DeltaZ = 0;
         }
         EntityPositionandRotation.Yaw = yaw;

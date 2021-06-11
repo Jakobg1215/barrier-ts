@@ -33,7 +33,10 @@ export default class PlayerManager {
     public async sendPacketAll(packet: Packet, id: number, exclude?: number[]) {
         this.connections.forEach(async player => {
             if (!exclude?.includes(player.getID())) {
-                await player.sendPacket(packet, id);
+                if (player.getState() === 3) {
+                    await player.sendPacket(packet, id);
+                    packet.clearBytes();
+                }
             }
         });
     }

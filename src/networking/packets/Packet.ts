@@ -243,6 +243,9 @@ export default class Packet {
     }
     public decrypt() {}
     public encrypt() {}
+    public clearBytes() {
+        this.bytes = Buffer.alloc(0);
+    }
     public addOffset(offset: number, retval: boolean = false) {
         if (retval) return (this.offset += offset);
         return (this.offset += offset) - offset;

@@ -63,7 +63,7 @@ export default class PlayerConnection {
                     PlayerInfo.Player.push(new playerfield(conn.username, conn.UUID));
                 });
             PlayerInfo.NumberOfPlayers = PlayerInfo.Player.length;
-            await this.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo + 1);
+            await this.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
 
             server
                 .getPlayerManager()
@@ -101,8 +101,8 @@ export default class PlayerConnection {
     public async sendChunks() {
         return Promise.resolve().then(async _v => {
             const chunk = fs.readFileSync(path.join(__dirname, '../../../NBT/chunk.nbt'));
-            for (let x = -8; x < 8; x++) {
-                for (let z = -8; z < 8; z++) {
+            for (let x = -9; x < 9; x++) {
+                for (let z = -9; z < 9; z++) {
                     const pk = new Packet();
                     pk.writeInt(x);
                     pk.writeInt(z);
