@@ -76,6 +76,7 @@ export enum PlayClientbound {
     OpenBook,
     OpenWindow,
     OpenSignEditor,
+    Ping,
     CraftRecipeResponse,
     PlayerAbilities,
     EndCombatEvent,
@@ -162,9 +163,9 @@ export enum PlayServerbound {
     PlayerDigging,
     EntityAction,
     SteerVehicle,
+    Pong,
     SetRecipeBookState,
     SetDisplayedRecipe,
-    UNKNOWN, // for 1.17 I don't know what this packet is
     NameItem,
     ResourcePackStatus,
     AdvancementTab,
