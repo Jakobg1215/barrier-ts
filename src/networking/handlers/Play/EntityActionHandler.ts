@@ -1,5 +1,6 @@
 import type Server from '../../../server';
 import Packet from '../../packets/Packet';
+import EntityTeleportPacket from '../../packets/Play/clientbound/EntityTeleport';
 import type EntityActionPacket from '../../packets/Play/serverbound/EntityActionPacket';
 import type PlayerConnection from '../../players/PlayerConnection';
 import { PlayClientbound, PlayServerbound } from '../../types/PacketIds';
@@ -8,7 +9,7 @@ import type Handler from '../Handler';
 export default class EntityActionHandler implements Handler<EntityActionPacket> {
     public id = PlayServerbound.EntityAction;
 
-    public async handle(packet: EntityActionPacket, server: Server, _player: PlayerConnection) {
+    public async handle(packet: EntityActionPacket, server: Server, player: PlayerConnection) {
         const EntityMetadata = new Packet();
         EntityMetadata.writeVarInt(packet.EntityID);
         switch (packet.ActionID) {
@@ -23,6 +24,15 @@ export default class EntityActionHandler implements Handler<EntityActionPacket> 
                 pk.writeVarInt(5);
                 pk.writeUnsignedByte(255);
                 await server.getPlayerManager().sendPacketAll(pk, PlayClientbound.EntityMetadata, [packet.EntityID]);
+                const TeleportPacket = new EntityTeleportPacket();
+                TeleportPacket.EntityID = player.getID();
+                TeleportPacket.X = player.getPosition().getX();
+                TeleportPacket.Y = player.getPosition().getY();
+                TeleportPacket.Z = player.getPosition().getZ();
+                TeleportPacket.Yaw = player.getRotation().getYaw();
+                TeleportPacket.Pitch = player.getRotation().getPitch();
+                TeleportPacket.OnGround = player.getOnGround();
+                await server.getPlayerManager().sendPacketAll(TeleportPacket, PlayClientbound.EntityTeleport, [player.getID()]);
                 break;
             }
             case ActionID.Stopsneaking: {
