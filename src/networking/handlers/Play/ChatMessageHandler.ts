@@ -68,7 +68,9 @@ export default class ChatMessageHandler implements Handler<ChatMessagePacketS> {
                     await player.sendPacket(message, PlayClientbound.ChatMessage);
                     break;
                 }
-                case 'test': {
+                case 'reload': {
+                    server.reload();
+                    return;
                 }
                 default: {
                     const message = new ChatMessagePacketC();

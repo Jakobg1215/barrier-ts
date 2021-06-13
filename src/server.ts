@@ -22,6 +22,10 @@ export default class Server {
         this.listen(Number(this.config.port));
     }
 
+    public reload() {
+        this.config = Config.getSettings();
+    }
+
     private async listen(port = 25565) {
         await this.networkRegistry.registerNetwork();
         this.server
