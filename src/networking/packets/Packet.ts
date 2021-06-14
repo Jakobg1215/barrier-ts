@@ -175,7 +175,15 @@ export default class Packet {
     }
     public writeVarLong() {}
     public writeEntityMetadata() {}
-    public writeSlot() {}
+    public writeSlot(slot: Slot) {
+        this.writeBoolean(slot.Present);
+        if (slot.Present) {
+            this.writeVarInt(slot.ItemID ?? 0);
+            this.writeByte(slot.ItemCount ?? 0);
+            this.append(slot.NBT?.bytes.slice(-Math.abs(slot.NBT?.offset)) ?? Buffer.alloc(1));
+            this.addOffset(slot.NBT?.offset ?? 0);
+        }
+    }
     public writeNBTTag(_NBT: NBT) {}
     public writePosition(_value: Position) {}
     public writeAngle(value: number) {

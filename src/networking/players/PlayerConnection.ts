@@ -5,6 +5,7 @@ import path from 'path';
 import type Server from '../../server';
 import Position from '../../types/Position';
 import Rotation from '../../types/Rotation';
+import Slot from '../../types/Slot';
 import Packet from '../packets/Packet';
 import PlayerInfoPacket from '../packets/Play/clientbound/PlayerInfoPacket';
 import SpawnPlayerPacket from '../packets/Play/clientbound/SpawnPlayerPacket';
@@ -22,6 +23,18 @@ export default class PlayerConnection {
     private rotation = new Rotation(0, 0);
     private onGround = true;
     private id!: number;
+    private hotBar: Slot[] = [
+        new Slot(),
+        new Slot(),
+        new Slot(),
+        new Slot(),
+        new Slot(),
+        new Slot(),
+        new Slot(),
+        new Slot(),
+        new Slot(),
+    ];
+    private selectedHotBarSlot = 0;
 
     public constructor(socket: Socket) {
         this.connection = socket;
@@ -31,6 +44,7 @@ export default class PlayerConnection {
     public async sendPacket(packet: Packet, id: number) {
         packet.encrypt();
         this.connection.write(packet.buildPacket(id));
+        packet.clearBytes();
     }
 
     public async sendRaw(data: Buffer) {
@@ -178,5 +192,21 @@ export default class PlayerConnection {
 
     public getIP() {
         return this.ip;
+    }
+
+    public setHotBar(slot: number, item: Slot) {
+        this.hotBar[slot] = item;
+    }
+
+    public getHotBar(slot: number) {
+        return this.hotBar[slot];
+    }
+
+    public setSelectedHotBarSlot(v: number) {
+        this.selectedHotBarSlot = v;
+    }
+
+    public getSelectedHotBarSlot() {
+        return this.selectedHotBarSlot;
     }
 }

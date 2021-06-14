@@ -2,7 +2,7 @@ export default class NBT {
     public readonly name: string;
     public readonly roots: Map<string, any> = new Map();
     private data: Buffer;
-    private offset = 0;
+    private offSet = 0;
     public constructor(data: Buffer = Buffer.alloc(0), list: boolean = false) {
         this.data = data;
         if (!(list || data.readInt8() === 0)) {
@@ -11,6 +11,14 @@ export default class NBT {
         } else {
             this.name = '';
         }
+    }
+
+    public get bytes(): Buffer {
+        return this.data;
+    }
+
+    public get offset(): number {
+        return this.offSet;
     }
 
     public readNBT() {
@@ -50,7 +58,7 @@ export default class NBT {
                     this.roots.set(
                         this.readRootName(),
                         this.data
-                            .slice(this.offset + 2, this.addOffset(this.data.readUInt16BE(this.addOffset(2)), true))
+                            .slice(this.offSet + 2, this.addOffset(this.data.readUInt16BE(this.addOffset(2)), true))
                             .toString(),
                     );
                     break;
@@ -58,9 +66,9 @@ export default class NBT {
                     this.roots.set(this.readRootName(), this.readList());
                     break;
                 case tagType.compound:
-                    const compound = new NBT(this.data.slice(this.offset - 1));
+                    const compound = new NBT(this.data.slice(this.offSet - 1));
                     compound.readNBT();
-                    this.addOffset(compound.offset - 1, true);
+                    this.addOffset(compound.offSet - 1, true);
                     this.roots.set(compound.name, compound);
                     break;
                 case tagType.intarray: {
@@ -137,7 +145,7 @@ export default class NBT {
                 for (let index = 0; index < length; index++) {
                     entries.push(
                         this.data
-                            .slice(this.offset + 2, this.addOffset(this.data.readUInt16BE(this.addOffset(2)), true))
+                            .slice(this.offSet + 2, this.addOffset(this.data.readUInt16BE(this.addOffset(2)), true))
                             .toString(),
                     );
                 }
@@ -149,9 +157,9 @@ export default class NBT {
                 return entries;
             case tagType.compound:
                 for (let index = 0; index < length; index++) {
-                    const compound = new NBT(this.data.slice(this.offset), true);
+                    const compound = new NBT(this.data.slice(this.offSet), true);
                     compound.readNBT();
-                    this.addOffset(compound.offset - 1, true);
+                    this.addOffset(compound.offSet - 1, true);
                     entries.push(compound);
                 }
                 return entries;
@@ -183,7 +191,7 @@ export default class NBT {
     }
 
     private readRootName() {
-        return this.data.slice(this.offset + 2, this.addOffset(this.readShort(), true)).toString('utf-8');
+        return this.data.slice(this.offSet + 2, this.addOffset(this.readShort(), true)).toString('utf-8');
     }
 
     private readByte() {
@@ -203,8 +211,8 @@ export default class NBT {
     }
 
     private addOffset(offset: number, retval: boolean = false) {
-        if (retval) return (this.offset += offset);
-        return (this.offset += offset) - offset;
+        if (retval) return (this.offSet += offset);
+        return (this.offSet += offset) - offset;
     }
 }
 
