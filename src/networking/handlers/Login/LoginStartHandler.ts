@@ -31,6 +31,8 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         await player.sendPacket(LoginSuccess, LoginClientbound.LoginSuccess);
         player.setState(ConnectionStates.Play);
 
+        server.getConsole().log(`${packet.Name} is joining the server`);
+
         const JoinGame = new JoinGamePacket();
         player.setid(server.getWorld().getId());
         JoinGame.EntityID = player.getID();

@@ -70,7 +70,7 @@ export default class ChatMessageHandler implements Handler<ChatMessagePacketS> {
                 }
                 case 'reload': {
                     server.reload();
-                    return;
+                    break;
                 }
                 default: {
                     const message = new ChatMessagePacketC();
@@ -82,12 +82,13 @@ export default class ChatMessageHandler implements Handler<ChatMessagePacketS> {
                     return await player.sendPacket(message, PlayClientbound.ChatMessage);
                 }
             }
-            return console.log(`${player.getName()} has executed the command ${command}`);
+            return server.getConsole().log(`${player.getName()} has executed the command ${command}`);
         }
         const message = new ChatMessagePacketC();
         message.JSONData = new Chat().translate('chat.type.text', [player.getName(), packet.Message]);
         message.Position = 0;
         message.Sender = player.getUUID();
         await server.getPlayerManager().sendPacketAll(message, PlayClientbound.ChatMessage);
+        server.getConsole().log(`<${player.getName()}> ${packet.Message}`);
     }
 }

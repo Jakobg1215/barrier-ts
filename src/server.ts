@@ -9,6 +9,7 @@ import PlayerManager from './networking/players/PlayerManager';
 import { PlayerInfoPlayer } from './networking/types/PacketFieldArguments';
 import { PlayClientbound } from './networking/types/PacketIds';
 import Config from './utils/Config';
+import Console from './utils/Console';
 import World from './world/World';
 
 export default class Server {
@@ -17,6 +18,7 @@ export default class Server {
     private networkRegistry = new NetworkRegistry();
     private playerManager = new PlayerManager();
     private config = Config.getSettings();
+    private console = new Console();
 
     public constructor() {
         this.listen(Number(this.config.port));
@@ -30,7 +32,7 @@ export default class Server {
         await this.networkRegistry.registerNetwork();
         this.server
             .listen(port, () => {
-                console.log(`Server is now listening on port: ${port}`);
+                this.console.log(`Server is now listening on port: ${port}`);
             })
             .on('connection', connection => {
                 const player = new PlayerConnection(connection);
@@ -66,7 +68,7 @@ export default class Server {
         const packetId = incomePacket.readVarInt();
         const packet = this.networkRegistry.getPacket(player.getState(), packetId);
         if (!packet) {
-            return console.log(
+            return this.console.warn(
                 `Packet 0x${packetId.toString(
                     16,
                 )} for state ${player.getState()} isn't implemented. Entiteid: ${player.getID()}`,
@@ -74,7 +76,7 @@ export default class Server {
         }
         const hander = this.networkRegistry.getHandler(player.getState(), packetId);
         if (!hander) {
-            return console.log(
+            return this.console.warn(
                 `Packet handler 0x${packetId.toString(
                     16,
                 )} for state ${player.getState()} isn't implemented. Entiteid: ${player.getID()}`,
@@ -84,7 +86,7 @@ export default class Server {
         try {
             pk.decrypt();
         } catch (error) {
-            console.log(`Packet 0x${packetId.toString(16)} failed with the error ${error}`);
+            this.console.error(`Packet 0x${packetId.toString(16)} failed with the error ${error}`);
         }
         await hander.handle(pk, this, player);
     }
@@ -103,6 +105,10 @@ export default class Server {
 
     public getConfig() {
         return this.config;
+    }
+
+    public getConsole() {
+        return this.console;
     }
 }
 
