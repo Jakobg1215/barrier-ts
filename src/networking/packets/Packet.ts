@@ -87,10 +87,9 @@ export default class Packet {
         }
         return slot;
     }
-    // TODO: Make this read the postion
     public readPosition() {
-        /*const poz =*/ this.bytes.slice(this.offset, this.addOffset(8, true));
-        return new Position();
+        const poz = this.bytes.slice(this.offset, this.addOffset(8, true));
+        return new Position(Math.floor(poz.readInt32BE() / 64), poz.readUInt8(7), Math.floor(poz.readIntBE(4, 3) / 16));
     }
     public readUUID() {
         return `${Number(this.readLong()).toString()}${Number(this.readLong()).toString()}`;
