@@ -89,7 +89,31 @@ export default class Packet {
     }
     public readPosition() {
         const poz = this.bytes.slice(this.offset, this.addOffset(8, true));
-        return new Position(Math.floor(poz.readInt32BE() / 64), poz.readUInt8(7), Math.floor(poz.readIntBE(4, 3) / 16));
+        const xdata = poz.slice(0, 4).toJSON().data;
+        let x: number[] | number = [];
+        if (xdata[0] > 127) {
+            x[0] = 255 - xdata[0];
+            x[1] = 255 - xdata[1];
+            x[2] = 255 - xdata[2];
+            x[3] = Math.abs((xdata[3] - (xdata[3] & 63)) / 64 - 4);
+            x = (x[0] * 4096 + x[1] * 1024 + x[2] * 256 + x[3] * 64) / 64;
+            x = x - x * 2;
+        } else {
+            x = xdata[0] * 4096 + xdata[1] * 1024 + xdata[2] * 64 + (xdata[3] - (xdata[3] & 63)) / 64;
+        }
+        const zdata = poz.slice(3, 7).toJSON().data;
+        let z: number[] | number = [];
+        if (zdata[0] % 64 > 31) {
+            z[0] = 63 - (zdata[0] % 64);
+            z[1] = 255 - zdata[1];
+            z[2] = 255 - zdata[2];
+            z[3] = Math.abs(zdata[3] / 16 - 16);
+            z = (z[0] * 65536 + z[1] * 4096 + z[2] * 256 + z[3] * 16) / 16;
+            z = z - z * 2;
+        } else {
+            z = (zdata[0] % 64) * 1048576 + zdata[1] * 4096 + zdata[2] * 16 + zdata[3] / 16;
+        }
+        return new Position(x, poz.readUInt8(7), z);
     }
     public readUUID() {
         return `${Number(this.readLong()).toString()}${Number(this.readLong()).toString()}`;
@@ -184,7 +208,46 @@ export default class Packet {
         }
     }
     public writeNBTTag(_NBT: NBT) {}
-    public writePosition(_value: Position) {}
+    public writePosition(position: Position) {
+        let z: number[] = [0, 0, 0, 0];
+        z[3] = Math.abs(position.getZ()) * 16;
+        if (z[3] >= 256) {
+            z[2] = Math.floor(z[3] / 256);
+            z[3] = z[3] - z[2] * 256;
+        }
+        if (z[2] >= 256) {
+            z[1] = Math.floor(z[2] / 256);
+            z[2] = z[2] - z[1] * 256;
+        }
+        if (z[1] >= 256) {
+            z[0] = Math.floor(z[1] / 256);
+            z[1] = z[1] - z[0] * 256;
+        }
+        if (position.getZ() < 0) {
+            z = [63 - z[0], 255 - z[1], 255 - z[2], 256 - z[3]];
+        }
+        let x: number[] = [0, 0, 0, 0];
+        x[3] = Math.abs(position.getX()) * 64;
+        if (x[3] >= 256) {
+            x[2] = Math.floor(x[3] / 256);
+            x[3] = x[3] - x[2] * 256;
+        }
+        if (x[2] >= 256) {
+            x[1] = Math.floor(x[2] / 256);
+            x[2] = x[2] - x[1] * 256;
+        }
+        if (x[1] >= 256) {
+            x[0] = Math.floor(x[1] / 256);
+            x[1] = x[1] - x[0] * 256;
+        }
+        if (position.getX() < 0) {
+            x = [255 - x[0], 255 - x[1], 255 - x[2], 256 - x[3]];
+        }
+        x[3] = x[3] + z[0];
+        const buf = Buffer.alloc(1);
+        buf.writeUInt8(position.getY());
+        this.append(Buffer.concat([Buffer.from(x), Buffer.from(z.slice(1)), buf]));
+    }
     public writeAngle(value: number) {
         this.writeUnsignedByte(value);
     }
