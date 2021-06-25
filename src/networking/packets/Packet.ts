@@ -88,32 +88,21 @@ export default class Packet {
         return slot;
     }
     public readPosition() {
-        const poz = this.bytes.slice(this.offset, this.addOffset(8, true));
-        const xdata = poz.slice(0, 4).toJSON().data;
-        let x: number[] | number = [];
-        if (xdata[0] > 127) {
-            x[0] = 255 - xdata[0];
-            x[1] = 255 - xdata[1];
-            x[2] = 255 - xdata[2];
-            x[3] = Math.abs((xdata[3] - (xdata[3] & 63)) / 64 - 4);
-            x = (x[0] * 4096 + x[1] * 1024 + x[2] * 256 + x[3] * 64) / 64;
-            x = x - x * 2;
-        } else {
-            x = xdata[0] * 4096 + xdata[1] * 1024 + xdata[2] * 64 + (xdata[3] - (xdata[3] & 63)) / 64;
-        }
-        const zdata = poz.slice(3, 7).toJSON().data;
-        let z: number[] | number = [];
-        if (zdata[0] % 64 > 31) {
-            z[0] = 63 - (zdata[0] % 64);
-            z[1] = 255 - zdata[1];
-            z[2] = 255 - zdata[2];
-            z[3] = Math.abs(zdata[3] / 16 - 16);
-            z = (z[0] * 65536 + z[1] * 4096 + z[2] * 256 + z[3] * 16) / 16;
-            z = z - z * 2;
-        } else {
-            z = (zdata[0] % 64) * 1048576 + zdata[1] * 4096 + zdata[2] * 16 + zdata[3] / 16;
-        }
-        return new Position(x, poz.readUInt8(7), z);
+        const bytes = this.bytes.slice(this.offset, this.addOffset(8, true));
+        const xbytes = bytes.slice(0, 4).toJSON().data;
+        const ybytes = bytes.slice(4, 7).toJSON().data;
+        return new Position(
+            Buffer.from([xbytes[0], xbytes[1], xbytes[2], xbytes[3] - (xbytes[3] & 63)]).readInt32BE() / 64,
+            bytes.readUInt8(7),
+            Buffer.from([
+                (ybytes[0] & 63) > 0 ? (ybytes[0] & 63) + 192 : 0,
+                ybytes[1],
+                ybytes[2],
+                ybytes[3],
+            ]).readInt32BE() /
+                256 /
+                16,
+        );
     }
     public readUUID() {
         return `${Number(this.readLong()).toString()}${Number(this.readLong()).toString()}`;
@@ -209,44 +198,22 @@ export default class Packet {
     }
     public writeNBTTag(_NBT: NBT) {}
     public writePosition(position: Position) {
-        let z: number[] = [0, 0, 0, 0];
-        z[3] = Math.abs(position.getZ()) * 16;
-        if (z[3] >= 256) {
-            z[2] = Math.floor(z[3] / 256);
-            z[3] = z[3] - z[2] * 256;
-        }
-        if (z[2] >= 256) {
-            z[1] = Math.floor(z[2] / 256);
-            z[2] = z[2] - z[1] * 256;
-        }
-        if (z[1] >= 256) {
-            z[0] = Math.floor(z[1] / 256);
-            z[1] = z[1] - z[0] * 256;
-        }
+        const zbuf = Buffer.alloc(4);
+        zbuf.writeInt32BE(position.getZ() * 16);
+        let zdata = zbuf.toJSON().data;
         if (position.getZ() < 0) {
-            z = [63 - z[0], 255 - z[1], 255 - z[2], 256 - z[3]];
+            zdata[0] = zdata[0] - 192;
         }
-        let x: number[] = [0, 0, 0, 0];
-        x[3] = Math.abs(position.getX()) * 64;
-        if (x[3] >= 256) {
-            x[2] = Math.floor(x[3] / 256);
-            x[3] = x[3] - x[2] * 256;
+        const xbuf = Buffer.alloc(4);
+        xbuf.writeInt32BE(position.getX() * 64);
+        let xdata = xbuf.toJSON().data;
+        if (position.getZ() < 0) {
+            xdata[3] = xdata[3] + zdata[0];
         }
-        if (x[2] >= 256) {
-            x[1] = Math.floor(x[2] / 256);
-            x[2] = x[2] - x[1] * 256;
-        }
-        if (x[1] >= 256) {
-            x[0] = Math.floor(x[1] / 256);
-            x[1] = x[1] - x[0] * 256;
-        }
-        if (position.getX() < 0) {
-            x = [255 - x[0], 255 - x[1], 255 - x[2], 256 - x[3]];
-        }
-        x[3] = x[3] + z[0];
-        const buf = Buffer.alloc(1);
-        buf.writeUInt8(position.getY());
-        this.append(Buffer.concat([Buffer.from(x), Buffer.from(z.slice(1)), buf]));
+        const ybuf = Buffer.alloc(1);
+        ybuf.writeUInt8(position.getY());
+
+        this.append(Buffer.concat([Buffer.from(xdata), Buffer.from(zdata.slice(1)), ybuf]));
     }
     public writeAngle(value: number) {
         this.writeUnsignedByte(value);
