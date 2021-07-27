@@ -34,9 +34,9 @@ export default class Config {
             value: 'A Barrierts Server',
             comment: 'This is the Message of the Day for the server list.',
         });
-        this.addSettings('max-players', { value: 10, comment: 'Right now this is visual only.' });
+        this.addSettings('max-players', { value: 10, comment: 'Limit how many players can be on your server.' });
         this.addSettings('server-name', { value: 'vanilla', comment: 'The name under the fps in the debug menu.' });
-        this.addSettings('always-day', { value: false, comment: 'This will make time stop' });
+        this.addSettings('always-day', { value: false, comment: 'This will make time stop.' });
         fs.writeFileSync(path.join(__dirname, '../../server.properties'), this.settings);
     }
 

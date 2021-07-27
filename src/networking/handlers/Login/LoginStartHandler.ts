@@ -5,6 +5,8 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
 import type Server from '../../../server';
+import Chat from '../../../types/Chat';
+import DisconnectPacket from '../../packets/Login/Clientbound/DisconnectPacket';
 import LoginSuccessPacket from '../../packets/Login/Clientbound/LoginSuccessPacket';
 import type LoginStartPacket from '../../packets/Login/Serverbound/LoginStartPacket';
 import Packet from '../../packets/Packet';
@@ -123,9 +125,14 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
 
             await server.getPlayerManager().sendPacketAll(SpawnPlayer, PlayClientbound.SpawnPlayer, [player.getID()]);
         };
+        if (server.getPlayerManager().getConnections().size - 1 >= server.getConfig()['max-players']) {
+            const disconnect = new DisconnectPacket();
+            disconnect.Reason = new Chat().addText('Server is full');
+            return await player.sendPacket(disconnect, LoginClientbound.Disconnect);
+        }
         https
             .get(`https://api.mojang.com/users/profiles/minecraft/${packet.Name}?at=${Date.now()}`, res => {
-                if (res.statusCode === 204) {
+                if (res.statusCode !== 200) {
                     player.setName(packet.Name);
                     player.setUUID(uuidv4());
                     login();
