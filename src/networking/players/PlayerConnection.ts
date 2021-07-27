@@ -1,4 +1,5 @@
 import fs from 'fs';
+import https from 'https';
 import type { Socket } from 'net';
 import path from 'path';
 
@@ -10,7 +11,7 @@ import Packet from '../packets/Packet';
 import PlayerInfoPacket from '../packets/Play/clientbound/PlayerInfoPacket';
 import SpawnPlayerPacket from '../packets/Play/clientbound/SpawnPlayerPacket';
 import { ConnectionStates } from '../types/ConnectionState';
-import type { PlayerInfoPlayer } from '../types/PacketFieldArguments';
+import type { PlayerInfoPlayer, PlayerInfoPlayerProperty } from '../types/PacketFieldArguments';
 import { PlayClientbound } from '../types/PacketIds';
 
 export default class PlayerConnection {
@@ -61,14 +62,33 @@ export default class PlayerConnection {
                     this.Name = name;
                     this.UUID = uuid;
                     this.DisplayName = JSON.stringify({ text: this.Name });
+                    const properties: PlayerInfoPlayerProperty[] = [];
+                    https
+                        .get(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`, inc => {
+                            inc.on('data', (data: Buffer) => {
+                                Array.from(JSON.parse(data.toString()).properties).forEach((property: any) => {
+                                    class prop implements PlayerInfoPlayerProperty {
+                                        Name = property.name;
+                                        Value = property.value;
+                                        IsSigned = property.signature ?? false;
+                                        Signature = property?.signature;
+                                    }
+                                    properties.push(new prop());
+                                });
+                            });
+                        })
+                        .on('error', console.log);
+                    this.NumberOfProperties = properties.length;
+                    this.Property = properties;
                 }
-                public Name!: string;
-                public UUID!: string;
-                public NumberOfProperties = 0;
+                public Name: string;
+                public UUID: string;
+                public NumberOfProperties: number;
+                public Property: PlayerInfoPlayerProperty[];
                 public Gamemode = 1;
                 public Ping = 0;
                 public HasDisplayName = true;
-                public DisplayName!: string;
+                public DisplayName: string;
             };
             server
                 .getPlayerManager()

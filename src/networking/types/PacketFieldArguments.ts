@@ -9,7 +9,7 @@ export interface PlayerInfoPlayer {
     DisplayName?: string;
 }
 
-interface PlayerInfoPlayerProperty {
+export interface PlayerInfoPlayerProperty {
     Name: string;
     Value: string;
     IsSigned: boolean;
