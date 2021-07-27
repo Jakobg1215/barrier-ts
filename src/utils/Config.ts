@@ -11,6 +11,7 @@ export default class Config {
             motd: 'A Barrierts Server',
             'max-players': 10,
             'server-name': 'vanilla',
+            'always-day': false,
         };
         fs.readFileSync(path.join(__dirname, '../../server.properties'))
             .toString()
@@ -35,6 +36,7 @@ export default class Config {
         });
         this.addSettings('max-players', { value: 10, comment: 'Right now this is visual only.' });
         this.addSettings('server-name', { value: 'vanilla', comment: 'The name under the fps in the debug menu.' });
+        this.addSettings('always-day', { value: false, comment: 'This will make time stop' });
         fs.writeFileSync(path.join(__dirname, '../../server.properties'), this.settings);
     }
 
