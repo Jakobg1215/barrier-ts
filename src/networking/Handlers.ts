@@ -14,6 +14,7 @@ import PlayerMovementHandler from './handlers/Play/PlayerMovementHandler';
 import PlayerPositionAndRotationHandler from './handlers/Play/PlayerPositionAndRotationHandler';
 import PlayerPositionHandler from './handlers/Play/PlayerPositionHandler';
 import PlayerRotationHandler from './handlers/Play/PlayerRotationHandler';
+import PluginMessageHandler from './handlers/Play/PluginMessageHandler';
 import TeleportConfirmHandler from './handlers/Play/TeleportConfirmHandler';
 import PingHandler from './handlers/Status/PingHandler';
 import RequestHandler from './handlers/Status/RequestHandler';
@@ -47,6 +48,7 @@ PlayHandlers.push(new PlayerMovementHandler());
 PlayHandlers.push(new PlayerPositionAndRotationHandler());
 PlayHandlers.push(new PlayerPositionHandler());
 PlayHandlers.push(new PlayerRotationHandler());
+PlayHandlers.push(new PluginMessageHandler());
 PlayHandlers.push(new TeleportConfirmHandler());
 
 export { HandshakeHandlers, StatusHandlers, LoginHandlers, PlayHandlers };

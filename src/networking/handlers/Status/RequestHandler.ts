@@ -14,7 +14,7 @@ export default class RequestHandler implements Handler<RequestPacket> {
         Response.JSONResponse = JSON.stringify({
             version: {
                 name: '1.16.5',
-                protocol: 755,
+                protocol: 756,
             },
             players: {
                 max: Number(server.getConfig()['max-players']),

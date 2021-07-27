@@ -5,7 +5,7 @@ export default class PluginMessagePacket extends Packet {
     public static readonly id = PlayServerbound.PluginMessage;
 
     public Channel!: string;
-    public Data!: number[];
+    public Data: number[] = [];
 
     public decrypt() {
         this.Channel = this.readIdentifier();

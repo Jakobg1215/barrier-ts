@@ -177,15 +177,20 @@ export default class Packet {
     }
     public writeVarInt(value: number) {
         do {
-            let temp = value & 0b01111111;
+            let currentByte = value & 0b01111111;
             value >>>= 7;
-            if (value != 0) {
-                temp |= 0b10000000;
-            }
-            this.writeUnsignedByte(temp);
-        } while (value != 0);
+            if (value !== 0) currentByte |= 0b10000000;
+            this.writeUnsignedByte(currentByte);
+        } while (value !== 0);
     }
-    public writeVarLong() {}
+    public writeVarLong(value: number) {
+        do {
+            let currentByte = value & 0b01111111;
+            value >>>= 7;
+            if (value != 0) currentByte |= 0b10000000;
+            this.writeByte(currentByte);
+        } while (value !== 0);
+    }
     public writeEntityMetadata() {}
     public writeSlot(slot: Slot) {
         this.writeBoolean(slot.Present);
