@@ -45,37 +45,29 @@ export default class Packet {
         return this.readString();
     }
     public readVarInt() {
-        let numRead = 0;
-        let result = 0;
-        let read;
+        let decodedInt = 0;
+        let bitOffset = 0;
+        let currentByte;
         do {
-            read = this.readUnsignedByte();
-            let value = read & 0b01111111;
-            result |= value << (7 * numRead);
-            numRead++;
-            if (numRead > 5) {
-                throw new Error('VarInt is too big');
-            }
-        } while ((read & 0b10000000) != 0);
-        return result;
+            currentByte = this.readUnsignedByte();
+            decodedInt |= (currentByte & 0b01111111) << bitOffset;
+            if (bitOffset == 35) throw new Error('VarInt is too big');
+            bitOffset += 7;
+        } while ((currentByte & 0b10000000) != 0);
+        return decodedInt;
     }
     // FIXME: This does not read a long, only to a Int.
     public readVarLong() {
-        let numRead = 0;
-        let result = 0;
-        let read;
+        let decodedLong = 0;
+        let bitOffset = 0;
+        let currentByte;
         do {
-            read = this.readUnsignedByte();
-            let value = read & 0b01111111;
-            result |= value << (7 * numRead);
-
-            numRead++;
-            if (numRead > 10) {
-                throw new Error('VarLong is too big');
-            }
-        } while ((read & 0b10000000) != 0);
-
-        return BigInt(result);
+            currentByte = this.readUnsignedByte();
+            decodedLong |= (currentByte & 0b01111111) << bitOffset;
+            if (bitOffset == 70) throw new Error('VarLong is too big');
+            bitOffset += 7;
+        } while ((currentByte & 0b10000000) != 0);
+        return decodedLong;
     }
     public readSlot() {
         const slot = new Slot();
