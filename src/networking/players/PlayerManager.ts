@@ -15,7 +15,7 @@ export default class PlayerManager {
                     player.sendPacket(pk, PlayClientbound.KeepAlive);
                 }
             });
-        }, 1000);
+        }, 15000);
     }
 
     public addConnection(ip: string, player: PlayerConnection) {

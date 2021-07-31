@@ -25,23 +25,16 @@ export default class World {
         this.worldage += 1;
         if (String(this.server.getConfig()['always-day']) === 'false') {
             this.time += 1;
-        } else {
-            const timeupdate = new TimeUpdatePacket();
-            timeupdate.WorldAge = BigInt(this.worldage);
-            timeupdate.Timeofday = BigInt(this.time);
-            await this.server.getPlayerManager().sendPacketAll(timeupdate, PlayClientbound.TimeUpdate);
         }
         if (this.time >= 24000) {
             this.time = 0;
         }
         if (this.ticks === 20) {
             this.ticks = 0;
-            if (String(this.server.getConfig()['always-day']) === 'false') {
-                const timeupdate = new TimeUpdatePacket();
-                timeupdate.WorldAge = BigInt(this.worldage);
-                timeupdate.Timeofday = BigInt(this.time);
-                await this.server.getPlayerManager().sendPacketAll(timeupdate, PlayClientbound.TimeUpdate);
-            }
+            const timeupdate = new TimeUpdatePacket();
+            timeupdate.WorldAge = BigInt(this.worldage);
+            timeupdate.Timeofday = BigInt(-this.time);
+            await this.server.getPlayerManager().sendPacketAll(timeupdate, PlayClientbound.TimeUpdate);
         }
     }
 
