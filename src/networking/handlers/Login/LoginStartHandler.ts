@@ -80,38 +80,22 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
             const PlayerInfo = new PlayerInfoPacket();
             PlayerInfo.Action = 0;
             PlayerInfo.NumberOfPlayers = 1;
-            https
-                .get(`https://sessionserver.mojang.com/session/minecraft/profile/${player.getUUID()}`, inc => {
-                    inc.on('data', async (data: Buffer) => {
-                        const properties: PlayerInfoPlayerProperty[] = Array.from(
-                            JSON.parse(data.toString()).properties,
-                        ).map((property: any) => {
-                            class prop implements PlayerInfoPlayerProperty {
-                                Name = property.name;
-                                Value = property.value;
-                                IsSigned = property.signature ?? false;
-                                Signature = property?.signature;
-                            }
-                            return new prop();
-                        });
-                        const playerfield = class Player implements PlayerInfoPlayer {
-                            public UUID = player.getUUID();
-                            public Name = player.getName();
-                            public NumberOfProperties = properties.length;
-                            public Property = properties;
-                            public Gamemode = 1;
-                            public Ping = 0;
-                            public HasDisplayName = true;
-                            public DisplayName = JSON.stringify({ text: player.getName() });
-                        };
-                        PlayerInfo.Player = [new playerfield()];
-                        await server
-                            .getPlayerManager()
-                            .sendPacketAll(PlayerInfo, PlayClientbound.PlayerInfo, [player.getID()]);
-                    });
-                })
-                .on('error', console.log);
-
+            const playerinfoplayer: PlayerInfoPlayer = {
+                UUID: player.getUUID(),
+                Name: player.getName(),
+                NumberOfProperties: player.getSkins().length,
+                Property: player.getSkins().map(val => {
+                    const prop: PlayerInfoPlayerProperty = {
+                        Name: val.name,
+                        Value: val.value,
+                        IsSigned: val.signature ?? false,
+                        Signature: val.signature,
+                    };
+                    return prop;
+                }),
+            };
+            PlayerInfo.Player = [playerinfoplayer];
+            await server.getPlayerManager().sendPacketAll(PlayerInfo, PlayClientbound.PlayerInfo, [player.getID()]);
             await player.sendOnlinePlayers(server);
 
             const SpawnPlayer = new SpawnPlayerPacket();
@@ -142,9 +126,28 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
                     const res = JSON.parse(data.toString());
                     player.setName(res.name);
                     player.setUUID(res.id);
-                    login();
+                    https
+                        .get(`https://sessionserver.mojang.com/session/minecraft/profile/${res.id}`, res => {
+                            if (res.statusCode !== 200) {
+                                login();
+                                return;
+                            }
+                            res.on('data', data => {
+                                player.setSkins(JSON.parse(data.toString()).properties);
+                                login();
+                            });
+                        })
+                        .on('error', err => {
+                            server.getConsole().error(err);
+                            login();
+                        });
                 });
             })
-            .on('error', console.log);
+            .on('error', err => {
+                server.getConsole().error(err);
+                player.setName(packet.Name);
+                player.setUUID(uuidv4());
+                login();
+            });
     }
 }

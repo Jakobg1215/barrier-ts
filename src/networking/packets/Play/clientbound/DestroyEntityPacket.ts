@@ -4,9 +4,11 @@ import Packet from '../../Packet';
 export default class DestroyEntityPacket extends Packet {
     public static readonly id = PlayClientbound.DestroyEntity;
 
-    public EntityID!: number;
+    public Count!: number;
+    public EntityIDs!: number[];
 
     public encrypt() {
-        this.writeVarInt(this.EntityID);
+        this.writeVarInt(this.Count);
+        this.EntityIDs.forEach(id => this.writeVarInt(id));
     }
 }

@@ -1,5 +1,4 @@
 import fs from 'fs';
-import https from 'https';
 import type { Socket } from 'net';
 import path from 'path';
 
@@ -36,6 +35,7 @@ export default class PlayerConnection {
         new Slot(),
     ];
     private selectedHotBarSlot = 0;
+    private skins: any[] = [];
 
     public constructor(socket: Socket) {
         this.connection = socket;
@@ -57,44 +57,25 @@ export default class PlayerConnection {
             const PlayerInfo = new PlayerInfoPacket();
             PlayerInfo.Action = 0;
             PlayerInfo.Player = [];
-            const playerfield = class Player implements PlayerInfoPlayer {
-                public constructor(name: string, uuid: string) {
-                    this.Name = name;
-                    this.UUID = uuid;
-                    this.DisplayName = JSON.stringify({ text: this.Name });
-                    const properties: PlayerInfoPlayerProperty[] = [];
-                    https
-                        .get(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`, inc => {
-                            inc.on('data', (data: Buffer) => {
-                                Array.from(JSON.parse(data.toString()).properties).forEach((property: any) => {
-                                    class prop implements PlayerInfoPlayerProperty {
-                                        Name = property.name;
-                                        Value = property.value;
-                                        IsSigned = property.signature ?? false;
-                                        Signature = property?.signature;
-                                    }
-                                    properties.push(new prop());
-                                });
-                            });
-                        })
-                        .on('error', console.log);
-                    this.NumberOfProperties = properties.length;
-                    this.Property = properties;
-                }
-                public Name: string;
-                public UUID: string;
-                public NumberOfProperties: number;
-                public Property: PlayerInfoPlayerProperty[];
-                public Gamemode = 1;
-                public Ping = 0;
-                public HasDisplayName = true;
-                public DisplayName: string;
-            };
             server
                 .getPlayerManager()
                 .getConnections()
-                .forEach(async conn => {
-                    PlayerInfo.Player.push(new playerfield(conn.username, conn.UUID));
+                .forEach(conn => {
+                    const player: PlayerInfoPlayer = {
+                        UUID: conn.UUID,
+                        Name: conn.username,
+                        NumberOfProperties: conn.skins.length,
+                        Property: conn.skins.map(val => {
+                            const prop: PlayerInfoPlayerProperty = {
+                                Name: val.name,
+                                Value: val.value,
+                                IsSigned: val.signature ?? false,
+                                Signature: val.signature,
+                            };
+                            return prop;
+                        }),
+                    };
+                    PlayerInfo.Player.push(player);
                 });
             PlayerInfo.NumberOfPlayers = PlayerInfo.Player.length;
             await this.sendPacket(PlayerInfo, PlayClientbound.PlayerInfo);
@@ -135,8 +116,8 @@ export default class PlayerConnection {
     public async sendChunks() {
         return Promise.resolve().then(async _v => {
             const chunk = fs.readFileSync(path.join(__dirname, '../../../NBT/chunk.nbt'));
-            for (let x = -9; x < 9; x++) {
-                for (let z = -9; z < 9; z++) {
+            for (let x = -10; x < 10; x++) {
+                for (let z = -10; z < 10; z++) {
                     const pk = new Packet();
                     pk.writeInt(x);
                     pk.writeInt(z);
@@ -228,5 +209,13 @@ export default class PlayerConnection {
 
     public getSelectedHotBarSlot() {
         return this.selectedHotBarSlot;
+    }
+
+    public setSkins(prop: any) {
+        this.skins = prop;
+    }
+
+    public getSkins() {
+        return this.skins;
     }
 }

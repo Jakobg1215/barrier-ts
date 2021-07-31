@@ -46,14 +46,14 @@ export default class Server {
                         const PlayerInfo = new PlayerInfoPacket();
                         PlayerInfo.Action = 4;
                         PlayerInfo.NumberOfPlayers = 1;
-                        const uuid = player?.getUUID() ?? '';
-                        const playerfield = class Player implements PlayerInfoPlayer {
-                            public UUID = uuid;
+                        const playerinfoplayer: PlayerInfoPlayer = {
+                            UUID: player.getUUID(),
                         };
-                        PlayerInfo.Player = [new playerfield()];
+                        PlayerInfo.Player = [playerinfoplayer];
                         await this.playerManager.sendPacketAll(PlayerInfo, PlayClientbound.PlayerInfo);
                         const DestroyEntity = new DestroyEntityPacket();
-                        DestroyEntity.EntityID = player.getID();
+                        DestroyEntity.Count = 1;
+                        DestroyEntity.EntityIDs = [player.getID()];
                         await this.getPlayerManager().sendPacketAll(DestroyEntity, PlayClientbound.DestroyEntity);
                     }
                     this.playerManager.removeConnection(connection.remoteAddress!);

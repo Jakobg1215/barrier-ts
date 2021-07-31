@@ -18,7 +18,6 @@ export default class PlayerInfoPacket extends Packet {
                 case Action.addplayer: {
                     this.writeString(this.Player[playerindex].Name ?? 'UknownPlayer');
                     this.writeVarInt(this.Player[playerindex].NumberOfProperties ?? 0);
-                    /*
                     for (
                         let propertyindex = 0;
                         propertyindex < (this.Player[playerindex].NumberOfProperties ?? 0);
@@ -30,9 +29,9 @@ export default class PlayerInfoPacket extends Packet {
                         if (this.Player[playerindex].Property![propertyindex].IsSigned) {
                             this.writeString(this.Player[playerindex].Property![propertyindex].Signature!);
                         }
-                    }*/
+                    }
                     this.writeVarInt(this.Player[playerindex].Gamemode ?? 1);
-                    this.writeVarInt(this.Player[playerindex].Ping ?? 1000);
+                    this.writeVarInt(this.Player[playerindex].Ping ?? -1);
                     this.writeBoolean(this.Player[playerindex].HasDisplayName ?? false);
                     if (this.Player[playerindex].HasDisplayName) {
                         this.writeString(this.Player[playerindex].DisplayName!);
