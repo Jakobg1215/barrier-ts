@@ -4,8 +4,10 @@ import LegacyServerListPingHandler from './handlers/Handshaking/LegacyServerList
 import LoginStartHandler from './handlers/Login/LoginStartHandler';
 import AnimationHandler from './handlers/Play/AnimationHandler';
 import ChatMessageHandler from './handlers/Play/ChatMessageHandler';
+import CloseWindowHandler from './handlers/Play/CloseWindowHandler';
 import CreativeInventoryActionHandler from './handlers/Play/CreativeInventoryActionHandler';
 import EntityActionHandler from './handlers/Play/EntityActionHandler';
+import HeldItemChangeHandler from './handlers/Play/HeldItemChangeHandler';
 import KeepAliveHandler from './handlers/Play/KeepAliveHandler';
 import PlayerAbilitiesHandler from './handlers/Play/PlayerAbilitiesHandler';
 import PlayerBlockPlacementHandler from './handlers/Play/PlayerBlockPlacementHandler';
@@ -38,8 +40,10 @@ LoginHandlers.push(new LoginStartHandler());
 // Play Handlers
 PlayHandlers.push(new AnimationHandler());
 PlayHandlers.push(new ChatMessageHandler());
+PlayHandlers.push(new CloseWindowHandler());
 PlayHandlers.push(new CreativeInventoryActionHandler());
 PlayHandlers.push(new EntityActionHandler());
+PlayHandlers.push(new HeldItemChangeHandler());
 PlayHandlers.push(new KeepAliveHandler());
 PlayHandlers.push(new PlayerAbilitiesHandler());
 PlayHandlers.push(new PlayerBlockPlacementHandler());
