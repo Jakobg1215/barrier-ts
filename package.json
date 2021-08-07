@@ -2,12 +2,11 @@
     "author": "Jakobg1215",
     "description": "A Minecraft Java server writen in TypeScript.",
     "devDependencies": {
-        "@types/node": "^15.12.2",
-        "@types/uuid": "^8.3.0",
+        "@types/node": "^16.4.13",
         "concurrently": "^6.2.0",
         "import-sort-style-module": "^6.0.0",
-        "nodemon": "^2.0.7",
-        "prettier": "^2.3.1",
+        "nodemon": "^2.0.12",
+        "prettier": "^2.3.2",
         "prettier-plugin-import-sort": "^0.0.7"
     },
     "files": [
