@@ -10,9 +10,6 @@
         "prettier": "^2.3.1",
         "prettier-plugin-import-sort": "^0.0.7"
     },
-    "dependencies": {
-        "uuid": "^8.3.2"
-    },
     "files": [
         "./dist/*"
     ],

@@ -7,5 +7,5 @@ import type Handler from '../Handler';
 export default class PlayerBlockPlacementHandler implements Handler<PlayerBlockPlacementPacket> {
     public id = PlayServerbound.PlayerBlockPlacement;
 
-    public handle(_packet: PlayerBlockPlacementPacket, _server: Server, _player: PlayerConnection) {}
+    public async handle(_packet: PlayerBlockPlacementPacket, _server: Server, _player: PlayerConnection) {}
 }

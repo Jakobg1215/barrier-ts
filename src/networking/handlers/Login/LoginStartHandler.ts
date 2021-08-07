@@ -1,8 +1,7 @@
+import crypto from 'crypto';
 import fs from 'fs';
 import https from 'https';
 import path from 'path';
-
-import { v4 as uuidv4 } from 'uuid';
 
 import type Server from '../../../server';
 import Chat from '../../../types/Chat';
@@ -118,7 +117,7 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
             .get(`https://api.mojang.com/users/profiles/minecraft/${packet.Name}?at=${Date.now()}`, res => {
                 if (res.statusCode !== 200) {
                     player.setName(packet.Name);
-                    player.setUUID(uuidv4());
+                    player.setUUID(crypto.randomUUID());
                     login();
                     return;
                 }
@@ -146,7 +145,7 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
             .on('error', err => {
                 server.getConsole().error(err);
                 player.setName(packet.Name);
-                player.setUUID(uuidv4());
+                player.setUUID(crypto.randomUUID());
                 login();
             });
     }
