@@ -54,7 +54,7 @@ export default class ChatMessageHandler implements Handler<ChatMessagePacketS> {
                             break;
                         default: {
                             const message = new ChatMessagePacketC();
-                            message.JSONData = new Chat().addText(`Unknown gamemode; ${args[0]}`);
+                            message.JSONData = new Chat().addText(`Unknown gamemode; ${args[0]}`, { color: 'red' });
                             message.Position = 1;
                             message.Sender = player.getUUID();
                             return await player.sendPacket(message, PlayClientbound.ChatMessage);
@@ -70,6 +70,56 @@ export default class ChatMessageHandler implements Handler<ChatMessagePacketS> {
                 }
                 case 'reload': {
                     server.reload();
+                    break;
+                }
+                case 'commands': {
+                    const DeclareCommands = new Packet();
+                    DeclareCommands.writeVarInt(9);
+                    // root
+                    DeclareCommands.writeByte(0);
+                    DeclareCommands.writeVarInt(3);
+                    DeclareCommands.writeVarInt(1);
+                    DeclareCommands.writeVarInt(2);
+                    DeclareCommands.writeVarInt(3);
+                    // op command
+                    DeclareCommands.writeByte(5);
+                    DeclareCommands.writeVarInt(0);
+                    DeclareCommands.writeString('op');
+                    // gamemode command
+                    DeclareCommands.writeByte(1);
+                    DeclareCommands.writeVarInt(5);
+                    DeclareCommands.writeVarInt(4);
+                    DeclareCommands.writeVarInt(5);
+                    DeclareCommands.writeVarInt(6);
+                    DeclareCommands.writeVarInt(7);
+                    DeclareCommands.writeVarInt(8);
+                    DeclareCommands.writeString('gamemode');
+                    // reload command
+                    DeclareCommands.writeByte(5);
+                    DeclareCommands.writeVarInt(0);
+                    DeclareCommands.writeString('reload');
+                    // gamemode arguments
+                    DeclareCommands.writeByte(5);
+                    DeclareCommands.writeVarInt(0);
+                    DeclareCommands.writeString('survival');
+                    DeclareCommands.writeByte(5);
+                    DeclareCommands.writeVarInt(0);
+                    DeclareCommands.writeString('creative');
+                    DeclareCommands.writeByte(5);
+                    DeclareCommands.writeVarInt(0);
+                    DeclareCommands.writeString('adventure');
+                    DeclareCommands.writeByte(5);
+                    DeclareCommands.writeVarInt(0);
+                    DeclareCommands.writeString('spectator');
+                    DeclareCommands.writeByte(6);
+                    DeclareCommands.writeVarInt(0);
+                    DeclareCommands.writeString('gamenum');
+                    DeclareCommands.writeString('brigadier:integer');
+                    DeclareCommands.writeByte(3);
+                    DeclareCommands.writeInt(0);
+                    DeclareCommands.writeInt(3);
+                    DeclareCommands.writeVarInt(0);
+                    await player.sendPacket(DeclareCommands, PlayClientbound.DeclareCommands);
                     break;
                 }
                 default: {
