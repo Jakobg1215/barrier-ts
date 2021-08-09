@@ -19,7 +19,7 @@ export default class UpdateStructureBlockPacket extends Packet {
     public Rotation!: number;
     public Metadata!: string;
     public Integrity!: number;
-    public Seed!: bigint;
+    public Seed!: number;
     public Flags!: number;
 
     public decrypt() {
