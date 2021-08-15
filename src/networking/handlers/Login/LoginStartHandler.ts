@@ -103,8 +103,8 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
             SpawnPlayer.X = player.getPosition().getX();
             SpawnPlayer.Y = player.getPosition().getY();
             SpawnPlayer.Z = player.getPosition().getZ();
-            SpawnPlayer.Yaw = player.getRotation().getYaw();
-            SpawnPlayer.Pitch = player.getRotation().getPitch();
+            SpawnPlayer.Yaw = player.getRotation().getx();
+            SpawnPlayer.Pitch = player.getRotation().gety();
 
             await server.getPlayerManager().sendPacketAll(SpawnPlayer, PlayClientbound.SpawnPlayer, [player.getID()]);
         };

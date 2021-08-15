@@ -1,7 +1,7 @@
 import type Chat from '../../types/Chat';
 import NBT from '../../types/NBT';
-import Position from '../../types/Position';
 import Slot from '../../types/Slot';
+import Vector3 from '../../types/Vector3';
 
 export default class Packet {
     public static readonly id: number;
@@ -83,7 +83,7 @@ export default class Packet {
         const bytes = this.bytes.slice(this.offset, this.addOffset(8, true));
         const xbytes = bytes.slice(0, 4).toJSON().data;
         const ybytes = bytes.slice(4, 7).toJSON().data;
-        return new Position(
+        return new Vector3(
             Buffer.from([xbytes[0], xbytes[1], xbytes[2], xbytes[3] - (xbytes[3] & 63)]).readInt32BE() / 64,
             bytes.readUInt8(7),
             Buffer.from([
@@ -194,7 +194,7 @@ export default class Packet {
         }
     }
     public writeNBTTag(_NBT: NBT) {}
-    public writePosition(position: Position) {
+    public writePosition(position: Vector3) {
         const zbuf = Buffer.alloc(4);
         zbuf.writeInt32BE(position.getZ() * 16);
         let zdata = zbuf.toJSON().data;

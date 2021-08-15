@@ -3,9 +3,9 @@ import type { Socket } from 'net';
 import path from 'path';
 
 import type Server from '../../server';
-import Position from '../../types/Position';
-import Rotation from '../../types/Rotation';
 import Slot from '../../types/Slot';
+import Vector2 from '../../types/Vector2';
+import Vector3 from '../../types/Vector3';
 import Packet from '../packets/Packet';
 import PlayerInfoPacket from '../packets/Play/clientbound/PlayerInfoPacket';
 import SpawnPlayerPacket from '../packets/Play/clientbound/SpawnPlayerPacket';
@@ -19,8 +19,9 @@ export default class PlayerConnection {
     private connectionState = ConnectionStates.Handshaking;
     private username!: string;
     private UUID!: string;
-    private position = new Position(0, 4, 0);
-    private rotation = new Rotation(0, 0);
+    private position = new Vector3(0, 4, 0);
+    private rotation = new Vector2(0, 0);
+    private chunk = new Vector2(0, 0);
     private onGround = true;
     private id!: number;
     private hotBar: Slot[] = [
@@ -85,7 +86,7 @@ export default class PlayerConnection {
                 .getConnections()
                 .forEach(async conn => {
                     if (conn.UUID === this.UUID) return;
-                    let yaw = Math.round(conn.rotation.getYaw());
+                    let yaw = Math.round(conn.rotation.getx());
                     while (yaw > 360 || yaw < -360) {
                         if (yaw > 360) {
                             yaw -= 360;
@@ -97,9 +98,9 @@ export default class PlayerConnection {
                     yaw = Math.round(yaw / (360 / 255));
                     if (yaw < 0) yaw = 255 + yaw;
                     let pitch =
-                        conn.rotation.getPitch() > 0
-                            ? (conn.rotation.getPitch() * 65) / 90
-                            : 255 - (Math.abs(conn.rotation.getPitch()) * 65) / 90;
+                        conn.rotation.gety() > 0
+                            ? (conn.rotation.gety() * 65) / 90
+                            : 255 - (Math.abs(conn.rotation.gety()) * 65) / 90;
                     const SpawnPlayer = new SpawnPlayerPacket();
                     SpawnPlayer.EntityID = conn.id;
                     SpawnPlayer.PlayerUUID = conn.UUID;
@@ -163,8 +164,8 @@ export default class PlayerConnection {
     }
 
     public setRotation(rotation?: { yaw: number; pitch: number }) {
-        this.rotation.setYaw(rotation?.yaw ?? this.rotation.getYaw());
-        this.rotation.setPitch(rotation?.pitch ?? this.rotation.getPitch());
+        this.rotation.setx(rotation?.yaw ?? this.rotation.getx());
+        this.rotation.sety(rotation?.pitch ?? this.rotation.gety());
     }
 
     public getRotation() {
@@ -217,5 +218,9 @@ export default class PlayerConnection {
 
     public getSkins() {
         return this.skins;
+    }
+
+    public getChunk() {
+        return this.chunk;
     }
 }

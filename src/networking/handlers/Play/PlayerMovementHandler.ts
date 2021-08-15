@@ -15,8 +15,8 @@ export default class PlayerMovementHandler implements Handler<PlayerMovementPack
         TeleportPacket.X = player.getPosition().getX();
         TeleportPacket.Y = player.getPosition().getY();
         TeleportPacket.Z = player.getPosition().getZ();
-        TeleportPacket.Yaw = player.getRotation().getYaw();
-        TeleportPacket.Pitch = player.getRotation().getPitch();
+        TeleportPacket.Yaw = player.getRotation().getx();
+        TeleportPacket.Pitch = player.getRotation().gety();
         TeleportPacket.OnGround = packet.OnGround;
         await server.getPlayerManager().sendPacketAll(TeleportPacket, PlayClientbound.EntityTeleport, [player.getID()]);
     }

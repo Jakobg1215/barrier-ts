@@ -1,4 +1,4 @@
-import type Position from '../../../../types/Position';
+import type Vector3 from '../../../../types/Vector3';
 import { PlayServerbound } from '../../../types/PacketIds';
 import Packet from '../../Packet';
 
@@ -6,7 +6,7 @@ export default class PlayerBlockPlacementPacket extends Packet {
     public static readonly id = PlayServerbound.PlayerBlockPlacement;
 
     public Hand!: number;
-    public Location!: Position;
+    public Location!: Vector3;
     public Face!: number;
     public CursorPositionX!: number;
     public CursorPositionY!: number;

@@ -1,4 +1,4 @@
-export default class Position {
+export default class Vector3 {
     private x: number;
     private y: number;
     private z: number;
