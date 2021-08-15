@@ -12,6 +12,7 @@ export default class Config {
             'max-players': 10,
             'server-name': 'vanilla',
             'always-day': false,
+            icon: '',
         };
         fs.readFileSync(path.join(__dirname, '../../server.properties'))
             .toString()
@@ -37,6 +38,7 @@ export default class Config {
         this.addSettings('max-players', { value: 10, comment: 'Limit how many players can be on your server.' });
         this.addSettings('server-name', { value: 'vanilla', comment: 'The name under the fps in the debug menu.' });
         this.addSettings('always-day', { value: false, comment: 'This will make time stop.' });
+        this.addSettings('icon', { value: '', comment: 'The path to the server icon. The icon must be 64 * 64.' });
         fs.writeFileSync(path.join(__dirname, '../../server.properties'), this.settings);
     }
 
