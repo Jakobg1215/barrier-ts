@@ -9,23 +9,20 @@
         "prettier": "^2.3.2",
         "prettier-plugin-import-sort": "^0.0.7"
     },
-    "files": [
-        "./dist/*"
-    ],
     "importSort": {
         ".ts": {
             "style": "module",
             "parser": "typescript"
         }
     },
-    "main": "./dist/server.js",
+    "main": "dist/server",
     "name": "barrierts",
     "private": true,
     "scripts": {
         "build": "tsc",
-        "dev": "concurrently -k \"tsc -w\" \"nodemon ./dist/server.js --delay 0.5\"",
-        "prettier": "prettier ./src --config ./.prettierrc --write",
-        "start": "node ./dist/server.js --unhandled-rejections=strict"
+        "dev": "concurrently -k -i \"tsc -w\" \"nodemon --delay 5 dist/server\"",
+        "prettier": "prettier src --config .prettierrc --write",
+        "start": "node dist/server --unhandled-rejections=strict"
     },
     "version": "1.0.0"
 }
