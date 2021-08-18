@@ -37,6 +37,7 @@ export default class PlayerConnection {
     ];
     private selectedHotBarSlot = 0;
     private skins: any[] = [];
+    public protocol: number = 0;
 
     public constructor(socket: Socket) {
         this.connection = socket;

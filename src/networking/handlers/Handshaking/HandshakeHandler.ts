@@ -12,6 +12,7 @@ export default class HandshakeHandler implements Handler<HandshakePacket> {
 
     public async handle(packet: HandshakePacket, server: Server, player: PlayerConnection) {
         player.setState(packet.NextState);
+        player.protocol = packet.ProtocolVersion;
         if (packet.NextState === ConnectionStates.Status) {
             new RequestHandler().handle(new Packet(), server, player);
         }

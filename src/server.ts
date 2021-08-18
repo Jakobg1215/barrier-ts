@@ -2,12 +2,14 @@ import net from 'net';
 
 import NetworkRegistry from './networking/NetworkRegistry';
 import Packet from './networking/packets/Packet';
+import ChatMessagePacket from './networking/packets/Play/clientbound/ChatMessagePacket';
 import DestroyEntityPacket from './networking/packets/Play/clientbound/DestroyEntityPacket';
 import PlayerInfoPacket from './networking/packets/Play/clientbound/PlayerInfoPacket';
 import PlayerConnection from './networking/players/PlayerConnection';
 import PlayerManager from './networking/players/PlayerManager';
 import { PlayerInfoPlayer } from './networking/types/PacketFieldArguments';
 import { PlayClientbound } from './networking/types/PacketIds';
+import Chat from './types/Chat';
 import Config from './utils/Config';
 import Console from './utils/Console';
 import World from './world/World';
@@ -55,6 +57,13 @@ export default class Server {
                         DestroyEntity.Count = 1;
                         DestroyEntity.EntityIDs = [player.getID()];
                         await this.getPlayerManager().sendPacketAll(DestroyEntity, PlayClientbound.DestroyEntity);
+                        const leaveMessage = new ChatMessagePacket();
+                        leaveMessage.JSONData = new Chat().translate('multiplayer.player.left', [player.getName()], {
+                            color: 'yellow',
+                        });
+                        leaveMessage.Position = 1;
+                        leaveMessage.Sender = '00000000000000000000000000000000';
+                        await this.getPlayerManager().sendPacketAll(leaveMessage, PlayClientbound.ChatMessage);
                     }
                     this.playerManager.removeConnection(connection.remoteAddress!);
                 });

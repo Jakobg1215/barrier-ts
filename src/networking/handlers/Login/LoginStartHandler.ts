@@ -9,6 +9,7 @@ import DisconnectPacket from '../../packets/Login/Clientbound/DisconnectPacket';
 import LoginSuccessPacket from '../../packets/Login/Clientbound/LoginSuccessPacket';
 import type LoginStartPacket from '../../packets/Login/Serverbound/LoginStartPacket';
 import Packet from '../../packets/Packet';
+import ChatMessagePacket from '../../packets/Play/clientbound/ChatMessagePacket';
 import JoinGamePacket from '../../packets/Play/clientbound/JoinGamePacket';
 import PlayerInfoPacket from '../../packets/Play/clientbound/PlayerInfoPacket';
 import PlayerPositionAndLookPacket from '../../packets/Play/clientbound/PlayerPositionAndLookPacket';
@@ -97,6 +98,14 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
             await server.getPlayerManager().sendPacketAll(PlayerInfo, PlayClientbound.PlayerInfo, [player.getID()]);
             await player.sendOnlinePlayers(server);
 
+            const JoinMessage = new ChatMessagePacket();
+            JoinMessage.JSONData = new Chat().translate('multiplayer.player.joined', [player.getName()], {
+                color: 'yellow',
+            });
+            JoinMessage.Position = 1;
+            JoinMessage.Sender = '00000000000000000000000000000000';
+            await server.getPlayerManager().sendPacketAll(JoinMessage, PlayClientbound.ChatMessage, [player.getID()]);
+
             const SpawnPlayer = new SpawnPlayerPacket();
             SpawnPlayer.EntityID = player.getID();
             SpawnPlayer.PlayerUUID = player.getUUID();
@@ -110,7 +119,17 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
         };
         if (server.getPlayerManager().getConnections().size - 1 >= server.getConfig()['max-players']) {
             const disconnect = new DisconnectPacket();
-            disconnect.Reason = new Chat().addText('Server is full');
+            disconnect.Reason = new Chat().translate('multiplayer.disconnect.server_full');
+            return await player.sendPacket(disconnect, LoginClientbound.Disconnect);
+        }
+        if (player.protocol < 756) {
+            const disconnect = new DisconnectPacket();
+            disconnect.Reason = new Chat().translate('multiplayer.disconnect.outdated_client', ['1.17.1']);
+            return await player.sendPacket(disconnect, LoginClientbound.Disconnect);
+        }
+        if (player.protocol > 756) {
+            const disconnect = new DisconnectPacket();
+            disconnect.Reason = new Chat().translate('multiplayer.disconnect.outdated_server', ['1.17.1']);
             return await player.sendPacket(disconnect, LoginClientbound.Disconnect);
         }
         https
