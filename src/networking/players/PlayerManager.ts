@@ -34,8 +34,7 @@ export default class PlayerManager {
         this.connections.forEach(async player => {
             if (!exclude?.includes(player.getID())) {
                 if (player.getState() === 3) {
-                    await player.sendPacket(packet, id);
-                    packet.clearBytes();
+                    player.getConnection().write(packet.buildPacket(id));
                 }
             }
         });
