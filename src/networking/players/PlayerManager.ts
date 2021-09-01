@@ -31,11 +31,15 @@ export default class PlayerManager {
     }
 
     public async sendPacketAll(packet: Packet, id: number, exclude?: number[]) {
+        packet.encrypt();
+        const encryptedPacket = packet;
         this.connections.forEach(async player => {
-            if (!exclude?.includes(player.getID())) {
-                if (player.getState() === 3) {
-                    player.getConnection().write(packet.buildPacket(id));
-                }
+            if (exclude === undefined) {
+                player.getConnection().write(encryptedPacket.buildPacket(id));
+                return;
+            }
+            if (!exclude.includes(player.getID())) {
+                player.getConnection().write(encryptedPacket.buildPacket(id));
             }
         });
     }

@@ -8,17 +8,15 @@ import type Handler from '../Handler';
 export default class TeleportConfirmHandler implements Handler<TeleportConfirmPacket> {
     public id = PlayServerbound.TeleportConfirm;
 
-    public async handle(packet: TeleportConfirmPacket, server: Server, player: PlayerConnection) {
+    public async handle(_packet: TeleportConfirmPacket, server: Server, player: PlayerConnection) {
         const TeleportPacket = new EntityTeleportPacket();
-        TeleportPacket.EntityID = packet.TeleportID;
+        TeleportPacket.EntityID = player.getID();
         TeleportPacket.X = player.getPosition().getX();
         TeleportPacket.Y = player.getPosition().getY();
         TeleportPacket.Z = player.getPosition().getZ();
         TeleportPacket.Yaw = player.getRotation().getx();
         TeleportPacket.Pitch = player.getRotation().gety();
         TeleportPacket.OnGround = player.getOnGround();
-        await server
-            .getPlayerManager()
-            .sendPacketAll(TeleportPacket, PlayClientbound.EntityTeleport, [packet.TeleportID]);
+        await server.getPlayerManager().sendPacketAll(TeleportPacket, PlayClientbound.EntityTeleport, [player.getID()]);
     }
 }
