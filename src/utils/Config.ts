@@ -10,7 +10,7 @@ export default class Config {
             port: 25565,
             motd: 'A Barrierts Server',
             'max-players': 10,
-            'server-name': 'vanilla',
+            'server-name': 'barrierts',
             'always-day': false,
             icon: '',
         };
