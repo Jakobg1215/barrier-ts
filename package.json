@@ -19,6 +19,7 @@
             "parser": "typescript"
         }
     },
+    "license": "MIT",
     "main": "dist/server",
     "name": "barrierts",
     "private": true,
