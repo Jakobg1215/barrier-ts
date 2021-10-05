@@ -2,22 +2,14 @@
     "author": "Jakobg1215",
     "description": "A Minecraft Java server writen in TypeScript.",
     "devDependencies": {
-        "@types/node": "^16.7.10",
-        "concurrently": "^6.2.1",
-        "import-sort-style-module": "^6.0.0",
-        "nodemon": "^2.0.12",
-        "prettier": "^2.3.2",
-        "prettier-plugin-import-sort": "^0.0.7",
-        "typescript": "^4.4.2"
+        "@types/node": "^16.10.3",
+        "concurrently": "^6.3.0",
+        "nodemon": "^2.0.13",
+        "prettier": "^2.4.1",
+        "typescript": "^4.4.3"
     },
     "engines": {
         "node": ">=10"
-    },
-    "importSort": {
-        ".ts": {
-            "style": "module",
-            "parser": "typescript"
-        }
     },
     "license": "MIT",
     "main": "dist/server",
@@ -25,9 +17,11 @@
     "private": true,
     "scripts": {
         "build": "tsc",
-        "dev": "concurrently -k -i \"tsc -w\" \"nodemon --delay 5 dist/server\"",
-        "prettier": "prettier src --config .prettierrc --write",
-        "start": "node dist/server --unhandled-rejections=strict"
+        "dev:tsc": "tsc -w",
+        "dev:nodemon": "nodemon dist/index --delay 1",
+        "dev": "concurrently -k -i -s \"all\" npm:dev:*",
+        "start": "node dist/index",
+        "prettier": "prettier src --config .prettierrc --write"
     },
     "version": "1.0.0"
 }
