@@ -1,5 +1,5 @@
-import net from 'net';
-
+import type { Buffer } from 'node:buffer';
+import { createServer } from 'node:net';
 import NetworkRegistry from './networking/NetworkRegistry';
 import Packet from './networking/packets/Packet';
 import ChatMessagePacket from './networking/packets/Play/clientbound/ChatMessagePacket';
@@ -16,7 +16,7 @@ import World from './world/World';
 
 export default class Server {
     private world = new World(this);
-    private server = new net.Server().close();
+    private server = createServer().close();
     private networkRegistry = new NetworkRegistry();
     private playerManager = new PlayerManager();
     private config = Config.getSettings();

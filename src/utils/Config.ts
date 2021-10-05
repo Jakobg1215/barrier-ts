@@ -1,11 +1,11 @@
-import fs from 'fs';
-import path from 'path';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 export default class Config {
     private static settings = '';
 
     public static getSettings() {
-        if (!fs.existsSync(path.join(__dirname, '../../server.properties'))) Config.crateFile();
+        if (!existsSync(join(__dirname, '../../server.properties'))) Config.crateFile();
         const fileop = {
             port: 25565,
             motd: 'A Barrierts Server',
@@ -14,7 +14,7 @@ export default class Config {
             'always-day': false,
             icon: '',
         };
-        fs.readFileSync(path.join(__dirname, '../../server.properties'))
+        readFileSync(join(__dirname, '../../server.properties'))
             .toString()
             .split('\n')
             .filter(v => v.length > 2)
@@ -39,7 +39,7 @@ export default class Config {
         this.addSettings('server-name', { value: 'vanilla', comment: 'The name under the fps in the debug menu.' });
         this.addSettings('always-day', { value: false, comment: 'This will make time stop.' });
         this.addSettings('icon', { value: '', comment: 'The path to the server icon. The icon must be 64 * 64.' });
-        fs.writeFileSync(path.join(__dirname, '../../server.properties'), this.settings);
+        writeFileSync(join(__dirname, '../../server.properties'), this.settings);
     }
 
     private static addSettings(setting: string, options?: { value?: any; comment?: string }) {
@@ -49,5 +49,3 @@ export default class Config {
         this.settings = this.settings.concat(option);
     }
 }
-
-Config.getSettings();

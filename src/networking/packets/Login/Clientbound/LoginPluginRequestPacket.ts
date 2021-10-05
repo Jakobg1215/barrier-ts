@@ -1,3 +1,4 @@
+import type { Buffer } from 'node:buffer';
 import { LoginClientbound } from '../../../types/PacketIds';
 import Packet from '../../Packet';
 

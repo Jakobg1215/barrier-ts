@@ -1,3 +1,5 @@
+import { Buffer } from 'node:buffer';
+
 export default class NBT {
     public readonly name: string;
     public readonly roots: Map<string, any> = new Map();

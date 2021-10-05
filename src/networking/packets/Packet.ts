@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 import type Chat from '../../types/Chat';
 import NBT from '../../types/NBT';
 import Slot from '../../types/Slot';

@@ -1,7 +1,7 @@
-import fs from 'fs';
-import type { Socket } from 'net';
-import path from 'path';
-
+import type { Buffer } from 'node:buffer';
+import { readFileSync } from 'node:fs';
+import type { Socket } from 'node:net';
+import { join } from 'node:path';
 import type Server from '../../server';
 import Slot from '../../types/Slot';
 import Vector2 from '../../types/Vector2';
@@ -117,7 +117,7 @@ export default class PlayerConnection {
 
     public async sendChunks() {
         return Promise.resolve().then(async _v => {
-            const chunk = fs.readFileSync(path.join(__dirname, '../../../NBT/chunk.nbt'));
+            const chunk = readFileSync(join(__dirname, '../../../NBT/chunk.nbt'));
             for (let x = -10; x < 10; x++) {
                 for (let z = -10; z < 10; z++) {
                     const pk = new Packet();

@@ -1,7 +1,7 @@
-import readline from 'readline';
+import { createInterface, emitKeypressEvents } from 'node:readline';
 
 export default class Console {
-    private interface = readline.createInterface({
+    private interface = createInterface({
         input: process.stdin,
         output: process.stdout,
         terminal: true,
@@ -11,7 +11,7 @@ export default class Console {
     });
 
     public constructor() {
-        readline.emitKeypressEvents(process.stdin);
+        emitKeypressEvents(process.stdin);
         process.stdin.setEncoding('utf8');
 
         this.interface.on('line', line => {
