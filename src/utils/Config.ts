@@ -7,11 +7,11 @@ export default class Config {
     public static getSettings() {
         if (!existsSync(join(__dirname, '../../server.properties'))) Config.crateFile();
         const fileop = {
-            port: 25565,
+            port: '25565',
             motd: 'A Barrierts Server',
-            'max-players': 10,
+            'max-players': '10',
             'server-name': 'barrierts',
-            'always-day': false,
+            'always-day': 'false',
             icon: '',
         };
         readFileSync(join(__dirname, '../../server.properties'))
@@ -30,14 +30,14 @@ export default class Config {
     }
 
     private static crateFile() {
-        this.addSettings('port', { value: 25565, comment: 'This tells what port for the server to use.' });
+        this.addSettings('port', { value: '25565', comment: 'This tells what port for the server to use.' });
         this.addSettings('motd', {
             value: 'A Barrierts Server',
             comment: 'This is the Message of the Day for the server list.',
         });
-        this.addSettings('max-players', { value: 10, comment: 'Limit how many players can be on your server.' });
+        this.addSettings('max-players', { value: '10', comment: 'Limit how many players can be on your server.' });
         this.addSettings('server-name', { value: 'vanilla', comment: 'The name under the fps in the debug menu.' });
-        this.addSettings('always-day', { value: false, comment: 'This will make time stop.' });
+        this.addSettings('always-day', { value: 'false', comment: 'This will make time stop.' });
         this.addSettings('icon', { value: '', comment: 'The path to the server icon. The icon must be 64 * 64.' });
         writeFileSync(join(__dirname, '../../server.properties'), this.settings);
     }

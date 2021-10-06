@@ -2,7 +2,6 @@ import crypto from 'crypto';
 import fs from 'fs';
 import https from 'https';
 import path from 'path';
-
 import type Server from '../../../server';
 import Chat from '../../../types/Chat';
 import DisconnectPacket from '../../packets/Login/Clientbound/DisconnectPacket';
@@ -46,7 +45,7 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
             JoinGame.DimensionCodec = fs.readFileSync(path.join(__dirname, '../../../../NBT/Dimension Codec.nbt'));
             JoinGame.WorldName = 'minecraft:overworld';
             JoinGame.Hashedseed = 0n;
-            JoinGame.MaxPlayers = server.getConfig()['max-players'];
+            JoinGame.MaxPlayers = parseInt(server.getConfig()['max-players']);
             JoinGame.ViewDistance = 10;
             JoinGame.ReducedDebugInfo = false;
             JoinGame.Enablerespawnscreen = true;
@@ -117,7 +116,7 @@ export default class LoginStartHandler implements Handler<LoginStartPacket> {
 
             await server.getPlayerManager().sendPacketAll(SpawnPlayer, PlayClientbound.SpawnPlayer, [player.getID()]);
         };
-        if (server.getPlayerManager().getConnections().size - 1 >= server.getConfig()['max-players']) {
+        if (server.getPlayerManager().getConnections().size - 1 >= parseInt(server.getConfig()['max-players'])) {
             const disconnect = new DisconnectPacket();
             disconnect.Reason = new Chat().translate('multiplayer.disconnect.server_full');
             return await player.sendPacket(disconnect, LoginClientbound.Disconnect);

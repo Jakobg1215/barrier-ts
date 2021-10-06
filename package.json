@@ -18,9 +18,9 @@
     "scripts": {
         "build": "tsc",
         "dev:tsc": "tsc -w",
-        "dev:nodemon": "nodemon dist/index --delay 1",
+        "dev:nodemon": "nodemon dist/server --delay 1",
         "dev": "concurrently -k -i -s \"all\" npm:dev:*",
-        "start": "node dist/index",
+        "start": "node dist/server",
         "prettier": "prettier src --config .prettierrc --write"
     },
     "version": "1.0.0"

@@ -23,7 +23,7 @@ export default class Server {
     private console = new Console();
 
     public constructor() {
-        this.listen(Number(this.config.port));
+        this.listen(parseInt(this.config.port));
     }
 
     public reload() {
