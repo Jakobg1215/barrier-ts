@@ -9,9 +9,10 @@
     "scripts": {
         "dev:tsc": "tsc -w",
         "dev:nodemon": "nodemon dist/BarrierTs",
-        "dev": "concurrently -r -k -i npm:start:*",
+        "dev": "concurrently -r -k -i npm:dev:*",
         "start": "node dist/BarrierTs",
         "build": "tsc",
+        "build:start": "tsc && node dist/BarrierTs",
         "prettier": "prettier src --config .prettierrc --write"
     }
 }
