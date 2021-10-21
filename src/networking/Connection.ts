@@ -7,6 +7,7 @@ import Player from '../world/entity/Player';
 import type Handler from './handlers/Handler';
 import Packet from './Packet';
 import type ClientboundPacket from './packets/ClientbountPacket';
+import ClientboundLoginDisconnectPacket from './packets/login/ClientboundLoginDisconnectPacket';
 import type ServerboundPacket from './packets/ServerboundPacket';
 import { ProtocolState } from './Protocol';
 
@@ -20,10 +21,12 @@ export default class Connection {
     private connectionPlayer: Player | null = null;
     private connectionEncryption: boolean = false;
     private connectionCompression: boolean = false;
+    private connnectionNetworkClosed: boolean = false;
 
     public constructor(socket: Socket, server: BarrierTs) {
         this.connectionNetworking = socket;
         this.connectionServer = server;
+
         this.connectionNetworking.on('data', (data: Buffer) => {
             const inPacket: Packet = new Packet(data);
             do {
@@ -56,6 +59,10 @@ export default class Connection {
                 packetHandle.hander(readPacket, this, this.connectionServer);
             } while (inPacket.getReadableBytes().length > 0);
         });
+
+        this.connectionNetworking.on('close', () => {
+            this.connnectionNetworkClosed = true;
+        });
     }
 
     public createPlayer(gameProfile: GameProfile): void {
@@ -66,16 +73,39 @@ export default class Connection {
         this.connectionProtocolState = state;
     }
 
-    public disconnect(): void {}
+    public disconnect(reason: string): void {
+        // TODO: Make use chat type
+        switch (this.connectionProtocolState) {
+            case ProtocolState.LOGIN: {
+                this.send(new ClientboundLoginDisconnectPacket(reason));
+                break;
+            }
+
+            case ProtocolState.PLAY: {
+                break;
+            }
+        }
+        this.end();
+    }
+
+    public end(): void {
+        this.connnectionNetworkClosed = true;
+        this.connectionNetworking.end();
+    }
 
     public send(data: ClientboundPacket): void {
         let dataChange: Buffer = data.write().buildPacket(data.id);
+
         if (this.connectionEncryption) {
             const cipher = createCipheriv('aes-128-cfb8', this.connectionKey!, this.connectionKey);
             dataChange = cipher.update(dataChange);
         }
+
         if (this.connectionCompression) {
         }
+
+        if (this.connnectionNetworkClosed) return;
+
         this.connectionNetworking.write(dataChange);
     }
 

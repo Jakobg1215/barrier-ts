@@ -21,7 +21,8 @@ export default class KeyHandler implements Handler<ServerboundKeyPacket> {
             packet.nonce,
         );
 
-        if (Buffer.compare(nonce, connection.nonce) !== 0) return connection.disconnect();
+        if (Buffer.compare(nonce, connection.nonce) !== 0)
+            return connection.disconnect(JSON.stringify({ translate: 'multiplayer.disconnect.generic' }));
 
         const performTwosCompliment = (buffer: Buffer): void => {
             let carry: boolean = true;
@@ -71,11 +72,11 @@ export default class KeyHandler implements Handler<ServerboundKeyPacket> {
             new URL(
                 `https://sessionserver.mojang.com/session/minecraft/hasJoined?username=${encodeURIComponent(
                     connection.name!,
-                )}&serverId=${hash}&id=127.0.0.1`,
+                )}&serverId=${hash}`,
             ),
             Responce => {
-                if (Responce.statusCode !== 200) {
-                    connection.disconnect();
+                if (Responce.statusCode === 204) {
+                    connection.disconnect(JSON.stringify({ translate: 'multiplayer.disconnect.unverified_username' }));
                 }
                 Responce.on('data', data => {
                     connection.setKey(key);

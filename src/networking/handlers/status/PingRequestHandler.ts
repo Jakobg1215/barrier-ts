@@ -7,6 +7,6 @@ import type Handler from '../Handler';
 export default class PingRequestHandler implements Handler<ServerboundPingRequestPacket> {
     public hander(_packet: ServerboundPingRequestPacket, connection: Connection, _server: BarrierTs): void {
         connection.send(new ClientboundPongResponsePacket(BigInt(Date.now())));
-        connection.networking.end();
+        connection.end();
     }
 }
