@@ -8,7 +8,7 @@ Its just a small project that I work in my free time.
 
 ### Requirements
 
--   node 10 or higher
+-   node 10.13.0 or higher
 
 ### Running
 
@@ -37,15 +37,3 @@ You can work on this project and submit pull request.
 I don't want to use any Dependencies only devDependencies.
 
 You can use `npm run dev` to run barrierts in nodemon.
-
-### ToDo's
-
--   [ ] make mutilplayer stable
--   [ ] have loging encryption
--   [ ] make the world infinite
--   [ ] have a chuck save system
--   [ ] pvp
--   [ ] entities
--   [ ] plugin support
--   [ ] command/command block system
--   [ ] invintory system
