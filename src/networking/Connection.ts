@@ -30,6 +30,7 @@ export default class Connection {
         this.connectionNetworking.on('data', (data: Buffer) => {
             const inPacket: Packet = new Packet(data);
             do {
+                if (this.connnectionNetworkClosed) return;
                 // Test if online and need to be compressed.
                 const packetLength: number = inPacket.readVarInt();
                 if (packetLength !== inPacket.getReadableBytes().length) {
