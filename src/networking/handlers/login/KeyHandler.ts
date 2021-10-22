@@ -7,6 +7,7 @@ import type Connection from '../../Connection';
 import ClientboundGameProfilePacket from '../../packets/login/ClientboundGameProfilePacket';
 import ClientboundLoginCompressionPacket from '../../packets/login/ClientboundLoginCompressionPacket';
 import type ServerboundKeyPacket from '../../packets/login/ServerboundKeyPacket';
+import { ProtocolState } from '../../Protocol';
 import type Handler from '../Handler';
 
 export default class KeyHandler implements Handler<ServerboundKeyPacket> {
@@ -84,11 +85,13 @@ export default class KeyHandler implements Handler<ServerboundKeyPacket> {
                     connection.createPlayer({ name: playerdata.name, uuid: playerdata.id });
                     connection.player?.setProperties(playerdata.properties);
                     connection.enableEncryption();
-                    if (server.config.compression > 0) {
+                    if (server.config.compression >= 0) {
                         connection.send(new ClientboundLoginCompressionPacket(server.config.compression));
                         connection.enableCompression();
                     }
                     connection.send(new ClientboundGameProfilePacket(connection.player?.gameProfile!));
+                    connection.setProtocolState(ProtocolState.PLAY);
+                    server.console.log(`Player ${connection.player?.gameProfile.name} has joined the game!`);
                 });
             },
         );

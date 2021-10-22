@@ -1,5 +1,5 @@
 import type { Buffer } from 'node:buffer';
-import { createCipheriv, randomBytes } from 'node:crypto';
+import { constants, createCipheriv, privateDecrypt, randomBytes } from 'node:crypto';
 import type { Socket } from 'node:net';
 import type BarrierTs from '../BarrierTs';
 import type GameProfile from '../types/GameProfile';
@@ -28,37 +28,52 @@ export default class Connection {
         this.connectionServer = server;
 
         this.connectionNetworking.on('data', (data: Buffer) => {
-            const inPacket: Packet = new Packet(data);
-            do {
-                if (this.connnectionNetworkClosed) return;
-                // Test if online and need to be compressed.
-                const packetLength: number = inPacket.readVarInt();
-                if (packetLength !== inPacket.getReadableBytes().length) {
-                    // Handle invalid packet length
-                }
+            const inPacket: Packet = this.connectionEncryption
+                ? new Packet(
+                      privateDecrypt(
+                          {
+                              key: `-----BEGIN RSA PRIVATE KEY-----\n${server.padLock.privateKey.toString(
+                                  'base64',
+                              )}\n-----END RSA PRIVATE KEY-----`,
+                              padding: constants.RSA_PKCS1_PADDING,
+                          },
+                          data,
+                      ),
+                  )
+                : new Packet(data);
+            if (!this.connectionCompression) {
+                do {
+                    if (this.connnectionNetworkClosed) return;
 
-                const packetid: number = inPacket.readVarInt();
+                    const packetLength: number = inPacket.readVarInt();
+                    if (packetLength !== inPacket.getReadableBytes().length) {
+                        // Handle invalid packet length
+                    }
 
-                const readPacket: ServerboundPacket | null = this.connectionServer.protocol.getPacket(
-                    this.connectionProtocolState,
-                    packetid,
-                );
-                if (!readPacket)
-                    return this.connectionServer.console.error(
-                        `Server packet ${packetid} not found for state ${this.connectionProtocolState}!`,
+                    const packetid: number = inPacket.readVarInt();
+
+                    const readPacket: ServerboundPacket | null = this.connectionServer.protocol.getPacket(
+                        this.connectionProtocolState,
+                        packetid,
                     );
-                readPacket.read(inPacket);
+                    if (!readPacket)
+                        return this.connectionServer.console.error(
+                            `Server packet ${packetid} not found for state ${this.connectionProtocolState}!`,
+                        );
+                    readPacket.read(inPacket);
 
-                const packetHandle: Handler<ServerboundPacket> | null = this.connectionServer.protocol.getHandler(
-                    this.connectionProtocolState,
-                    packetid,
-                );
-                if (!packetHandle)
-                    return this.connectionServer.console.warn(
-                        `Server handler ${packetid} not found for state ${this.connectionProtocolState}!`,
+                    const packetHandle: Handler<ServerboundPacket> | null = this.connectionServer.protocol.getHandler(
+                        this.connectionProtocolState,
+                        packetid,
                     );
-                packetHandle.hander(readPacket, this, this.connectionServer);
-            } while (inPacket.getReadableBytes().length > 0);
+                    if (!packetHandle)
+                        return this.connectionServer.console.warn(
+                            `Server handler ${packetid} not found for state ${this.connectionProtocolState}!`,
+                        );
+                    packetHandle.hander(readPacket, this, this.connectionServer);
+                } while (inPacket.getReadableBytes().length > 0);
+                return;
+            }
         });
 
         this.connectionNetworking.on('close', () => {
@@ -95,14 +110,21 @@ export default class Connection {
     }
 
     public send(data: ClientboundPacket): void {
-        let dataChange: Buffer = data.write().buildPacket(data.id);
+        const dataWrite = data.write();
+        let dataChange: Buffer = dataWrite.getReadableBytes();
+
+        if (this.connectionCompression) {
+            if (dataChange.length > this.connectionServer.config.compression) {
+                //deflateSync(dataChange);
+            } else {
+            }
+        } else {
+            dataChange = dataWrite.buildPacket(data.id);
+        }
 
         if (this.connectionEncryption) {
             const cipher = createCipheriv('aes-128-cfb8', this.connectionKey!, this.connectionKey);
             dataChange = cipher.update(dataChange);
-        }
-
-        if (this.connectionCompression) {
         }
 
         if (this.connnectionNetworkClosed) return;
