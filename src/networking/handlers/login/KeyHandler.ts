@@ -3,7 +3,12 @@ import { constants, createHash, privateDecrypt } from 'node:crypto';
 import { get } from 'node:https';
 import { URL } from 'node:url';
 import type BarrierTs from '../../../BarrierTs';
+import DimensionType from '../../../types/DimensionType';
+import { GameType } from '../../../types/GameType';
+import RegistryHolder from '../../../types/RegistryHolder';
+import ObjectToNbt from '../../../utilities/ObjectToNbt';
 import type Connection from '../../Connection';
+import ClientboundLoginPacket from '../../packets/game/ClientboundLoginPacket';
 import ClientboundGameProfilePacket from '../../packets/login/ClientboundGameProfilePacket';
 import ClientboundLoginCompressionPacket from '../../packets/login/ClientboundLoginCompressionPacket';
 import type ServerboundKeyPacket from '../../packets/login/ServerboundKeyPacket';
@@ -91,6 +96,25 @@ export default class KeyHandler implements Handler<ServerboundKeyPacket> {
                     }
                     connection.send(new ClientboundGameProfilePacket(connection.player?.gameProfile!));
                     connection.setProtocolState(ProtocolState.PLAY);
+                    connection.send(
+                        new ClientboundLoginPacket(
+                            0,
+                            0n,
+                            false,
+                            GameType.CREATIVE,
+                            GameType.CREATIVE,
+                            ['minecraft:overworld', 'minecraft:the_nether', 'minecraft:the_end'],
+                            ObjectToNbt(RegistryHolder),
+                            ObjectToNbt(DimensionType),
+                            'minecraft:overworld',
+                            server.config.maxplayers,
+                            10,
+                            false,
+                            true,
+                            true,
+                            true,
+                        ),
+                    );
                     server.console.log(`Player ${connection.player?.gameProfile.name} has joined the game!`);
                 });
             },

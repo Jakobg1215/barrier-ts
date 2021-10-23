@@ -191,6 +191,12 @@ export default class Packet {
         this.writeLong(uuid.readLong());
         return this;
     }
+
+    public append(data: Buffer): this {
+        this.bytes = Buffer.concat([this.bytes, data]);
+        return this;
+    }
+
     //#endregion
     public getReadableBytes(): Buffer {
         return this.bytes.slice(this.offset);

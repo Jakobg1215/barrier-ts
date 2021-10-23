@@ -5,16 +5,16 @@ import type ServerboundStatusRequestPacket from '../../packets/status/Serverboun
 import type Handler from '../Handler';
 
 export default class StatusRequestHandler implements Handler<ServerboundStatusRequestPacket> {
-    public hander(_packet: ServerboundStatusRequestPacket, connection: Connection, _server: BarrierTs): void {
+    public hander(_packet: ServerboundStatusRequestPacket, connection: Connection, server: BarrierTs): void {
         connection.send(
             new ClientboundStatusResponsePacket(
                 JSON.stringify({
                     version: {
-                        name: '1.17.1',
-                        protocol: 756,
+                        name: server.minecraftVersion.version,
+                        protocol: server.minecraftVersion.protocol,
                     },
                     players: {
-                        max: 100,
+                        max: server.config.maxplayers,
                         online: 5,
                     },
                     description: {

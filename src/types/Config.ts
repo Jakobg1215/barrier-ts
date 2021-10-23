@@ -5,4 +5,5 @@ export default interface Config {
     online: boolean;
     compression: number;
     serverId: string;
+    maxplayers: number;
 }

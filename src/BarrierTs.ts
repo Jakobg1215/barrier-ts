@@ -7,7 +7,10 @@ import ConfigReader from './utilities/ConfigReader';
 import Console from './utilities/Console';
 
 export default class BarrierTs {
-    public readonly prorotocolVersion: number = 756;
+    public readonly minecraftVersion = {
+        version: '1.17.1',
+        protocol: 756,
+    };
     private readonly serverConsole: Console = new Console(this);
     private serverConfigurations: Config = ConfigReader.getConfigurations(this);
     private readonly serverProtocol: Protocol = new Protocol();

@@ -9,13 +9,19 @@ export default class ClientIntentionHandler implements Handler<ClientIntentionPa
         switch (packet.intention) {
             case ProtocolState.LOGIN: {
                 connection.setProtocolState(ProtocolState.LOGIN);
-                if (packet.protocolVersion !== server.prorotocolVersion) {
-                    if (packet.protocolVersion > server.prorotocolVersion)
+                if (packet.protocolVersion !== server.minecraftVersion.protocol) {
+                    if (packet.protocolVersion > server.minecraftVersion.protocol)
                         return connection.disconnect(
-                            JSON.stringify({ translate: 'multiplayer.disconnect.outdated_server', with: ['1.17.1'] }),
+                            JSON.stringify({
+                                translate: 'multiplayer.disconnect.outdated_server',
+                                with: [server.minecraftVersion.version],
+                            }),
                         );
                     return connection.disconnect(
-                        JSON.stringify({ translate: 'multiplayer.disconnect.outdated_client', with: ['1.17.1'] }),
+                        JSON.stringify({
+                            translate: 'multiplayer.disconnect.outdated_client',
+                            with: [server.minecraftVersion.version],
+                        }),
                     );
                 }
                 break;

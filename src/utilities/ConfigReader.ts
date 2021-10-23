@@ -58,6 +58,7 @@ export default class ConfigReader {
         formatOption('online', this.defaultValues.online);
         formatOption('compression', this.defaultValues.compression);
         formatOption('serverId', this.defaultValues.serverId);
+        formatOption('maxplayers', this.defaultValues.maxplayers);
         writeFileSync(this.filePath, Buffer.concat(options), { encoding: 'utf-8' });
     }
 
@@ -68,6 +69,7 @@ export default class ConfigReader {
         online: false,
         compression: 0,
         serverId: '',
+        maxplayers: 20,
     };
 
     private static readonly filePath: string = join(__dirname, '../../server.properties');

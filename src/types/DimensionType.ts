@@ -1,0 +1,17 @@
+export default {
+    piglin_safe: '0b',
+    natural: '1b',
+    ambient_light: '0f',
+    infiniburn: 'minecraft:infiniburn_overworld',
+    respawn_anchor_works: '0b',
+    has_skylight: '1b',
+    bed_works: '1b',
+    effects: 'minecraft:overworld',
+    has_raids: '1b',
+    logical_height: 256,
+    coordinate_scale: '1d',
+    min_y: 0,
+    has_ceiling: '0b',
+    ultrawarm: '0b',
+    height: 256,
+};
