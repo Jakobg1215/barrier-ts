@@ -5,9 +5,9 @@ import type BarrierTs from '../BarrierTs';
 import type GameProfile from '../types/GameProfile';
 import Player from '../world/entity/Player';
 import type Handler from './handlers/Handler';
-import Packet from './Packet';
 import type ClientboundPacket from './packets/ClientbountPacket';
 import ClientboundLoginDisconnectPacket from './packets/login/ClientboundLoginDisconnectPacket';
+import Packet from './packets/Packet';
 import type ServerboundPacket from './packets/ServerboundPacket';
 import { ProtocolState } from './Protocol';
 
@@ -60,7 +60,15 @@ export default class Connection {
                         return this.connectionServer.console.error(
                             `Server packet ${packetid} not found for state ${this.connectionProtocolState}!`,
                         );
-                    readPacket.read(inPacket);
+
+                    try {
+                        readPacket.read(inPacket);
+                    } catch {
+                        server.console.error(
+                            `Read error for packet ${packetid} on state ${this.connectionProtocolState}!`,
+                        );
+                        return;
+                    }
 
                     const packetHandle: Handler<ServerboundPacket> | null = this.connectionServer.protocol.getHandler(
                         this.connectionProtocolState,

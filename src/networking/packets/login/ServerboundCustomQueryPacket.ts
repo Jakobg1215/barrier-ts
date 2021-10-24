@@ -1,4 +1,4 @@
-import Packet from '../../Packet';
+import Packet from '../Packet';
 import type ServerboundPacket from '../ServerboundPacket';
 
 export default class ServerboundCustomQueryPacket implements ServerboundPacket {

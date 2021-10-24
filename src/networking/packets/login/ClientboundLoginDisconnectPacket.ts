@@ -1,5 +1,5 @@
-import Packet from '../../Packet';
 import type ClientboundPacket from '../ClientbountPacket';
+import Packet from '../Packet';
 
 export default class ClientboundLoginDisconnectPacket implements ClientboundPacket {
     public readonly id: number = 0;

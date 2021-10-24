@@ -1,6 +1,6 @@
 import type GameProfile from '../../../types/GameProfile';
-import Packet from '../../Packet';
 import type ClientboundPacket from '../ClientbountPacket';
+import Packet from '../Packet';
 
 export default class ClientboundGameProfilePacket implements ClientboundPacket {
     public readonly id: number = 2;

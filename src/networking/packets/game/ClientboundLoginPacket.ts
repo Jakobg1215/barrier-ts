@@ -1,7 +1,7 @@
 import type { Buffer } from 'node:buffer';
-import type { GameType } from '../../../types/GameType';
-import Packet from '../../Packet';
+import type { GameType } from '../../../types/enums/GameType';
 import type ClientboundPacket from '../ClientbountPacket';
+import Packet from '../Packet';
 
 export default class ClientboundLoginPacket implements ClientboundPacket {
     public readonly id: number = 38;

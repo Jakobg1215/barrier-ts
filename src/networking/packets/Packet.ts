@@ -1,4 +1,6 @@
 import { Buffer } from 'node:buffer';
+import BlockPos from '../../types/BlockPos';
+import Slot from '../../types/Slot';
 
 export default class Packet {
     private bytes: Buffer;
@@ -71,6 +73,25 @@ export default class Packet {
         } while ((currentByte & 0b10000000) != 0);
         return decodedInt;
     }
+
+    public readVarLong(): bigint {
+        // TODO: implement read varlong
+        return 0n;
+    }
+
+    public readUUID(): string {
+        // TODO: implement read UUID
+        return '';
+    }
+
+    public readBlockPos(): BlockPos {
+        return new BlockPos();
+    }
+
+    public readSlot(): Slot {
+        return new Slot();
+    }
+
     //#endregion
     //#region writeing
     public writeBoolean(value: boolean): this {

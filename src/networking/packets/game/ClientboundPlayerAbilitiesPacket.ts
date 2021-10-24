@@ -1,5 +1,5 @@
-import Packet from '../../Packet';
 import type ClientboundPacket from '../ClientbountPacket';
+import Packet from '../Packet';
 
 export default class ClientboundPlayerAbilitiesPacket implements ClientboundPacket {
     public readonly id: number = 50;
@@ -28,12 +28,12 @@ export default class ClientboundPlayerAbilitiesPacket implements ClientboundPack
 
     public write(): Packet {
         const data = new Packet();
-        let bitField = 0;
-        if (this.invulnerable) bitField |= 1;
-        if (this.isFlying) bitField |= 2;
-        if (this.canFly) bitField |= 4;
-        if (this.instabuild) bitField |= 8;
-        data.writeByte(bitField);
+        let bitMask = 0;
+        if (this.invulnerable) bitMask |= 1;
+        if (this.isFlying) bitMask |= 2;
+        if (this.canFly) bitMask |= 4;
+        if (this.instabuild) bitMask |= 8;
+        data.writeByte(bitMask);
         data.writeFloat(this.flyingSpeed);
         data.writeFloat(this.walkingSpeed);
         return data;

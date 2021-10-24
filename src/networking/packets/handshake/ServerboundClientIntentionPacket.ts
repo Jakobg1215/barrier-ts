@@ -1,5 +1,5 @@
-import type Packet from '../../Packet';
 import type { ProtocolState } from '../../Protocol';
+import type Packet from '../Packet';
 import type ServerboundPacket from '../ServerboundPacket';
 
 export default class ClientIntentionPacket implements ServerboundPacket {

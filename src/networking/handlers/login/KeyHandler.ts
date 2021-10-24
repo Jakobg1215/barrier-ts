@@ -4,7 +4,7 @@ import { get } from 'node:https';
 import { URL } from 'node:url';
 import type BarrierTs from '../../../BarrierTs';
 import DimensionType from '../../../types/DimensionType';
-import { GameType } from '../../../types/GameType';
+import { GameType } from '../../../types/enums/GameType';
 import RegistryHolder from '../../../types/RegistryHolder';
 import ObjectToNbt from '../../../utilities/ObjectToNbt';
 import type Connection from '../../Connection';
