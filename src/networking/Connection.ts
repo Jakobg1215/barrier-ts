@@ -10,7 +10,10 @@ import ObjectToNbt from '../utilities/ObjectToNbt';
 import Player from '../world/entity/Player';
 import type Handler from './handlers/Handler';
 import type ClientboundPacket from './packets/ClientbountPacket';
+import ClientboundKeepAlivePacket from './packets/game/ClientboundKeepAlivePacket';
 import ClientboundLoginPacket from './packets/game/ClientboundLoginPacket';
+import ClientboundPlayerAbilitiesPacket from './packets/game/ClientboundPlayerAbilitiesPacket';
+import ClientboundPlayerPositionPacket from './packets/game/ClientboundPlayerPositionPacket';
 import ClientboundGameProfilePacket from './packets/login/ClientboundGameProfilePacket';
 import ClientboundLoginDisconnectPacket from './packets/login/ClientboundLoginDisconnectPacket';
 import Packet from './packets/Packet';
@@ -29,6 +32,7 @@ export default class Connection {
     private connectionCompression: boolean = false;
     private connnectionNetworkClosed: boolean = false;
     private connectionConnected: boolean = false;
+    private connectionKeepAliveId: Buffer = randomBytes(8);
 
     public constructor(socket: Socket, server: BarrierTs) {
         this.connectionNetworking = socket;
@@ -112,6 +116,13 @@ export default class Connection {
         this.connectionNetworking.on('error', error => {
             this.connectionServer.console.error(`Client had an ${error.message}`);
         });
+
+        setInterval(() => {
+            if (this.connectionConnected) {
+                this.connectionKeepAliveId = randomBytes(8);
+                this.send(new ClientboundKeepAlivePacket(this.connectionKeepAliveId.readBigInt64BE()));
+            }
+        }, 15000);
     }
 
     public createPlayer(gameProfile: GameProfile): void {
@@ -159,6 +170,8 @@ export default class Connection {
                 true,
             ),
         );
+        this.send(new ClientboundPlayerAbilitiesPacket(true, true, true, true, 0.05, 0.1));
+        this.send(new ClientboundPlayerPositionPacket(0, 0, 0, 0, 0, 0, 0, false));
         this.connectionConnected = true;
         this.connectionServer.addPlayer();
         this.connectionServer.console.log(`Player ${this.connectionPlayer?.gameProfile.name} has joined the game!`);
@@ -226,5 +239,9 @@ export default class Connection {
 
     public get name(): string | null {
         return this.connectionName;
+    }
+
+    public get keepAliveId(): Buffer {
+        return this.connectionKeepAliveId;
     }
 }
