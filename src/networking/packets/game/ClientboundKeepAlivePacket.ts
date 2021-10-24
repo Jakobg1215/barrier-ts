@@ -10,8 +10,6 @@ export default class ClientboundKeepAlivePacket implements ClientboundPacket {
     }
 
     public write(): Packet {
-        const data = new Packet();
-        data.writeLong(this.identifier);
-        return data;
+        return new Packet().writeLong(this.identifier);
     }
 }

@@ -10,8 +10,6 @@ export default class ClientboundStatusResponsePacket implements ClientboundPacke
     }
 
     public write(): Packet {
-        const data = new Packet();
-        data.writeString(this.serverStatus);
-        return data;
+        return new Packet().writeString(this.serverStatus);
     }
 }

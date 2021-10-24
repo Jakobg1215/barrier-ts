@@ -11,9 +11,6 @@ export default class ClientboundGameProfilePacket implements ClientboundPacket {
     }
 
     public write(): Packet {
-        const data = new Packet();
-        data.writeUUID(this.gameProfile.uuid);
-        data.writeString(this.gameProfile.name);
-        return data;
+        return new Packet().writeUUID(this.gameProfile.uuid).writeString(this.gameProfile.name);
     }
 }

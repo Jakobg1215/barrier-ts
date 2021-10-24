@@ -12,9 +12,6 @@ export default class ClientboundCustomPayloadPacket implements ClientboundPacket
     }
 
     public write(): Packet {
-        const data = new Packet();
-        data.writeString(this.identifier);
-        data.append(this.data);
-        return data;
+        return new Packet().writeString(this.identifier).append(this.data);
     }
 }

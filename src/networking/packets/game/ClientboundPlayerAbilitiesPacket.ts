@@ -27,15 +27,11 @@ export default class ClientboundPlayerAbilitiesPacket implements ClientboundPack
     }
 
     public write(): Packet {
-        const data = new Packet();
         let bitMask = 0;
         if (this.invulnerable) bitMask |= 1;
         if (this.isFlying) bitMask |= 2;
         if (this.canFly) bitMask |= 4;
         if (this.instabuild) bitMask |= 8;
-        data.writeByte(bitMask);
-        data.writeFloat(this.flyingSpeed);
-        data.writeFloat(this.walkingSpeed);
-        return data;
+        return new Packet().writeByte(bitMask).writeFloat(this.flyingSpeed).writeFloat(this.walkingSpeed);
     }
 }

@@ -15,10 +15,6 @@ export default class ClientboundHelloPacket implements ClientboundPacket {
     }
 
     public write(): Packet {
-        const data = new Packet();
-        data.writeString(this.serverId);
-        data.writeByteArray(this.publicKey);
-        data.writeByteArray(this.nonce);
-        return data;
+        return new Packet().writeString(this.serverId).writeByteArray(this.publicKey).writeByteArray(this.nonce);
     }
 }

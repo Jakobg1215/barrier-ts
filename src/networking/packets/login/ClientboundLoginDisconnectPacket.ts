@@ -10,8 +10,6 @@ export default class ClientboundLoginDisconnectPacket implements ClientboundPack
     }
 
     public write(): Packet {
-        const data = new Packet();
-        data.writeString(this.reason);
-        return data;
+        return new Packet().writeString(this.reason);
     }
 }

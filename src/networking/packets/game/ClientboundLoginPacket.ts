@@ -56,25 +56,25 @@ export default class ClientboundLoginPacket implements ClientboundPacket {
     }
 
     public write(): Packet {
-        const data = new Packet();
-        data.writeInt(this.playerId);
-        data.writeBoolean(this.hardcore);
-        data.writeByte(this.gameType);
-        data.writeByte(this.previousGameType);
-        data.writeVarInt(this.levels.length);
+        const data = new Packet()
+            .writeInt(this.playerId)
+            .writeBoolean(this.hardcore)
+            .writeByte(this.gameType)
+            .writeByte(this.previousGameType)
+            .writeVarInt(this.levels.length);
         this.levels.forEach((level: string): void => {
             data.writeString(level);
         });
-        data.append(this.registryHolder);
-        data.append(this.dimensionType);
-        data.writeString(this.dimension);
-        data.writeLong(this.seed);
-        data.writeVarInt(this.maxPlayers);
-        data.writeVarInt(this.chunkRadius);
-        data.writeBoolean(this.reducedDebugInfo);
-        data.writeBoolean(this.showDeathScreen);
-        data.writeBoolean(this.isDebug);
-        data.writeBoolean(this.isFlat);
+        data.append(this.registryHolder)
+            .append(this.dimensionType)
+            .writeString(this.dimension)
+            .writeLong(this.seed)
+            .writeVarInt(this.maxPlayers)
+            .writeVarInt(this.chunkRadius)
+            .writeBoolean(this.reducedDebugInfo)
+            .writeBoolean(this.showDeathScreen)
+            .writeBoolean(this.isDebug)
+            .writeBoolean(this.isFlat);
         return data;
     }
 }

@@ -10,8 +10,6 @@ export default class ClientboundLoginCompressionPacket implements ClientboundPac
     }
 
     public write(): Packet {
-        const data = new Packet();
-        data.writeVarInt(this.compressionThreshold);
-        return data;
+        return new Packet().writeVarInt(this.compressionThreshold);
     }
 }

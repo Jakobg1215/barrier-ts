@@ -10,8 +10,6 @@ export default class ClientboundPongResponsePacket implements ClientboundPacket 
     }
 
     public write(): Packet {
-        const data = new Packet();
-        data.writeLong(this.time);
-        return data;
+        return new Packet().writeLong(this.time);
     }
 }

@@ -14,10 +14,6 @@ export default class ClientboundCustomQueryPacket implements ClientboundPacket {
     }
 
     public write(): Packet {
-        const data = new Packet();
-        data.writeVarInt(this.transactionId);
-        data.writeIdentifier(this.identifier);
-        data.writeBytes(this.data);
-        return data;
+        return new Packet().writeVarInt(this.transactionId).writeIdentifier(this.identifier).writeBytes(this.data);
     }
 }

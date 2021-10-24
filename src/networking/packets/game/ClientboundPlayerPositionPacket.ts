@@ -33,15 +33,14 @@ export default class ClientboundPlayerPositionPacket implements ClientboundPacke
     }
 
     public write(): Packet {
-        const data = new Packet();
-        data.writeDouble(this.x);
-        data.writeDouble(this.y);
-        data.writeDouble(this.z);
-        data.writeFloat(this.yRot);
-        data.writeFloat(this.xRot);
-        data.writeByte(this.relativeArguments);
-        data.writeVarInt(this.id);
-        data.writeBoolean(this.dismountVehicle);
-        return data;
+        return new Packet()
+            .writeDouble(this.x)
+            .writeDouble(this.y)
+            .writeDouble(this.z)
+            .writeFloat(this.yRot)
+            .writeFloat(this.xRot)
+            .writeByte(this.relativeArguments)
+            .writeVarInt(this.id)
+            .writeBoolean(this.dismountVehicle);
     }
 }
