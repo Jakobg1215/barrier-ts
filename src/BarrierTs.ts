@@ -1,6 +1,7 @@
 import { generateKeyPairSync, KeyPairSyncResult } from 'node:crypto';
 import { createServer, isIP, Server, Socket } from 'node:net';
 import Connection from './networking/Connection';
+import type ClientboundPacket from './networking/packets/ClientbountPacket';
 import Protocol from './networking/Protocol';
 import type Config from './types/Config';
 import ConfigReader from './utilities/ConfigReader';
@@ -59,6 +60,10 @@ export default class BarrierTs {
 
     public removePlayer(): void {
         --this.serverPlayerCount;
+    }
+
+    public brodcast(data: ClientboundPacket) {
+        this.serverConnections.forEach((con: Connection) => con.send(data));
     }
 
     public get console(): Console {
