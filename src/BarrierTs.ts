@@ -64,8 +64,12 @@ export default class BarrierTs {
         --this.serverPlayerCount;
     }
 
-    public brodcast(data: ClientboundPacket) {
-        this.serverConnections.forEach((con: Connection) => con.send(data));
+    public brodcast(data: ClientboundPacket, exclude: number[] = []) {
+        this.serverConnections.forEach((con: Connection) => {
+            if (!exclude.includes(con.player?.id!)) {
+                con.send(data);
+            }
+        });
     }
 
     public get console(): Console {

@@ -10,12 +10,14 @@ import ObjectToNbt from '../utilities/ObjectToNbt';
 import Player from '../world/entity/Player';
 import type Handler from './handlers/Handler';
 import type ClientboundPacket from './packets/ClientbountPacket';
+import ClientboundAddPlayerPacket from './packets/game/ClientboundAddPlayerPacket';
 import ClientboundCustomPayloadPacket from './packets/game/ClientboundCustomPayloadPacket';
 import ClientboundKeepAlivePacket from './packets/game/ClientboundKeepAlivePacket';
 import ClientboundLoginPacket from './packets/game/ClientboundLoginPacket';
 import ClientboundPlayerAbilitiesPacket from './packets/game/ClientboundPlayerAbilitiesPacket';
 import ClientboundPlayerInfoPacket from './packets/game/ClientboundPlayerInfoPacket';
 import ClientboundPlayerPositionPacket from './packets/game/ClientboundPlayerPositionPacket';
+import ClientboundRemoveEntitiesPacket from './packets/game/ClientboundRemoveEntitiesPacket';
 import ClientboundGameProfilePacket from './packets/login/ClientboundGameProfilePacket';
 import ClientboundLoginDisconnectPacket from './packets/login/ClientboundLoginDisconnectPacket';
 import Packet from './packets/Packet';
@@ -121,6 +123,7 @@ export default class Connection {
                         },
                     ]),
                 );
+                this.connectionServer.brodcast(new ClientboundRemoveEntitiesPacket([this.connectionPlayer.id]));
             }
             this.connectionServer.connections.delete(this);
         });
@@ -195,7 +198,6 @@ export default class Connection {
             ),
         );
         this.send(new ClientboundPlayerAbilitiesPacket(true, true, true, true, 0.05, 0.1));
-        this.send(new ClientboundPlayerPositionPacket(0, 0, 0, 0, 0, 0, 0, false));
         this.send(
             new ClientboundPlayerInfoPacket(
                 0,
@@ -221,6 +223,16 @@ export default class Connection {
                 },
             ]),
         );
+        Array.from(this.connectionServer.connections)
+            .filter(element => element.protocolState === ProtocolState.PLAY)
+            .forEach(element => {
+                if (element.connectionPlayer.id === this.connectionPlayer.id) return;
+                this.send(new ClientboundAddPlayerPacket(element.connectionPlayer));
+            });
+        this.connectionServer.brodcast(new ClientboundAddPlayerPacket(this.connectionPlayer), [
+            this.connectionPlayer.id,
+        ]);
+        this.send(new ClientboundPlayerPositionPacket(0, 0, 0, 0, 0, 0, 0, false)); // this should be the last packet
         this.connectionConnected = true;
         this.connectionServer.addPlayer();
         this.connectionServer.console.log(`Player ${this.connectionPlayer.gameProfile.name} has joined the game!`);

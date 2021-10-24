@@ -1,18 +1,15 @@
-export default class Vector3 {
+export default class Vector2 {
     private xCoordinate: number;
     private yCoordinate: number;
-    private zCoordinate: number;
 
-    public constructor(x: number, y: number, z: number) {
+    public constructor(x: number, y: number) {
         this.xCoordinate = x;
         this.yCoordinate = y;
-        this.zCoordinate = z;
     }
 
     public setCoordinates(newCords: this): this {
         this.xCoordinate = newCords.xCoordinate;
         this.yCoordinate = newCords.yCoordinate;
-        this.zCoordinate = newCords.zCoordinate;
         return this;
     }
 
@@ -26,11 +23,6 @@ export default class Vector3 {
         return this;
     }
 
-    public setZ(newZ: number): this {
-        this.zCoordinate = newZ;
-        return this;
-    }
-
     public get x(): number {
         return this.xCoordinate;
     }
@@ -39,11 +31,7 @@ export default class Vector3 {
         return this.yCoordinate;
     }
 
-    public get z(): number {
-        return this.zCoordinate;
-    }
-
-    public static zero(): Vector3 {
-        return new this(0, 0, 0);
+    public static zero(): Vector2 {
+        return new this(0, 0);
     }
 }
