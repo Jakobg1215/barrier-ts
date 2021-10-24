@@ -15,6 +15,10 @@ export default class Console {
                 this.log('reloading');
                 return this.consoleServer.reload();
             }
+            if (line === '/clear') {
+                clear();
+                return;
+            }
             this.warn(line);
         });
     }

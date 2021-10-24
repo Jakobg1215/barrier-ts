@@ -55,10 +55,12 @@ export default class ConfigReader {
         formatOption('port', this.defaultValues.port, 'The port the server will listening on.');
         formatOption('host', this.defaultValues.host);
         formatOption('debug', this.defaultValues.debug, 'To enable debug logs.');
-        formatOption('online', this.defaultValues.online);
-        formatOption('compression', this.defaultValues.compression);
+        formatOption('online', this.defaultValues.online, 'Validate players with Mojang servers.');
+        formatOption('compression', this.defaultValues.compression, 'The threshold before packets are compressed.');
         formatOption('serverId', this.defaultValues.serverId);
-        formatOption('maxplayers', this.defaultValues.maxplayers);
+        formatOption('maxplayers', this.defaultValues.maxplayers, 'The max amunt of players that can join.');
+        formatOption('motd', this.defaultValues.motd, 'The message of the day.');
+        formatOption('icon', this.defaultValues.icon, 'The path to the server icon. (must be 64*64 png)');
         writeFileSync(this.filePath, Buffer.concat(options), { encoding: 'utf-8' });
     }
 
@@ -70,6 +72,9 @@ export default class ConfigReader {
         compression: 0,
         serverId: '',
         maxplayers: 20,
+        motd: 'A BarrierTs Server',
+        difficulty: 2,
+        icon: '',
     };
 
     private static readonly filePath: string = join(__dirname, '../../server.properties');

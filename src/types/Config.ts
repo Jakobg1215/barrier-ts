@@ -6,4 +6,7 @@ export default interface Config {
     compression: number;
     serverId: string;
     maxplayers: number;
+    motd: string;
+    difficulty: number;
+    icon: string;
 }

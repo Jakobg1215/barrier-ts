@@ -26,7 +26,8 @@ export default class BarrierTs {
         },
     });
     private readonly serverNetworking: Server = createServer();
-    private readonly serverPlayerConnection: Set<Connection> = new Set();
+    private readonly serverConnections: Set<Connection> = new Set();
+    private serverPlayerCount: number = 0;
 
     public constructor() {
         if (isIP(this.serverConfigurations.host))
@@ -44,12 +45,20 @@ export default class BarrierTs {
         this.serverNetworking.on('connection', (socket: Socket): void => {
             this.serverConsole.debug(`A client is connecting to the server!`);
 
-            this.serverPlayerConnection.add(new Connection(socket, this));
+            this.serverConnections.add(new Connection(socket, this));
         });
     }
 
     public reload(): void {
         this.serverConfigurations = ConfigReader.getConfigurations(this);
+    }
+
+    public addPlayer(): void {
+        ++this.serverPlayerCount;
+    }
+
+    public removePlayer(): void {
+        --this.serverPlayerCount;
     }
 
     public get console(): Console {
@@ -66,6 +75,14 @@ export default class BarrierTs {
 
     public get padLock(): KeyPairSyncResult<Buffer, Buffer> {
         return this.serverPadLock;
+    }
+
+    public get playerCount(): number {
+        return this.serverPlayerCount;
+    }
+
+    public get connections(): Set<Connection> {
+        return this.serverConnections;
     }
 }
 

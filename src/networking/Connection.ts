@@ -2,10 +2,16 @@ import type { Buffer } from 'node:buffer';
 import { constants, createCipheriv, privateDecrypt, randomBytes } from 'node:crypto';
 import type { Socket } from 'node:net';
 import type BarrierTs from '../BarrierTs';
+import DimensionType from '../types/DimensionType';
+import { GameType } from '../types/enums/GameType';
 import type GameProfile from '../types/GameProfile';
+import RegistryHolder from '../types/RegistryHolder';
+import ObjectToNbt from '../utilities/ObjectToNbt';
 import Player from '../world/entity/Player';
 import type Handler from './handlers/Handler';
 import type ClientboundPacket from './packets/ClientbountPacket';
+import ClientboundLoginPacket from './packets/game/ClientboundLoginPacket';
+import ClientboundGameProfilePacket from './packets/login/ClientboundGameProfilePacket';
 import ClientboundLoginDisconnectPacket from './packets/login/ClientboundLoginDisconnectPacket';
 import Packet from './packets/Packet';
 import type ServerboundPacket from './packets/ServerboundPacket';
@@ -22,6 +28,7 @@ export default class Connection {
     private connectionEncryption: boolean = false;
     private connectionCompression: boolean = false;
     private connnectionNetworkClosed: boolean = false;
+    private connectionConnected: boolean = false;
 
     public constructor(socket: Socket, server: BarrierTs) {
         this.connectionNetworking = socket;
@@ -75,10 +82,9 @@ export default class Connection {
                         this.connectionProtocolState,
                         packetid,
                     );
-                    if (!packetHandle)
-                        return this.connectionServer.console.warn(
+                    if (!packetHandle) return; /* this.connectionServer.console.warn(
                             `Server handler ${packetid} not found for state ${this.connectionProtocolState}!`,
-                        );
+                        ); */
                     packetHandle.hander(readPacket, this, this.connectionServer);
                 } while (inPacket.getReadableBytes().length > 0);
                 return;
@@ -87,6 +93,14 @@ export default class Connection {
 
         this.connectionNetworking.on('close', () => {
             this.connnectionNetworkClosed = true;
+            if (this.connectionConnected) {
+                this.connectionServer.removePlayer();
+            }
+            this.connectionServer.connections.delete(this);
+        });
+
+        this.connectionNetworking.on('error', error => {
+            this.connectionServer.console.error(`Client had an ${error.message}`);
         });
     }
 
@@ -111,6 +125,33 @@ export default class Connection {
             }
         }
         this.end();
+    }
+
+    public login(): void {
+        this.send(new ClientboundGameProfilePacket(this.connectionPlayer?.gameProfile!));
+        this.setProtocolState(ProtocolState.PLAY);
+        this.send(
+            new ClientboundLoginPacket(
+                0,
+                0n,
+                false,
+                GameType.CREATIVE,
+                GameType.CREATIVE,
+                ['minecraft:overworld', 'minecraft:the_nether', 'minecraft:the_end'],
+                ObjectToNbt(RegistryHolder),
+                ObjectToNbt(DimensionType),
+                'minecraft:overworld',
+                this.connectionServer.config.maxplayers,
+                10,
+                false,
+                true,
+                true,
+                true,
+            ),
+        );
+        this.connectionConnected = true;
+        this.connectionServer.addPlayer();
+        this.connectionServer.console.log(`Player ${this.connectionPlayer?.gameProfile.name} has joined the game!`);
     }
 
     public end(): void {
