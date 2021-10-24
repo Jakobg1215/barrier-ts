@@ -1,5 +1,5 @@
 export default {
-    // Once custom dimension/biome work this can be split into diffent files
+    // Split this to have custom dimension/biomes when ready
     'minecraft:dimension_type': {
         type: 'minecraft:dimension_type',
         value: [
