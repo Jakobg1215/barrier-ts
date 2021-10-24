@@ -6,6 +6,7 @@ import Protocol from './networking/Protocol';
 import type Config from './types/Config';
 import ConfigReader from './utilities/ConfigReader';
 import Console from './utilities/Console';
+import World from './world/World';
 
 export default class BarrierTs {
     public readonly minecraftVersion = {
@@ -13,6 +14,7 @@ export default class BarrierTs {
         protocol: 756,
     };
     private readonly serverConsole: Console = new Console(this);
+    private readonly serverWorld: World = new World();
     private serverConfigurations: Config = ConfigReader.getConfigurations(this);
     private readonly serverProtocol: Protocol = new Protocol();
     private readonly serverPadLock: KeyPairSyncResult<Buffer, Buffer> = generateKeyPairSync('rsa', {
@@ -88,6 +90,10 @@ export default class BarrierTs {
 
     public get connections(): Set<Connection> {
         return this.serverConnections;
+    }
+
+    public get world(): World {
+        return this.serverWorld;
     }
 }
 

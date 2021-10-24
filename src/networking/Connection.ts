@@ -138,7 +138,7 @@ export default class Connection {
     }
 
     public createPlayer(gameProfile: GameProfile): void {
-        this.connectionPlayer = new Player(gameProfile);
+        this.connectionPlayer = new Player(gameProfile, this.connectionServer.world.giveUniqueId());
     }
 
     public setProtocolState(state: ProtocolState): void {
@@ -165,7 +165,7 @@ export default class Connection {
         this.setProtocolState(ProtocolState.PLAY);
         this.send(
             new ClientboundLoginPacket(
-                0,
+                this.connectionPlayer.id,
                 0n,
                 false,
                 GameType.CREATIVE,

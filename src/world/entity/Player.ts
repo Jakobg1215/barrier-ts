@@ -1,19 +1,14 @@
-import Vector3 from '../../types/classes/Vector3';
 import type GameProfile from '../../types/GameProfile';
+import BaseEntity from './BaseEntity';
 
-export default class Player {
+export default class Player extends BaseEntity {
     private readonly playerGameProfile: GameProfile;
     private playerUserName: string; // TODO: Make use chat type
-    private readonly playerPosition: Vector3 = Vector3.zero();
 
-    public constructor(gameProfile: GameProfile) {
+    public constructor(gameProfile: GameProfile, id: number) {
+        super(id);
         this.playerGameProfile = gameProfile;
         this.playerUserName = JSON.stringify({ text: this.playerGameProfile.name });
-    }
-
-    public updatePosition(pos: Vector3): this {
-        this.playerPosition.setCoordinates(pos);
-        return this;
     }
 
     public get gameProfile(): GameProfile {
@@ -22,9 +17,5 @@ export default class Player {
 
     public get userName(): string {
         return this.playerUserName;
-    }
-
-    public get position(): Vector3 {
-        return this.playerPosition;
     }
 }
