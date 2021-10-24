@@ -14,6 +14,7 @@ import ClientboundCustomPayloadPacket from './packets/game/ClientboundCustomPayl
 import ClientboundKeepAlivePacket from './packets/game/ClientboundKeepAlivePacket';
 import ClientboundLoginPacket from './packets/game/ClientboundLoginPacket';
 import ClientboundPlayerAbilitiesPacket from './packets/game/ClientboundPlayerAbilitiesPacket';
+import ClientboundPlayerInfoPacket from './packets/game/ClientboundPlayerInfoPacket';
 import ClientboundPlayerPositionPacket from './packets/game/ClientboundPlayerPositionPacket';
 import ClientboundGameProfilePacket from './packets/login/ClientboundGameProfilePacket';
 import ClientboundLoginDisconnectPacket from './packets/login/ClientboundLoginDisconnectPacket';
@@ -28,7 +29,7 @@ export default class Connection {
     private readonly connectionNetworking: Socket;
     private readonly connectionServer: BarrierTs;
     private connectionName: string | null = null;
-    private connectionPlayer: Player | null = null;
+    private connectionPlayer!: Player;
     private connectionEncryption: boolean = false;
     private connectionCompression: boolean = false;
     private connnectionNetworkClosed: boolean = false;
@@ -110,6 +111,16 @@ export default class Connection {
             this.connnectionNetworkClosed = true;
             if (this.connectionConnected) {
                 this.connectionServer.removePlayer();
+                this.connectionServer.brodcast(
+                    new ClientboundPlayerInfoPacket(4, [
+                        {
+                            latency: 0,
+                            gameMode: GameType.CREATIVE,
+                            profile: this.connectionPlayer.gameProfile,
+                            displayName: this.connectionPlayer.userName,
+                        },
+                    ]),
+                );
             }
             this.connectionServer.connections.delete(this);
         });
@@ -150,7 +161,7 @@ export default class Connection {
     }
 
     public login(): void {
-        this.send(new ClientboundGameProfilePacket(this.connectionPlayer?.gameProfile!));
+        this.send(new ClientboundGameProfilePacket(this.connectionPlayer.gameProfile!));
         this.setProtocolState(ProtocolState.PLAY);
         this.send(
             new ClientboundLoginPacket(
@@ -185,9 +196,34 @@ export default class Connection {
         );
         this.send(new ClientboundPlayerAbilitiesPacket(true, true, true, true, 0.05, 0.1));
         this.send(new ClientboundPlayerPositionPacket(0, 0, 0, 0, 0, 0, 0, false));
+        this.send(
+            new ClientboundPlayerInfoPacket(
+                0,
+                Array.from(this.connectionServer.connections)
+                    .filter(element => element.protocolState === ProtocolState.PLAY)
+                    .map(element => {
+                        return {
+                            latency: 0,
+                            gameMode: GameType.CREATIVE,
+                            profile: element.connectionPlayer.gameProfile,
+                            displayName: this.connectionPlayer.userName,
+                        };
+                    }),
+            ),
+        );
+        this.connectionServer.brodcast(
+            new ClientboundPlayerInfoPacket(0, [
+                {
+                    latency: 0,
+                    gameMode: GameType.CREATIVE,
+                    profile: this.connectionPlayer.gameProfile,
+                    displayName: this.connectionPlayer.userName,
+                },
+            ]),
+        );
         this.connectionConnected = true;
         this.connectionServer.addPlayer();
-        this.connectionServer.console.log(`Player ${this.connectionPlayer?.gameProfile.name} has joined the game!`);
+        this.connectionServer.console.log(`Player ${this.connectionPlayer.gameProfile.name} has joined the game!`);
     }
 
     public end(): void {

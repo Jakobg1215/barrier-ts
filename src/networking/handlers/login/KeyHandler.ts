@@ -3,6 +3,7 @@ import { constants, createHash, privateDecrypt } from 'node:crypto';
 import { get } from 'node:https';
 import { URL } from 'node:url';
 import type BarrierTs from '../../../BarrierTs';
+import type { property } from '../../../types/GameProfile';
 import type Connection from '../../Connection';
 import ClientboundLoginCompressionPacket from '../../packets/login/ClientboundLoginCompressionPacket';
 import type ServerboundKeyPacket from '../../packets/login/ServerboundKeyPacket';
@@ -80,8 +81,11 @@ export default class KeyHandler implements Handler<ServerboundKeyPacket> {
                 Responce.on('data', data => {
                     connection.setKey(key);
                     const playerdata: MojangResponce = JSON.parse(data.toString());
-                    connection.createPlayer({ name: playerdata.name, uuid: playerdata.id });
-                    connection.player?.setProperties(playerdata.properties);
+                    connection.createPlayer({
+                        name: playerdata.name,
+                        uuid: playerdata.id,
+                        properties: playerdata.properties,
+                    });
                     connection.enableEncryption();
                     if (server.config.compression >= 0) {
                         connection.send(new ClientboundLoginCompressionPacket(server.config.compression));
@@ -97,5 +101,5 @@ export default class KeyHandler implements Handler<ServerboundKeyPacket> {
 interface MojangResponce {
     id: string;
     name: string;
-    properties: object[];
+    properties: property[];
 }

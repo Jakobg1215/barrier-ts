@@ -10,6 +10,7 @@ export default class ServerboundHelloPacket implements ServerboundPacket {
         this.gameProfile = {
             name: data.readString(),
             uuid: randomUUID(),
+            properties: null,
         };
         return this;
     }
