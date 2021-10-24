@@ -10,6 +10,7 @@ import ObjectToNbt from '../utilities/ObjectToNbt';
 import Player from '../world/entity/Player';
 import type Handler from './handlers/Handler';
 import type ClientboundPacket from './packets/ClientbountPacket';
+import ClientboundCustomPayloadPacket from './packets/game/ClientboundCustomPayloadPacket';
 import ClientboundKeepAlivePacket from './packets/game/ClientboundKeepAlivePacket';
 import ClientboundLoginPacket from './packets/game/ClientboundLoginPacket';
 import ClientboundPlayerAbilitiesPacket from './packets/game/ClientboundPlayerAbilitiesPacket';
@@ -168,6 +169,18 @@ export default class Connection {
                 true,
                 true,
                 true,
+            ),
+        );
+        this.send(
+            new ClientboundCustomPayloadPacket(
+                'minecraft:brand',
+                new Packet()
+                    .writeString(
+                        this.connectionServer.config.serverId.length > 0
+                            ? `BarrierTs: ${this.connectionServer.config.serverId}`
+                            : `BarrierTs`,
+                    )
+                    .getReadableBytes(),
             ),
         );
         this.send(new ClientboundPlayerAbilitiesPacket(true, true, true, true, 0.05, 0.1));

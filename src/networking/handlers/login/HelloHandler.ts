@@ -16,6 +16,12 @@ export default class HelloHandler implements Handler<ServerboundHelloPacket> {
             return connection.login();
         }
         connection.setName(packet.gameProfile.name);
-        connection.send(new ClientboundHelloPacket(server.config.serverId, server.padLock.publicKey, connection.nonce));
+        connection.send(
+            new ClientboundHelloPacket(
+                server.config.serverId.length > 20 ? '' : server.config.serverId,
+                server.padLock.publicKey,
+                connection.nonce,
+            ),
+        );
     }
 }

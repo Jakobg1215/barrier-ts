@@ -57,7 +57,7 @@ export default class ConfigReader {
         formatOption('debug', this.defaultValues.debug, 'To enable debug logs.');
         formatOption('online', this.defaultValues.online, 'Validate players with Mojang servers.');
         formatOption('compression', this.defaultValues.compression, 'The threshold before packets are compressed.');
-        formatOption('serverId', this.defaultValues.serverId);
+        formatOption('serverId', this.defaultValues.serverId, 'Shows in the debug menu.');
         formatOption('maxplayers', this.defaultValues.maxplayers, 'The max amunt of players that can join.');
         formatOption('motd', this.defaultValues.motd, 'The message of the day.');
         formatOption('icon', this.defaultValues.icon, 'The path to the server icon. (must be 64*64 png)');
@@ -69,7 +69,7 @@ export default class ConfigReader {
         host: '0.0.0.0',
         debug: false,
         online: false,
-        compression: 0,
+        compression: -1,
         serverId: '',
         maxplayers: 20,
         motd: 'A BarrierTs Server',

@@ -5,6 +5,6 @@ import type Handler from '../Handler';
 
 export default class CustomPayloadHandler implements Handler<ServerboundCustomPayloadPacket> {
     public hander(_packet: ServerboundCustomPayloadPacket, _connection: Connection, _server: BarrierTs): void {
-        throw new Error('Method not implemented.');
+        // The vanilla server does nothing
     }
 }
