@@ -1,5 +1,5 @@
+import Vector3 from '../../../types/classes/Vector3';
 import type { InteractionHand } from '../../../types/enums/InteractionHand';
-import Vector3 from '../../../types/Vector3';
 import type Packet from '../Packet';
 import type ServerboundPacket from '../ServerboundPacket';
 

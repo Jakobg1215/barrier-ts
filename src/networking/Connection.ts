@@ -41,6 +41,7 @@ export default class Connection {
                       ),
                   )
                 : new Packet(data);
+
             if (!this.connectionCompression) {
                 do {
                     if (this.connnectionNetworkClosed) return;

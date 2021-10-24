@@ -1,6 +1,6 @@
 import { Buffer } from 'node:buffer';
-import BlockPos from '../../types/BlockPos';
-import Slot from '../../types/Slot';
+import BlockPos from '../../types/classes/BlockPos';
+import Slot from '../../types/classes/Slot';
 
 export default class Packet {
     private bytes: Buffer;

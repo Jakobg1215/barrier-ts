@@ -1,5 +1,5 @@
-import BlockPos from '../../../types/BlockPos';
-import Vector3 from '../../../types/Vector3';
+import BlockPos from '../../../types/classes/BlockPos';
+import Vector3 from '../../../types/classes/Vector3';
 import type Packet from '../Packet';
 import type ServerboundPacket from '../ServerboundPacket';
 

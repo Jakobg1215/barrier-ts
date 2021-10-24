@@ -1,4 +1,4 @@
-import type BlockPos from '../../../types/BlockPos';
+import type BlockPos from '../../../types/classes/BlockPos';
 import type { Direction } from '../../../types/enums/Direction';
 import type Packet from '../Packet';
 import type ServerboundPacket from '../ServerboundPacket';

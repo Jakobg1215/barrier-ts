@@ -1,4 +1,4 @@
-import type Slot from '../../../types/Slot';
+import type Slot from '../../../types/classes/Slot';
 import type Packet from '../Packet';
 import type ServerboundPacket from '../ServerboundPacket';
 
