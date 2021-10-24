@@ -64,6 +64,7 @@ export default class Connection {
                         this.connectionProtocolState,
                         packetid,
                     );
+
                     if (!readPacket)
                         return this.connectionServer.console.error(
                             `Server packet ${packetid} not found for state ${this.connectionProtocolState}!`,
@@ -82,10 +83,19 @@ export default class Connection {
                         this.connectionProtocolState,
                         packetid,
                     );
-                    if (!packetHandle) return; /* this.connectionServer.console.warn(
+
+                    if (!packetHandle)
+                        return this.connectionServer.console.warn(
                             `Server handler ${packetid} not found for state ${this.connectionProtocolState}!`,
-                        ); */
-                    packetHandle.hander(readPacket, this, this.connectionServer);
+                        );
+
+                    try {
+                        packetHandle.hander(readPacket, this, this.connectionServer);
+                    } catch {
+                        server.console.error(
+                            `Failed to handler packet ${packetid} on state ${this.connectionProtocolState}!`,
+                        );
+                    }
                 } while (inPacket.getReadableBytes().length > 0);
                 return;
             }

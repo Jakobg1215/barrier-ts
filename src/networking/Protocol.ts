@@ -1,3 +1,51 @@
+import AcceptTeleportationHandler from './handlers/game/AcceptTeleportationHandler';
+import BlockEntityTagQueryHandler from './handlers/game/BlockEntityTagQueryHandler';
+import ChangeDifficultyHandler from './handlers/game/ChangeDifficultyHandler';
+import ChatHandler from './handlers/game/ChatHandler';
+import ClientCommandHandler from './handlers/game/ClientCommandHandler';
+import ClientInformationHandler from './handlers/game/ClientInformationHandler';
+import CommandSuggestionHandler from './handlers/game/CommandSuggestionHandler';
+import ContainerButtonClickHandler from './handlers/game/ContainerButtonClickHandler';
+import ContainerClickHandler from './handlers/game/ContainerClickHandler';
+import ContainerCloseHandler from './handlers/game/ContainerCloseHandler';
+import CustomPayloadHandler from './handlers/game/CustomPayloadHandler';
+import EditBookHandler from './handlers/game/EditBookHandler';
+import EntityTagQueryHandler from './handlers/game/EntityTagQueryHandler';
+import InteractHandler from './handlers/game/InteractHandler';
+import JigsawGenerateHandler from './handlers/game/JigsawGenerateHandler';
+import KeepAliveHandler from './handlers/game/KeepAliveHandler';
+import LockDifficultyHandler from './handlers/game/LockDifficultyHandler';
+import MovePlayerPosHandler from './handlers/game/MovePlayerPosHandler';
+import MovePlayerPosRotHandler from './handlers/game/MovePlayerPosRotHandler';
+import MovePlayerRotHandler from './handlers/game/MovePlayerRotHandler';
+import MovePlayerStatusOnlyHandler from './handlers/game/MovePlayerStatusOnlyHandler';
+import MoveVehicleHandler from './handlers/game/MoveVehicleHandler';
+import PaddleBoatHandler from './handlers/game/PaddleBoatHandler';
+import PickItemHandler from './handlers/game/PickItemHandler';
+import PlaceRecipeHandler from './handlers/game/PlaceRecipeHandler';
+import PlayerAbilitiesHandler from './handlers/game/PlayerAbilitiesHandler';
+import PlayerActionHandler from './handlers/game/PlayerActionHandler';
+import PlayerCommandHandler from './handlers/game/PlayerCommandHandler';
+import PlayerInputHandler from './handlers/game/PlayerInputHandler';
+import PongHandler from './handlers/game/PongHandler';
+import RecipeBookChangeSettingsHandler from './handlers/game/RecipeBookChangeSettingsHandler';
+import RecipeBookSeenRecipeHandler from './handlers/game/RecipeBookSeenRecipeHandler';
+import RenameItemHandler from './handlers/game/RenameItemHandler';
+import ResourcePackHandler from './handlers/game/ResourcePack';
+import SeenAdvancementsHandler from './handlers/game/SeenAdvancementsHandler';
+import SelectTradeHandler from './handlers/game/SelectTradeHandler';
+import SetBeaconHandler from './handlers/game/SetBeaconHandler';
+import SetCarriedItemHandler from './handlers/game/SetCarriedItemHandler';
+import SetCommandBlockHandler from './handlers/game/SetCommandBlockHandler';
+import SetCommandMinecartHandler from './handlers/game/SetCommandMinecartHandler';
+import SetCreativeModeSlotHandler from './handlers/game/SetCreativeModeSlotHandler';
+import SetJigsawBlockHandler from './handlers/game/SetJigsawBlockHandler';
+import SetStructureBlockHandler from './handlers/game/SetStructureBlockHandler';
+import SignUpdateHandler from './handlers/game/SignUpdateHandler';
+import SwingHandler from './handlers/game/SwingHandler';
+import TeleportToEntityHandler from './handlers/game/TeleportToEntityHandler';
+import UseItemHandler from './handlers/game/UseItemHandler';
+import UseItemOnHandler from './handlers/game/UseItemOnHandler';
 import type Handler from './handlers/Handler';
 import ClientIntentionHandler from './handlers/handshake/ClientIntentionHandler';
 import CustomQueryHandler from './handlers/login/CustomQueryHandler';
@@ -6,7 +54,7 @@ import KeyHandler from './handlers/login/KeyHandler';
 import PingRequestHandler from './handlers/status/PingRequestHandler';
 import StatusRequestHandler from './handlers/status/StatusRequestHandler';
 import ServerboundAcceptTeleportationPacket from './packets/game/ServerboundAcceptTeleportationPacket';
-import ServerboundBlockEntityTagQuery from './packets/game/ServerboundBlockEntityTagQuery';
+import ServerboundBlockEntityTagQueryPacket from './packets/game/ServerboundBlockEntityTagQueryPacket';
 import ServerboundChangeDifficultyPacket from './packets/game/ServerboundChangeDifficultyPacket';
 import ServerboundChatPacket from './packets/game/ServerboundChatPacket';
 import ServerboundClientCommandPacket from './packets/game/ServerboundClientCommandPacket';
@@ -17,7 +65,7 @@ import ServerboundContainerClickPacket from './packets/game/ServerboundContainer
 import ServerboundContainerClosePacket from './packets/game/ServerboundContainerClosePacket';
 import ServerboundCustomPayloadPacket from './packets/game/ServerboundCustomPayloadPacket';
 import ServerboundEditBookPacket from './packets/game/ServerboundEditBookPacket';
-import ServerboundEntityTagQuery from './packets/game/ServerboundEntityTagQuery';
+import ServerboundEntityTagQueryPacket from './packets/game/ServerboundEntityTagQueryPacket';
 import ServerboundInteractPacket from './packets/game/ServerboundInteractPacket';
 import ServerboundJigsawGeneratePacket from './packets/game/ServerboundJigsawGeneratePacket';
 import ServerboundKeepAlivePacket from './packets/game/ServerboundKeepAlivePacket';
@@ -84,7 +132,7 @@ export default class Protocol {
     ];
     private protocolPlayPackets: ServerboundPacket[] = [
         new ServerboundAcceptTeleportationPacket(),
-        new ServerboundBlockEntityTagQuery(),
+        new ServerboundBlockEntityTagQueryPacket(),
         new ServerboundChangeDifficultyPacket(),
         new ServerboundChatPacket(),
         new ServerboundClientCommandPacket(),
@@ -95,7 +143,7 @@ export default class Protocol {
         new ServerboundContainerClosePacket(),
         new ServerboundCustomPayloadPacket(),
         new ServerboundEditBookPacket(),
-        new ServerboundEntityTagQuery(),
+        new ServerboundEntityTagQueryPacket(),
         new ServerboundInteractPacket(),
         new ServerboundJigsawGeneratePacket(),
         new ServerboundKeepAlivePacket(),
@@ -132,6 +180,56 @@ export default class Protocol {
         new ServerboundUseItemOnPacket(),
         new ServerboundUseItemPacket(),
     ];
+    private protocolPlayHandlers: Handler<ServerboundPacket>[] = [
+        new AcceptTeleportationHandler(),
+        new BlockEntityTagQueryHandler(),
+        new ChangeDifficultyHandler(),
+        new ChatHandler(),
+        new ClientCommandHandler(),
+        new ClientInformationHandler(),
+        new CommandSuggestionHandler(),
+        new ContainerButtonClickHandler(),
+        new ContainerClickHandler(),
+        new ContainerCloseHandler(),
+        new CustomPayloadHandler(),
+        new EditBookHandler(),
+        new EntityTagQueryHandler(),
+        new InteractHandler(),
+        new JigsawGenerateHandler(),
+        new KeepAliveHandler(),
+        new LockDifficultyHandler(),
+        new MovePlayerPosHandler(),
+        new MovePlayerPosRotHandler(),
+        new MovePlayerRotHandler(),
+        new MovePlayerStatusOnlyHandler(),
+        new MoveVehicleHandler(),
+        new PaddleBoatHandler(),
+        new PickItemHandler(),
+        new PlaceRecipeHandler(),
+        new PlayerAbilitiesHandler(),
+        new PlayerActionHandler(),
+        new PlayerCommandHandler(),
+        new PlayerInputHandler(),
+        new PongHandler(),
+        new RecipeBookChangeSettingsHandler(),
+        new RecipeBookSeenRecipeHandler(),
+        new RenameItemHandler(),
+        new ResourcePackHandler(),
+        new SeenAdvancementsHandler(),
+        new SelectTradeHandler(),
+        new SetBeaconHandler(),
+        new SetCarriedItemHandler(),
+        new SetCommandBlockHandler(),
+        new SetCommandMinecartHandler(),
+        new SetCreativeModeSlotHandler(),
+        new SetJigsawBlockHandler(),
+        new SetStructureBlockHandler(),
+        new SignUpdateHandler(),
+        new SwingHandler(),
+        new TeleportToEntityHandler(),
+        new UseItemOnHandler(),
+        new UseItemHandler(),
+    ];
 
     public getPacket(state: ProtocolState, id: number): ServerboundPacket | null {
         switch (state) {
@@ -164,7 +262,7 @@ export default class Protocol {
             }
 
             case ProtocolState.PLAY: {
-                return null;
+                return this.protocolPlayHandlers[id] ?? null;
             }
 
             case ProtocolState.STATUS: {

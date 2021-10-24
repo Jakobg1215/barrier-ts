@@ -11,7 +11,7 @@ export default class Console {
         this.consoleServer = server;
         clear();
         this.consoleInterface.on('line', (line: string): void => {
-            if (line === 'reload') {
+            if (line === '/reload') {
                 this.log('reloading');
                 return this.consoleServer.reload();
             }
