@@ -1,4 +1,4 @@
-import { log } from 'node:console';
+import { clear, log } from 'node:console';
 import { stdin } from 'node:process';
 import { createInterface, Interface } from 'node:readline';
 import type BarrierTs from '../BarrierTs';
@@ -9,6 +9,7 @@ export default class Console {
 
     public constructor(server: BarrierTs) {
         this.consoleServer = server;
+        clear();
         this.consoleInterface.on('line', (line: string): void => {
             if (line === 'reload') {
                 this.log('reloading');
