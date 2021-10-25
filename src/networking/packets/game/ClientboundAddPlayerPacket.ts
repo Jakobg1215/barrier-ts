@@ -18,8 +18,8 @@ export default class ClientboundAddPlayerPacket implements ClientboundPacket {
         this.x = player.position.x;
         this.y = player.position.y;
         this.z = player.position.z;
-        this.yRot = (Math.round(player.rotation.y) * 256) / 360;
-        this.xRot = (Math.round(player.rotation.x) * 256) / 360;
+        this.yRot = ((Math.round(player.rotation.y) * 256) / 360) & 255;
+        this.xRot = ((Math.round(player.rotation.x) * 256) / 360) & 255;
     }
 
     public write(): Packet {
