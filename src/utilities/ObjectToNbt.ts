@@ -1,4 +1,5 @@
 import type { Buffer } from 'node:buffer';
+import { TagIds } from '../types/enums/NbtTags';
 import NbtWriter from './NbtWriter';
 // TODO: Finnish this if needed
 export default function ObjectToNbt(data: object): Buffer {
@@ -193,20 +194,4 @@ export default function ObjectToNbt(data: object): Buffer {
     nbtData.writeUnsignedByte(TagIds.END);
 
     return nbtData.buffer;
-}
-
-enum TagIds {
-    END,
-    BYTE,
-    SHORT,
-    INT,
-    LONG,
-    FLOAT,
-    DOUBLE,
-    BYTEARRAY,
-    STRING,
-    LIST,
-    COMPOUND,
-    INTARRAY,
-    LONGARRAY,
 }

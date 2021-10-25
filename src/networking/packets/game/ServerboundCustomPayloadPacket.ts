@@ -1,3 +1,4 @@
+import type { Buffer } from 'node:buffer';
 import type Packet from '../Packet';
 import type ServerboundPacket from '../ServerboundPacket';
 

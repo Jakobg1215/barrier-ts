@@ -1,3 +1,4 @@
+import type { Buffer } from 'node:buffer';
 import type ClientboundPacket from '../ClientbountPacket';
 import Packet from '../Packet';
 

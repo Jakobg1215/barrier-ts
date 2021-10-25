@@ -1,0 +1,15 @@
+export enum TagIds {
+    END,
+    BYTE,
+    SHORT,
+    INT,
+    LONG,
+    FLOAT,
+    DOUBLE,
+    BYTEARRAY,
+    STRING,
+    LIST,
+    COMPOUND,
+    INTARRAY,
+    LONGARRAY,
+}

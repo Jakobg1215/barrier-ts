@@ -1,3 +1,4 @@
+import type { Buffer } from 'node:buffer';
 import { generateKeyPairSync, KeyPairSyncResult } from 'node:crypto';
 import { createServer, isIP, Server, Socket } from 'node:net';
 import Connection from './networking/Connection';
