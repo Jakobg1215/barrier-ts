@@ -10,6 +10,16 @@
             "outFiles": ["${workspaceFolder}/dist/**/*.js"],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Watch",
+            "program": "${workspaceFolder}/src/BarrierTs.ts",
+            "preLaunchTask": "tsc: watch - tsconfig.json",
+            "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+            "console": "integratedTerminal",
+            "runtimeExecutable": "nodemon"
         }
     ]
 }
