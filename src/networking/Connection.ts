@@ -1,6 +1,7 @@
-import type { Buffer } from 'node:buffer';
-import { constants, createCipheriv, privateDecrypt, randomBytes } from 'node:crypto';
+import { Buffer } from 'node:buffer';
+import { createCipheriv, randomBytes } from 'node:crypto';
 import type { Socket } from 'node:net';
+import { deflateSync, inflateSync } from 'node:zlib';
 import type BarrierTs from '../BarrierTs';
 import DimensionType from '../types/DimensionType';
 import { GameType } from '../types/enums/GameType';
@@ -43,70 +44,108 @@ export default class Connection {
         this.connectionServer = server;
 
         this.connectionNetworking.on('data', (data: Buffer) => {
-            const inPacket: Packet = this.connectionEncryption
-                ? new Packet(
-                      privateDecrypt(
-                          {
-                              key: `-----BEGIN RSA PRIVATE KEY-----\n${server.padLock.privateKey.toString(
-                                  'base64',
-                              )}\n-----END RSA PRIVATE KEY-----`,
-                              padding: constants.RSA_PKCS1_PADDING,
-                          },
-                          data,
-                      ),
-                  )
-                : new Packet(data);
+            //createDecipheriv('aes-128-cfb8', this.connectionKey!, this.connectionKey!);
 
-            if (!this.connectionCompression) {
-                do {
-                    if (this.connnectionNetworkClosed) return;
+            const inPacket: Packet = new Packet(data);
 
-                    const packetLength: number = inPacket.readVarInt();
-                    if (packetLength !== inPacket.getReadableBytes().length) {
-                        // Handle invalid packet length
-                    }
+            if (this.connectionCompression) {
+                //const packetLength: number = inPacket.readVarInt();
+                inPacket.readVarInt();
 
-                    const packetid: number = inPacket.readVarInt();
+                const dataLength: number = inPacket.readVarInt();
 
-                    const readPacket: ServerboundPacket | null = this.connectionServer.protocol.getPacket(
-                        this.connectionProtocolState,
-                        packetid,
+                // TODO: Handle if wrong size
+
+                const packetData: Packet = new Packet(
+                    dataLength > 0 ? inflateSync(inPacket.getReadableBytes()) : inPacket.getReadableBytes(),
+                );
+
+                //do {
+                const packetid: number = packetData.readVarInt();
+
+                const readPacket: ServerboundPacket | null = this.connectionServer.protocol.getPacket(
+                    this.connectionProtocolState,
+                    packetid,
+                );
+
+                if (!readPacket)
+                    return this.connectionServer.console.error(
+                        `Server packet ${packetid} not found for state ${this.connectionProtocolState}!`,
                     );
 
-                    if (!readPacket)
-                        return this.connectionServer.console.error(
-                            `Server packet ${packetid} not found for state ${this.connectionProtocolState}!`,
-                        );
+                try {
+                    readPacket.read(packetData);
+                } catch {
+                    server.console.error(`Read error for packet ${packetid} on state ${this.connectionProtocolState}!`);
+                    return;
+                }
 
-                    try {
-                        readPacket.read(inPacket);
-                    } catch {
-                        server.console.error(
-                            `Read error for packet ${packetid} on state ${this.connectionProtocolState}!`,
-                        );
-                        return;
-                    }
+                const packetHandle: Handler<ServerboundPacket> | null = this.connectionServer.protocol.getHandler(
+                    this.connectionProtocolState,
+                    packetid,
+                );
 
-                    const packetHandle: Handler<ServerboundPacket> | null = this.connectionServer.protocol.getHandler(
-                        this.connectionProtocolState,
-                        packetid,
+                if (!packetHandle)
+                    return this.connectionServer.console.warn(
+                        `Server handler ${packetid} not found for state ${this.connectionProtocolState}!`,
                     );
 
-                    if (!packetHandle)
-                        return this.connectionServer.console.warn(
-                            `Server handler ${packetid} not found for state ${this.connectionProtocolState}!`,
-                        );
-
-                    try {
-                        packetHandle.hander(readPacket, this, this.connectionServer);
-                    } catch {
-                        server.console.error(
-                            `Failed to handler packet ${packetid} on state ${this.connectionProtocolState}!`,
-                        );
-                    }
-                } while (inPacket.getReadableBytes().length > 0);
+                try {
+                    packetHandle.hander(readPacket, this, this.connectionServer);
+                } catch {
+                    server.console.error(
+                        `Failed to handler packet ${packetid} on state ${this.connectionProtocolState}!`,
+                    );
+                }
+                //} while (packetData.getReadableBytes().length > 0);
                 return;
             }
+
+            do {
+                if (this.connnectionNetworkClosed) return;
+
+                const packetLength: number = inPacket.readVarInt();
+                if (packetLength !== inPacket.getReadableBytes().length) {
+                    // Handle invalid packet length
+                }
+
+                const packetid: number = inPacket.readVarInt();
+
+                const readPacket: ServerboundPacket | null = this.connectionServer.protocol.getPacket(
+                    this.connectionProtocolState,
+                    packetid,
+                );
+
+                if (!readPacket)
+                    return this.connectionServer.console.error(
+                        `Server packet ${packetid} not found for state ${this.connectionProtocolState}!`,
+                    );
+
+                try {
+                    readPacket.read(inPacket);
+                } catch {
+                    server.console.error(`Read error for packet ${packetid} on state ${this.connectionProtocolState}!`);
+                    return;
+                }
+
+                const packetHandle: Handler<ServerboundPacket> | null = this.connectionServer.protocol.getHandler(
+                    this.connectionProtocolState,
+                    packetid,
+                );
+
+                if (!packetHandle)
+                    return this.connectionServer.console.warn(
+                        `Server handler ${packetid} not found for state ${this.connectionProtocolState}!`,
+                    );
+
+                try {
+                    packetHandle.hander(readPacket, this, this.connectionServer);
+                } catch {
+                    server.console.error(
+                        `Failed to handler packet ${packetid} on state ${this.connectionProtocolState}!`,
+                    );
+                }
+            } while (inPacket.getReadableBytes().length > 0);
         });
 
         this.connectionNetworking.on('close', () => {
@@ -164,6 +203,7 @@ export default class Connection {
     }
 
     public login(): void {
+        this.connectionConnected = true;
         this.send(new ClientboundGameProfilePacket(this.connectionPlayer.gameProfile!));
         this.setProtocolState(ProtocolState.PLAY);
         this.send(
@@ -233,7 +273,7 @@ export default class Connection {
             this.connectionPlayer.id,
         ]);
         this.send(new ClientboundPlayerPositionPacket(0, 0, 0, 0, 0, 0, 0, false)); // this should be the last packet
-        this.connectionConnected = true;
+        if (!this.connectionConnected) return;
         this.connectionServer.addPlayer();
         this.connectionServer.console.log(`Player ${this.connectionPlayer.gameProfile.name} has joined the game!`);
     }
@@ -248,9 +288,30 @@ export default class Connection {
         let dataChange: Buffer = dataWrite.getReadableBytes();
 
         if (this.connectionCompression) {
-            if (dataChange.length > this.connectionServer.config.compression) {
-                //deflateSync(dataChange);
+            if (dataChange.length >= this.connectionServer.config.compression) {
+                const uncompressed = new Packet()
+                    .writeVarInt(data.id)
+                    .append(dataWrite.getReadableBytes())
+                    .getReadableBytes().length;
+                const compressed = deflateSync(
+                    new Packet().writeVarInt(data.id).append(dataWrite.getReadableBytes()).getReadableBytes(),
+                );
+                dataChange = Buffer.concat([
+                    new Packet().writeVarInt(Packet.sizeVarInt(uncompressed) + compressed.length).getReadableBytes(),
+                    new Packet().writeVarInt(uncompressed).getReadableBytes(),
+                    compressed,
+                ]);
             } else {
+                const uncompressed = new Packet()
+                    .writeVarInt(data.id)
+                    .append(dataWrite.getReadableBytes())
+                    .getReadableBytes();
+
+                dataChange = Buffer.concat([
+                    new Packet().writeVarInt(Packet.sizeVarInt(0) + uncompressed.length).getReadableBytes(),
+                    new Packet().writeVarInt(0).getReadableBytes(),
+                    uncompressed,
+                ]);
             }
         } else {
             dataChange = dataWrite.buildPacket(data.id);

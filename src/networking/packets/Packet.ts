@@ -229,11 +229,12 @@ export default class Packet {
     }
 
     public buildPacket(id: number): Buffer {
-        const pkId = new Packet();
-        pkId.writeVarInt(id);
-        const pkLength = new Packet();
-        pkLength.writeVarInt(pkId.bytes.byteLength + this.bytes.byteLength);
-        const pk = Buffer.concat([pkLength.bytes, pkId.bytes]);
-        return Buffer.concat([pk, this.bytes]);
+        const packetId = new Packet().writeVarInt(id);
+        const packetLength = new Packet().writeVarInt(packetId.bytes.length + this.bytes.length);
+        return Buffer.concat([packetLength.bytes, packetId.bytes, this.bytes]);
+    }
+
+    public static sizeVarInt(val: number): number {
+        return new this().writeVarInt(val).bytes.length;
     }
 }

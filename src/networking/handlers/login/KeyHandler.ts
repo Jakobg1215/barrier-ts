@@ -59,7 +59,7 @@ export default class KeyHandler implements Handler<ServerboundKeyPacket> {
             mcHexDigest(
                 Buffer.from(
                     createHash('sha1')
-                        .update(server.config.serverId)
+                        .update(server.config.serverId.length > 20 ? '' : server.config.serverId)
                         .update(key)
                         .update(server.padLock.publicKey)
                         .digest('hex'),
@@ -78,6 +78,11 @@ export default class KeyHandler implements Handler<ServerboundKeyPacket> {
                 if (Responce.statusCode === 204) {
                     connection.disconnect(JSON.stringify({ translate: 'multiplayer.disconnect.unverified_username' }));
                 }
+
+                if (Responce.statusCode === 502) {
+                    connection.disconnect(JSON.stringify({ translate: 'multiplayer.disconnect.authservers_down' }));
+                }
+
                 Responce.on('data', data => {
                     connection.setKey(key);
                     const playerdata: MojangResponce = JSON.parse(data.toString());

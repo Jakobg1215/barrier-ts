@@ -22,7 +22,7 @@ export default class ConfigReader {
                         break;
                     }
                     case 'number': {
-                        (settings as any)[option] = parseInt(value) || (settings as any)[option];
+                        (settings as any)[option] = parseInt(value) ?? (settings as any)[option];
                         break;
                     }
                     case 'boolean': {
@@ -69,7 +69,7 @@ export default class ConfigReader {
         host: '0.0.0.0',
         debug: false,
         online: false,
-        compression: -1,
+        compression: 256,
         serverId: '',
         maxplayers: 20,
         motd: 'A BarrierTs Server',
