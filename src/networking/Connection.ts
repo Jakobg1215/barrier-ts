@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer';
-import { createCipheriv, randomBytes } from 'node:crypto';
+import { Cipher, createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 import type { Socket } from 'node:net';
 import { deflateSync, inflateSync } from 'node:zlib';
 import type BarrierTs from '../BarrierTs';
@@ -33,20 +33,23 @@ export default class Connection {
     private readonly connectionServer: BarrierTs;
     private connectionName: string | null = null;
     private connectionPlayer!: Player;
-    private connectionEncryption: boolean = false;
+    private connectionEncrypted: boolean = false;
+    private connectionEncrtyption!: Cipher;
+    private connectionDecryption!: Cipher;
     private connectionCompression: boolean = false;
     private connnectionNetworkClosed: boolean = false;
     private connectionConnected: boolean = false;
     private connectionKeepAliveId: Buffer = randomBytes(8);
+    private readonly connectionkeepAliveLoop: NodeJS.Timer;
 
     public constructor(socket: Socket, server: BarrierTs) {
         this.connectionNetworking = socket;
         this.connectionServer = server;
 
         this.connectionNetworking.on('data', (data: Buffer) => {
-            //createDecipheriv('aes-128-cfb8', this.connectionKey!, this.connectionKey!);
-
-            const inPacket: Packet = new Packet(data);
+            const inPacket: Packet = new Packet(
+                this.connectionConnected ? this.connectionDecryption.update(data) : data,
+            );
 
             if (this.connectionCompression) {
                 //const packetLength: number = inPacket.readVarInt();
@@ -164,6 +167,7 @@ export default class Connection {
                 );
                 this.connectionServer.brodcast(new ClientboundRemoveEntitiesPacket([this.connectionPlayer.id]));
             }
+            clearInterval(this.connectionkeepAliveLoop);
             this.connectionServer.connections.delete(this);
         });
 
@@ -171,7 +175,7 @@ export default class Connection {
             this.connectionServer.console.error(`Client had an ${error.message}`);
         });
 
-        setInterval(() => {
+        this.connectionkeepAliveLoop = setInterval(() => {
             if (this.connectionConnected) {
                 this.connectionKeepAliveId = randomBytes(8);
                 this.send(new ClientboundKeepAlivePacket(this.connectionKeepAliveId.readBigInt64BE()));
@@ -317,9 +321,8 @@ export default class Connection {
             dataChange = dataWrite.buildPacket(data.id);
         }
 
-        if (this.connectionEncryption) {
-            const cipher = createCipheriv('aes-128-cfb8', this.connectionKey!, this.connectionKey);
-            dataChange = cipher.update(dataChange);
+        if (this.connectionEncrypted) {
+            dataChange = this.connectionEncrtyption.update(dataChange);
         }
 
         if (this.connnectionNetworkClosed) return;
@@ -336,7 +339,9 @@ export default class Connection {
     }
 
     public enableEncryption(): void {
-        this.connectionEncryption = true;
+        this.connectionEncrypted = true;
+        this.connectionEncrtyption = createCipheriv('aes-128-cfb8', this.connectionKey!, this.connectionKey);
+        this.connectionDecryption = createDecipheriv('aes-128-cfb8', this.connectionKey!, this.connectionKey);
     }
 
     public enableCompression(): void {

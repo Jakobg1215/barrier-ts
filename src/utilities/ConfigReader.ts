@@ -68,7 +68,7 @@ export default class ConfigReader {
         port: 25565,
         host: '0.0.0.0',
         debug: false,
-        online: false,
+        online: true,
         compression: 256,
         serverId: '',
         maxplayers: 20,
