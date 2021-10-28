@@ -153,6 +153,8 @@ export default class Connection {
 
         this.connectionNetworking.on('close', () => {
             this.connnectionNetworkClosed = true;
+            this.connectionCompression = false;
+            this.connectionEncrypted = false;
             if (this.connectionConnected) {
                 this.connectionServer.removePlayer();
                 this.connectionServer.brodcast(
