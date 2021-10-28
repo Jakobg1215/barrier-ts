@@ -282,7 +282,11 @@ export default class NbtReader {
         const reader: NbtReader = new this(data);
         reader.readUnsignedByte();
         reader.readUnsignedShort();
-        return reader.readTagCompound();
+        return [reader.readTagCompound(), reader.offset];
+    }
+
+    public get buffer(): Buffer {
+        return this.bytes;
     }
 
     private addOffset(offset: number, retval: boolean = false): number {
