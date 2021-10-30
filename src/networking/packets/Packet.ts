@@ -1,5 +1,6 @@
 import { Buffer } from 'node:buffer';
 import BlockPos from '../../types/classes/BlockPos';
+import type Chat from '../../types/classes/Chat';
 import Slot from '../../types/classes/Slot';
 
 export default class Packet {
@@ -179,6 +180,10 @@ export default class Packet {
         buf.write(value, 'utf-8');
         this.bytes = Buffer.concat([this.bytes, buf]);
         return this;
+    }
+
+    public writeChat(chat: Chat): this {
+        return this.writeString(chat.toString());
     }
 
     public writeIdentifier(value: string): this {

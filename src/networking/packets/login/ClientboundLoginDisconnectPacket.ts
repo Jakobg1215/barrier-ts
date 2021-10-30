@@ -1,15 +1,16 @@
+import type Chat from '../../../types/classes/Chat';
 import type ClientboundPacket from '../ClientbountPacket';
 import Packet from '../Packet';
 
 export default class ClientboundLoginDisconnectPacket implements ClientboundPacket {
     public readonly id: number = 0;
-    public reason: string; // TODO: Make use chat type
+    public reason: Chat;
 
-    public constructor(reason: string) {
+    public constructor(reason: Chat) {
         this.reason = reason;
     }
 
     public write(): Packet {
-        return new Packet().writeString(this.reason);
+        return new Packet().writeChat(this.reason);
     }
 }

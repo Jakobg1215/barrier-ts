@@ -1,3 +1,4 @@
+import type Chat from '../../../types/classes/Chat';
 import type { GameType } from '../../../types/enums/GameType';
 import type GameProfile from '../../../types/GameProfile';
 import type { property } from '../../../types/GameProfile';
@@ -37,7 +38,7 @@ export default class ClientboundPlayerInfoPacket implements ClientboundPacket {
                         data.writeBoolean(false);
                         return;
                     }
-                    data.writeBoolean(true).writeString(element.displayName);
+                    data.writeBoolean(true).writeChat(element.displayName);
                 });
                 break;
             }
@@ -63,7 +64,7 @@ export default class ClientboundPlayerInfoPacket implements ClientboundPacket {
                         data.writeBoolean(false);
                         return;
                     }
-                    data.writeBoolean(true).writeString(element.displayName);
+                    data.writeBoolean(true).writeChat(element.displayName);
                 });
                 break;
             }
@@ -91,5 +92,5 @@ interface PlayerUpdate {
     latency: number;
     gameMode: GameType;
     profile: GameProfile;
-    displayName: string | null; // TODO: use type chat
+    displayName: Chat | null;
 }

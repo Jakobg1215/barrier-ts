@@ -3,7 +3,7 @@ import Packet from '../Packet';
 
 export default class ClientboundStatusResponsePacket implements ClientboundPacket {
     public readonly id: number = 0;
-    public serverStatus: string; // TODO: Make use chat type
+    public serverStatus: string;
 
     public constructor(serverStatus: string) {
         this.serverStatus = serverStatus;

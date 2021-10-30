@@ -3,6 +3,7 @@ import { Cipher, createCipheriv, createDecipheriv, randomBytes } from 'node:cryp
 import type { Socket } from 'node:net';
 import { deflateSync, inflateSync } from 'node:zlib';
 import type BarrierTs from '../BarrierTs';
+import type Chat from '../types/classes/Chat';
 import DimensionType from '../types/DimensionType';
 import { GameType } from '../types/enums/GameType';
 import type GameProfile from '../types/GameProfile';
@@ -193,8 +194,7 @@ export default class Connection {
         this.connectionProtocolState = state;
     }
 
-    public disconnect(reason: string): void {
-        // TODO: Make use chat type
+    public disconnect(reason: Chat): void {
         switch (this.connectionProtocolState) {
             case ProtocolState.LOGIN: {
                 this.send(new ClientboundLoginDisconnectPacket(reason));

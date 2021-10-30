@@ -3,6 +3,7 @@ import { constants, createHash, privateDecrypt } from 'node:crypto';
 import { get } from 'node:https';
 import { URL } from 'node:url';
 import type BarrierTs from '../../../BarrierTs';
+import Chat from '../../../types/classes/Chat';
 import type { property } from '../../../types/GameProfile';
 import type Connection from '../../Connection';
 import ClientboundLoginCompressionPacket from '../../packets/login/ClientboundLoginCompressionPacket';
@@ -22,7 +23,7 @@ export default class KeyHandler implements Handler<ServerboundKeyPacket> {
         );
 
         if (Buffer.compare(nonce, connection.nonce) !== 0)
-            return connection.disconnect(JSON.stringify({ translate: 'multiplayer.disconnect.generic' }));
+            return connection.disconnect(new Chat().addTranslate('multiplayer.disconnect.generic', new Chat()));
 
         const performTwosCompliment = (buffer: Buffer): void => {
             let carry: boolean = true;
@@ -76,11 +77,15 @@ export default class KeyHandler implements Handler<ServerboundKeyPacket> {
             ),
             Responce => {
                 if (Responce.statusCode === 204) {
-                    connection.disconnect(JSON.stringify({ translate: 'multiplayer.disconnect.unverified_username' }));
+                    connection.disconnect(
+                        new Chat().addTranslate('multiplayer.disconnect.unverified_username', new Chat()),
+                    );
                 }
 
                 if (Responce.statusCode === 502) {
-                    connection.disconnect(JSON.stringify({ translate: 'multiplayer.disconnect.authservers_down' }));
+                    connection.disconnect(
+                        new Chat().addTranslate('multiplayer.disconnect.authservers_down', new Chat()),
+                    );
                 }
 
                 Responce.on('data', data => {
