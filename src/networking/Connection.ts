@@ -49,7 +49,7 @@ export default class Connection {
 
         this.connectionNetworking.on('data', (data: Buffer) => {
             const inPacket: Packet = new Packet(
-                this.connectionConnected ? this.connectionDecryption.update(data) : data,
+                this.connectionConnected && this.connectionEncrypted ? this.connectionDecryption.update(data) : data,
             );
 
             if (this.connectionCompression) {
