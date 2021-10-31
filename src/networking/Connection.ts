@@ -42,6 +42,7 @@ export default class Connection {
     private connectionConnected: boolean = false;
     private connectionKeepAliveId: Buffer = randomBytes(8);
     private readonly connectionkeepAliveLoop: NodeJS.Timer;
+    private connectionTeleportId: Buffer = randomBytes(4);
 
     public constructor(socket: Socket, server: BarrierTs) {
         this.connectionNetworking = socket;
@@ -278,7 +279,9 @@ export default class Connection {
         this.connectionServer.brodcast(new ClientboundAddPlayerPacket(this.connectionPlayer), [
             this.connectionPlayer.id,
         ]);
-        this.send(new ClientboundPlayerPositionPacket(0, 0, 0, 0, 0, 0, 0, false)); // this should be the last packet
+        this.send(
+            new ClientboundPlayerPositionPacket(0, 0, 0, 0, 0, 0, this.connectionTeleportId.readInt32BE(), false),
+        ); // this should be the last packet
         if (!this.connectionConnected) return;
         this.connectionServer.addPlayer();
         this.connectionServer.console.log(`Player ${this.connectionPlayer.gameProfile.name} has joined the game!`);
@@ -372,5 +375,9 @@ export default class Connection {
 
     public get keepAliveId(): Buffer {
         return this.connectionKeepAliveId;
+    }
+
+    public get teleportId(): Buffer {
+        return this.connectionTeleportId;
     }
 }

@@ -40,7 +40,7 @@ export default class ClientboundPlayerPositionPacket implements ClientboundPacke
             .writeFloat(this.yRot)
             .writeFloat(this.xRot)
             .writeByte(this.relativeArguments)
-            .writeVarInt(this.id)
+            .writeVarInt(this.identifier)
             .writeBoolean(this.dismountVehicle);
     }
 }
