@@ -72,7 +72,7 @@ export default class KeyHandler implements Handler<ServerboundKeyPacket> {
         get(
             new URL(
                 `https://sessionserver.mojang.com/session/minecraft/hasJoined?username=${encodeURIComponent(
-                    connection.name!,
+                    connection.name,
                 )}&serverId=${hash}`,
             ),
             Responce => {

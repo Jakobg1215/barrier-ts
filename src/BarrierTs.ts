@@ -67,7 +67,7 @@ export default class BarrierTs {
 
     public brodcast(data: ClientboundPacket, exclude: number[] = []) {
         this.serverConnections.forEach((con: Connection) => {
-            if (!exclude.includes(con.player?.id!)) {
+            if (!exclude.includes(con.player.id)) {
                 con.send(data);
             }
         });

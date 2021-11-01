@@ -29,11 +29,14 @@ import { ProtocolState } from './Protocol';
 export default class Connection {
     private connectionProtocolState: ProtocolState = ProtocolState.HANDSHAKING;
     private readonly connectionNonce: Buffer = randomBytes(4);
-    private connectionKey: Buffer | null = null;
+    private connectionKey!: Buffer;
     private readonly connectionNetworking: Socket;
     private readonly connectionServer: BarrierTs;
-    private connectionName: string | null = null;
-    private connectionPlayer!: Player;
+    private connectionName: string = 'OFFLINE';
+    private connectionPlayer: Player = new Player(
+        { name: 'OFFLINE', uuid: '00000000000000000000000000000000', properties: [] },
+        -1,
+    );
     private connectionEncrypted: boolean = false;
     private connectionEncrtyption!: Cipher;
     private connectionDecryption!: Cipher;
@@ -220,7 +223,7 @@ export default class Connection {
 
     public login(): void {
         this.connectionConnected = true;
-        this.send(new ClientboundGameProfilePacket(this.connectionPlayer.gameProfile!));
+        this.send(new ClientboundGameProfilePacket(this.connectionPlayer.gameProfile));
         this.setProtocolState(ProtocolState.PLAY);
         this.send(
             new ClientboundLoginPacket(
@@ -354,8 +357,8 @@ export default class Connection {
 
     public enableEncryption(): void {
         this.connectionEncrypted = true;
-        this.connectionEncrtyption = createCipheriv('aes-128-cfb8', this.connectionKey!, this.connectionKey);
-        this.connectionDecryption = createDecipheriv('aes-128-cfb8', this.connectionKey!, this.connectionKey);
+        this.connectionEncrtyption = createCipheriv('aes-128-cfb8', this.connectionKey, this.connectionKey);
+        this.connectionDecryption = createDecipheriv('aes-128-cfb8', this.connectionKey, this.connectionKey);
     }
 
     public enableCompression(): void {
@@ -370,7 +373,7 @@ export default class Connection {
         return this.connectionNetworking;
     }
 
-    public get player(): Player | null {
+    public get player(): Player {
         return this.connectionPlayer;
     }
 
@@ -378,7 +381,7 @@ export default class Connection {
         return this.connectionNonce;
     }
 
-    public get name(): string | null {
+    public get name(): string {
         return this.connectionName;
     }
 
