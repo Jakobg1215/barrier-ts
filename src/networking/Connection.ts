@@ -54,65 +54,74 @@ export default class Connection {
             );
 
             if (this.connectionCompression) {
-                //const packetLength: number = inPacket.readVarInt();
-                inPacket.readVarInt();
+                do {
+                    if (this.connnectionNetworkClosed) return;
 
-                const dataLength: number = inPacket.readVarInt();
+                    const compressedInPacket: Packet = new Packet(inPacket.getReadableBytes());
 
-                // TODO: Handle if wrong size
+                    const packetLength: number = inPacket.readVarInt();
+                    compressedInPacket.readVarInt();
 
-                const packetData: Packet = new Packet(
-                    dataLength > 0 ? inflateSync(inPacket.getReadableBytes()) : inPacket.getReadableBytes(),
-                );
-
-                //do {
-                const packetid: number = packetData.readVarInt();
-
-                const readPacket: ServerboundPacket | null = this.connectionServer.protocol.getPacket(
-                    this.connectionProtocolState,
-                    packetid,
-                );
-
-                if (!readPacket)
-                    return this.connectionServer.console.error(
-                        `Server packet ${packetid} not found for state ${this.connectionProtocolState}!`,
+                    const dataLength: number = compressedInPacket.readVarInt();
+                    const packetData: Packet = new Packet(
+                        dataLength > 0
+                            ? inflateSync(compressedInPacket.getReadableBytes())
+                            : compressedInPacket.getReadableBytes(),
                     );
 
-                try {
-                    readPacket.read(packetData);
-                } catch {
-                    server.console.error(`Read error for packet ${packetid} on state ${this.connectionProtocolState}!`);
-                    return;
-                }
+                    // TODO: Need to handle invalid packet length
 
-                const packetHandle: Handler<ServerboundPacket> | null = this.connectionServer.protocol.getHandler(
-                    this.connectionProtocolState,
-                    packetid,
-                );
+                    inPacket.addOffset(packetLength, true);
 
-                if (!packetHandle)
-                    return this.connectionServer.console.warn(
-                        `Server handler ${packetid} not found for state ${this.connectionProtocolState}!`,
+                    const packetid: number = packetData.readVarInt();
+
+                    const readPacket: ServerboundPacket | null = this.connectionServer.protocol.getPacket(
+                        this.connectionProtocolState,
+                        packetid,
                     );
 
-                try {
-                    packetHandle.hander(readPacket, this, this.connectionServer);
-                } catch {
-                    server.console.error(
-                        `Failed to handler packet ${packetid} on state ${this.connectionProtocolState}!`,
+                    if (!readPacket)
+                        return this.connectionServer.console.error(
+                            `Server packet ${packetid} not found for state ${this.connectionProtocolState}!`,
+                        );
+
+                    try {
+                        readPacket.read(packetData);
+                    } catch {
+                        server.console.error(
+                            `Read error for packet ${packetid} on state ${this.connectionProtocolState}!`,
+                        );
+                        return;
+                    }
+
+                    const packetHandle: Handler<ServerboundPacket> | null = this.connectionServer.protocol.getHandler(
+                        this.connectionProtocolState,
+                        packetid,
                     );
-                }
-                //} while (packetData.getReadableBytes().length > 0);
+
+                    if (!packetHandle)
+                        return this.connectionServer.console.warn(
+                            `Server handler ${packetid} not found for state ${this.connectionProtocolState}!`,
+                        );
+
+                    try {
+                        packetHandle.hander(readPacket, this, this.connectionServer);
+                    } catch {
+                        server.console.error(
+                            `Failed to handler packet ${packetid} on state ${this.connectionProtocolState}!`,
+                        );
+                    }
+                } while (inPacket.getReadableBytes().length > 0);
                 return;
             }
 
             do {
                 if (this.connnectionNetworkClosed) return;
 
-                const packetLength: number = inPacket.readVarInt();
-                if (packetLength !== inPacket.getReadableBytes().length) {
-                    // Handle invalid packet length
-                }
+                //const packetLength: number = inPacket.readVarInt();
+                inPacket.readVarInt();
+
+                // TODO: Need to handle invalid packet length
 
                 const packetid: number = inPacket.readVarInt();
 
@@ -280,7 +289,7 @@ export default class Connection {
             this.connectionPlayer.id,
         ]);
         this.send(
-            new ClientboundPlayerPositionPacket(0, 0, 0, 0, 0, 0, this.connectionTeleportId.readInt32BE(), false),
+            new ClientboundPlayerPositionPacket(7.5, 0, 7.5, 0, 0, 0, this.connectionTeleportId.readInt32BE(), false),
         ); // this should be the last packet
         if (!this.connectionConnected) return;
         this.connectionServer.addPlayer();
