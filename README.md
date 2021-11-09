@@ -1,3 +1,7 @@
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=round)](https://github.com/prettier/prettier)
+[![ts](https://badgen.net/badge/Built%20With/TypeScript/blue)](https://github.com/microsoft/TypeScript)
+[![nodemon](https://badgen.net/badge/Developed%20With/Nodemon/green)](https://github.com/remy/nodemon)
+
 # Barrierts
 
 A Minecraft Java server written in TypeScript!
