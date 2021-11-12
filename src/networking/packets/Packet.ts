@@ -67,17 +67,27 @@ export default class Packet {
         let bitOffset = 0;
         let currentByte;
         do {
-            currentByte = this.readUnsignedByte();
+            currentByte = this.readByte();
             decodedInt |= (currentByte & 0b01111111) << bitOffset;
-            if (bitOffset == 35) throw new Error('VarInt is too big');
+            if (bitOffset == 35) throw new RangeError('VarInt is too big');
             bitOffset += 7;
         } while ((currentByte & 0b10000000) != 0);
         return decodedInt;
     }
 
     public readVarLong(): bigint {
-        // TODO: implement read varlong
-        return 0n;
+        let value = 0n;
+        let bitOffset = 0n;
+        let currentByte;
+        do {
+            if (bitOffset == 70n) throw new RangeError('VarLong is too big');
+
+            currentByte = this.readByte();
+            value |= (BigInt(currentByte) & 0b01111111n) << bitOffset;
+
+            bitOffset += 7n;
+        } while ((currentByte & 0b10000000) !== 0);
+        return new BigInt64Array([value])[0]!; // There is probably a better way to do this but this is fine for now
     }
 
     public readUUID(): string {
