@@ -43,7 +43,32 @@ export default class Vector3 {
         return this.zCoordinate;
     }
 
-    public static zero(): Vector3 {
+    public toString(): string {
+        return `(${this.xCoordinate}, ${this.yCoordinate}, ${this.zCoordinate})`;
+    }
+
+    public static get zero(): Vector3 {
         return new this(0, 0, 0);
+    }
+
+    public static distance(to: Vector3, from: Vector3): number {
+        return Math.sqrt(
+            (from.xCoordinate - to.xCoordinate) ** 2 +
+                (from.yCoordinate - to.yCoordinate) ** 2 +
+                (from.zCoordinate - to.zCoordinate) ** 2,
+        );
+    }
+
+    public static angle(to: Vector3, from: Vector3): Vector3 {
+        const d0 = to.xCoordinate - from.xCoordinate;
+        const d1 = to.yCoordinate - from.yCoordinate;
+        const d2 = to.zCoordinate - from.zCoordinate;
+        const d3 = Math.sqrt(d0 * d0 + d2 * d2);
+
+        return new this(
+            (Math.atan2(d2, d0) * (180 / Math.PI) - 90.0) % 360,
+            -(Math.atan2(d1, d3) * (180 / Math.PI)) % 360,
+            0, // There is no reason to calculate the roll
+        );
     }
 }

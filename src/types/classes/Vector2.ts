@@ -31,7 +31,7 @@ export default class Vector2 {
         return this.yCoordinate;
     }
 
-    public static zero(): Vector2 {
+    public static get zero(): Vector2 {
         return new this(0, 0);
     }
 }
