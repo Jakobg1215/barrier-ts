@@ -90,7 +90,7 @@ export default class Packet {
 
             bitOffset += 7n;
         } while ((currentByte & 0b10000000) !== 0);
-        return new BigInt64Array([value])[0]!; // There is probably a better way to do this but this is fine for now
+        return new BigInt64Array([value]).at(0)!; // There is probably a better way to do this but this is fine for now
     }
 
     public readUUID(): string {
@@ -98,8 +98,17 @@ export default class Packet {
     }
 
     public readBlockPos(): BlockPos {
-        this.readLong(); // TODO: Read block pos
-        return new BlockPos();
+        const bits: string = this.bytes
+            .slice(this.offset, this.addOffset(8, true))
+            .toJSON()
+            .data.map(byte => byte.toString(2).padStart(8, '0'))
+            .join('');
+
+        return new BlockPos(
+            bits.slice(0, 1) === '0' ? parseInt(bits.slice(0, 26), 2) : parseInt(bits.slice(0, 26), 2) - 67108864,
+            parseInt(bits.slice(52, 64), 2), // TODO: Need to handle negitive numbers
+            bits.slice(27, 28) === '0' ? parseInt(bits.slice(27, 52), 2) : parseInt(bits.slice(27, 52), 2) - 33554432,
+        );
     }
 
     public readSlot(): Slot {
@@ -220,6 +229,17 @@ export default class Packet {
             if (value !== 0) currentByte |= 0b10000000;
             this.writeUnsignedByte(currentByte);
         } while (value !== 0);
+        return this;
+    }
+
+    public writeVarLong(value: bigint): this {
+        let bitVal: string = new BigUint64Array([value]).at(0)!.toString(2).padStart(64, '0');
+        do {
+            let currentByte: bigint = BigInt(`0b${bitVal}`) & 0b01111111n;
+            bitVal = bitVal.slice(0, -7);
+            if (BigInt(`0b0${bitVal}`) !== 0n) currentByte |= 0b10000000n;
+            this.writeUnsignedByte(Number(currentByte));
+        } while (BigInt(`0b0${bitVal}`) !== 0n);
         return this;
     }
 
