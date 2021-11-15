@@ -2,6 +2,7 @@ import { Buffer } from 'node:buffer';
 import BlockPos from '../../types/classes/BlockPos';
 import type Chat from '../../types/classes/Chat';
 import Slot from '../../types/classes/Slot';
+import NbtReader from '../../utilities/NbtReader';
 
 export default class Packet {
     private bytes: Buffer;
@@ -10,7 +11,9 @@ export default class Packet {
     public constructor(data = Buffer.alloc(0)) {
         this.bytes = data;
     }
+
     //#region reading
+
     public readBoolean(): boolean {
         if (this.readByte()) return true;
         return false;
@@ -91,20 +94,29 @@ export default class Packet {
     }
 
     public readUUID(): string {
-        // TODO: implement read UUID
-        return '';
+        return this.readLong().toString(16) + this.readLong().toString(16);
     }
 
     public readBlockPos(): BlockPos {
+        this.readLong(); // TODO: Read block pos
         return new BlockPos();
     }
 
     public readSlot(): Slot {
-        return new Slot();
+        if (!this.readBoolean()) {
+            return Slot.Empty;
+        }
+        return new Slot(
+            true,
+            this.readVarInt(),
+            this.readByte(),
+            this.bytes.slice(this.offset, this.addOffset(NbtReader.readData(this.bytes.slice(this.offset))[1], true)),
+        );
     }
 
     //#endregion
     //#region writeing
+
     public writeBoolean(value: boolean): this {
         value ? this.writeByte(1) : this.writeByte(0);
         return this;
@@ -234,6 +246,7 @@ export default class Packet {
     }
 
     //#endregion
+
     public getReadableBytes(): Buffer {
         return this.bytes.slice(this.offset);
     }

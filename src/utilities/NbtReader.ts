@@ -278,9 +278,9 @@ export default class NbtReader {
 
     //#endregion
 
-    public static readData(data: Buffer): object {
+    public static readData(data: Buffer): [object, number] {
         const reader: NbtReader = new this(data);
-        reader.readUnsignedByte();
+        if (reader.readUnsignedByte() === 0) return [{}, 1];
         reader.readUnsignedShort();
         return [reader.readTagCompound(), reader.offset];
     }
