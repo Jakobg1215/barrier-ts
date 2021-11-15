@@ -5,6 +5,7 @@ import { deflateSync, inflateSync } from 'node:zlib';
 import type BarrierTs from '../BarrierTs';
 import type Chat from '../types/classes/Chat';
 import DimensionType from '../types/DimensionType';
+import { Difficulty } from '../types/enums/Difficulty';
 import { GameType } from '../types/enums/GameType';
 import type GameProfile from '../types/GameProfile';
 import RegistryHolder from '../types/RegistryHolder';
@@ -13,6 +14,7 @@ import Player from '../world/entity/Player';
 import type Handler from './handlers/Handler';
 import type ClientboundPacket from './packets/ClientbountPacket';
 import ClientboundAddPlayerPacket from './packets/game/ClientboundAddPlayerPacket';
+import ClientboundChangeDifficultyPacket from './packets/game/ClientboundChangeDifficultyPacket';
 import ClientboundCustomPayloadPacket from './packets/game/ClientboundCustomPayloadPacket';
 import ClientboundKeepAlivePacket from './packets/game/ClientboundKeepAlivePacket';
 import ClientboundLoginPacket from './packets/game/ClientboundLoginPacket';
@@ -20,6 +22,7 @@ import ClientboundPlayerAbilitiesPacket from './packets/game/ClientboundPlayerAb
 import ClientboundPlayerInfoPacket from './packets/game/ClientboundPlayerInfoPacket';
 import ClientboundPlayerPositionPacket from './packets/game/ClientboundPlayerPositionPacket';
 import ClientboundRemoveEntitiesPacket from './packets/game/ClientboundRemoveEntitiesPacket';
+import ClientboundSetChunkCacheCenterPacket from './packets/game/ClientboundSetChunkCacheCenterPacket';
 import ClientboundGameProfilePacket from './packets/login/ClientboundGameProfilePacket';
 import ClientboundLoginDisconnectPacket from './packets/login/ClientboundLoginDisconnectPacket';
 import Packet from './packets/Packet';
@@ -256,6 +259,7 @@ export default class Connection {
                     .getReadableBytes(),
             ),
         );
+        this.send(new ClientboundChangeDifficultyPacket(Difficulty.NORMAL, true));
         this.send(new ClientboundPlayerAbilitiesPacket(true, true, true, true, 0.05, 0.1));
         this.send(
             new ClientboundPlayerInfoPacket(
@@ -291,6 +295,7 @@ export default class Connection {
         this.connectionServer.brodcast(new ClientboundAddPlayerPacket(this.connectionPlayer), [
             this.connectionPlayer.id,
         ]);
+        this.send(new ClientboundSetChunkCacheCenterPacket(0, 0));
         this.send(
             new ClientboundPlayerPositionPacket(7.5, 0, 7.5, 0, 0, 0, this.connectionTeleportId.readInt32BE(), false),
         ); // this should be the last packet
