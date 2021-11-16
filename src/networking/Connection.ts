@@ -17,6 +17,7 @@ import ClientboundAddPlayerPacket from './packets/game/ClientboundAddPlayerPacke
 import ClientboundChangeDifficultyPacket from './packets/game/ClientboundChangeDifficultyPacket';
 import ClientboundCustomPayloadPacket from './packets/game/ClientboundCustomPayloadPacket';
 import ClientboundKeepAlivePacket from './packets/game/ClientboundKeepAlivePacket';
+import ClientboundLevelChunkPacket from './packets/game/ClientboundLevelChunkPacket';
 import ClientboundLoginPacket from './packets/game/ClientboundLoginPacket';
 import ClientboundPlayerAbilitiesPacket from './packets/game/ClientboundPlayerAbilitiesPacket';
 import ClientboundPlayerInfoPacket from './packets/game/ClientboundPlayerInfoPacket';
@@ -240,10 +241,10 @@ export default class Connection {
                 ObjectToNbt(DimensionType),
                 'minecraft:overworld',
                 this.connectionServer.config.maxplayers,
-                10,
+                8,
                 false,
                 true,
-                true,
+                false,
                 true,
             ),
         );
@@ -296,9 +297,50 @@ export default class Connection {
             this.connectionPlayer.id,
         ]);
         this.send(new ClientboundSetChunkCacheCenterPacket(0, 0));
+
+        const chunkdata = new Packet()
+            .writeShort(1024)
+            .writeUnsignedByte(4)
+            .writeVarInt(4)
+            .writeVarInt(0)
+            .writeVarInt(33)
+            .writeVarInt(10)
+            .writeVarInt(9)
+            .writeVarInt(256);
+
+        for (let bedrock = 0; bedrock < 16; bedrock++) {
+            chunkdata.writeLong(1229782938247303441n);
+        }
+        for (let dirt = 0; dirt < 32; dirt++) {
+            chunkdata.writeLong(2459565876494606882n);
+        }
+        for (let grass = 0; grass < 16; grass++) {
+            chunkdata.writeLong(3689348814741910323n);
+        }
+        for (let air = 0; air < 192; air++) {
+            chunkdata.writeLong(0n);
+        }
+
+        for (let x = -8; x < 8; x++) {
+            for (let z = -8; z < 8; z++) {
+                this.send(
+                    new ClientboundLevelChunkPacket(
+                        x,
+                        z,
+                        [1n],
+                        ObjectToNbt({}),
+                        Array(1024).fill(127),
+                        chunkdata.getReadableBytes(),
+                        [],
+                    ),
+                );
+            }
+        }
+
         this.send(
-            new ClientboundPlayerPositionPacket(7.5, 0, 7.5, 0, 0, 0, this.connectionTeleportId.readInt32BE(), false),
+            new ClientboundPlayerPositionPacket(0.5, 4, 0.5, 0, 0, 0, this.connectionTeleportId.readInt32BE(), false),
         ); // this should be the last packet
+
         if (!this.connectionConnected) return;
         this.connectionServer.addPlayer();
         this.connectionServer.console.log(`Player ${this.connectionPlayer.gameProfile.name} has joined the game!`);
