@@ -272,7 +272,7 @@ export default class Connection {
                             latency: 0,
                             gameMode: GameType.CREATIVE,
                             profile: element.connectionPlayer.gameProfile,
-                            displayName: this.connectionPlayer.userName,
+                            displayName: element.connectionPlayer.userName,
                         };
                     }),
             ),
@@ -286,6 +286,7 @@ export default class Connection {
                     displayName: this.connectionPlayer.userName,
                 },
             ]),
+            [this.connectionPlayer.id],
         );
         Array.from(this.connectionServer.connections)
             .filter(element => element.protocolState === ProtocolState.PLAY)
