@@ -261,7 +261,7 @@ export default class Connection {
             ),
         );
         this.send(new ClientboundChangeDifficultyPacket(Difficulty.NORMAL, true));
-        this.send(new ClientboundPlayerAbilitiesPacket(true, true, true, true, 0.05, 0.1));
+        this.send(new ClientboundPlayerAbilitiesPacket(true, false, true, true, 0.05, 0.1));
         this.send(
             new ClientboundPlayerInfoPacket(
                 0,

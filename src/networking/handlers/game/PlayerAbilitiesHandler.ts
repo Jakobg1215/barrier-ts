@@ -4,7 +4,7 @@ import type ServerboundPlayerAbilitiesPacket from '../../packets/game/Serverboun
 import type Handler from '../Handler';
 
 export default class PlayerAbilitiesHandler implements Handler<ServerboundPlayerAbilitiesPacket> {
-    public hander(_packet: ServerboundPlayerAbilitiesPacket, _connection: Connection, _server: BarrierTs): void {
-        throw new Error('Method not implemented.');
+    public hander(packet: ServerboundPlayerAbilitiesPacket, connection: Connection, _server: BarrierTs): void {
+        connection.player.isFlying = packet.isFlying;
     }
 }

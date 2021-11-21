@@ -5,6 +5,7 @@ import BaseEntity from './BaseEntity';
 export default class Player extends BaseEntity {
     private readonly playerGameProfile: GameProfile;
     private playerUserName: Chat;
+    public isFlying: boolean = false;
 
     public constructor(gameProfile: GameProfile, id: number) {
         super(id);
