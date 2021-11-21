@@ -12,7 +12,7 @@ Its just a small project that I work in my free time.
 
 ### Requirements
 
--   node 10.13.0 or higher
+-   You just need node(I use the Latest version of node)
 
 ### Running
 
@@ -38,6 +38,6 @@ npm start
 
 You can work on this project and submit pull request.
 
-I don't want to use any Dependencies only devDependencies.
+This project will not use any external runtime libraries.
 
-You can use `npm run dev` to run barrierts in nodemon.
+You can use `npm run dev` to run barrierts in nodemon or F5 in VS Code.
