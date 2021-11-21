@@ -17,6 +17,6 @@ export default class MovePlayerPosHandler implements Handler<ServerboundMovePlay
             ),
             [connection.player.id],
         );
-        connection.player?.updatePosition(new Vector3(packet.x, packet.y, packet.z));
+        connection.player.updatePosition(new Vector3(packet.x, packet.y, packet.z));
     }
 }

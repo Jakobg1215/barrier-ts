@@ -11,13 +11,13 @@ export default class MovePlayerRotHandler implements Handler<ServerboundMovePlay
         server.brodcast(
             new ClientboundMoveEntityPacketRot(
                 connection.player.id,
-                ((packet.yRot * 256) / 360) & 255,
-                ((packet.xRot * 256) / 360) & 255,
+                (packet.yRot * 256) / 360,
+                (packet.xRot * 256) / 360,
                 packet.onGround,
             ),
             [connection.player.id],
         );
-        server.brodcast(new ClientboundRotateHeadPacket(connection.player.id, ((packet.yRot * 256) / 360) & 255), [
+        server.brodcast(new ClientboundRotateHeadPacket(connection.player.id, (packet.yRot * 256) / 360), [
             connection.player.id,
         ]);
         connection.player.updateRotation(new Vector2(packet.xRot, packet.yRot));

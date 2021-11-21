@@ -7,8 +7,8 @@ export default class ClientboundMoveEntityPacketRot implements ClientboundPacket
     public write(): Packet {
         return new Packet()
             .writeVarInt(this.entityId)
-            .writeUnsignedByte(this.yRot)
-            .writeUnsignedByte(this.xRot)
+            .writeByte(this.yRot)
+            .writeByte(this.xRot)
             .writeBoolean(this.onGround);
     }
 }

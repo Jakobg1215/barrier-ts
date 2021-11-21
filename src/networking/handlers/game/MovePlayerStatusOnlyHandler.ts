@@ -13,14 +13,14 @@ export default class MovePlayerStatusOnlyHandler implements Handler<ServerboundM
                 connection.player.position.x,
                 connection.player.position.y,
                 connection.player.position.z,
-                ((connection.player.rotation.y * 256) / 360) & 255,
-                ((connection.player.rotation.x * 256) / 360) & 255,
+                (connection.player.rotation.y * 256) / 360,
+                (connection.player.rotation.x * 256) / 360,
                 packet.onGround,
             ),
             [connection.player.id],
         );
         server.brodcast(
-            new ClientboundRotateHeadPacket(connection.player.id, ((connection.player.rotation.y * 256) / 360) & 255),
+            new ClientboundRotateHeadPacket(connection.player.id, (connection.player.rotation.y * 256) / 360),
             [connection.player.id],
         );
     }

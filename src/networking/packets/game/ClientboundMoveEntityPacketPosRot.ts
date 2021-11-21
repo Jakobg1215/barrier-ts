@@ -18,8 +18,8 @@ export default class ClientboundMoveEntityPacketPosRot implements ClientboundPac
             .writeShort(this.xa)
             .writeShort(this.ya)
             .writeShort(this.za)
-            .writeUnsignedByte(this.yRot)
-            .writeUnsignedByte(this.xRot)
+            .writeByte(this.yRot)
+            .writeByte(this.xRot)
             .writeBoolean(this.onGround);
     }
 }

@@ -15,8 +15,11 @@ export default class ClientboundTeleportEntityPacket implements ClientboundPacke
     public write(): Packet {
         return new Packet()
             .writeVarInt(this.id)
-            .writeUnsignedByte(this.yRot)
-            .writeUnsignedByte(this.xRot)
+            .writeDouble(this.x)
+            .writeDouble(this.y)
+            .writeDouble(this.z)
+            .writeByte(this.yRot)
+            .writeByte(this.xRot)
             .writeBoolean(this.onGround);
     }
 }
