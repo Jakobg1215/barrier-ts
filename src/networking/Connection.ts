@@ -292,11 +292,30 @@ export default class Connection {
             .filter(element => element.protocolState === ProtocolState.PLAY)
             .forEach(element => {
                 if (element.connectionPlayer.id === this.connectionPlayer.id) return;
-                this.send(new ClientboundAddPlayerPacket(element.connectionPlayer));
+                this.send(
+                    new ClientboundAddPlayerPacket(
+                        element.player.id,
+                        element.player.gameProfile.uuid,
+                        element.player.position.x,
+                        element.player.position.y,
+                        element.player.position.z,
+                        ((element.player.rotation.y * 256) / 360) & 255,
+                        ((element.player.rotation.x * 256) / 360) & 255,
+                    ),
+                );
             });
-        this.connectionServer.brodcast(new ClientboundAddPlayerPacket(this.connectionPlayer), [
-            this.connectionPlayer.id,
-        ]);
+        this.connectionServer.brodcast(
+            new ClientboundAddPlayerPacket(
+                this.connectionPlayer.id,
+                this.connectionPlayer.gameProfile.uuid,
+                this.connectionPlayer.position.x,
+                this.connectionPlayer.position.y,
+                this.connectionPlayer.position.z,
+                ((this.connectionPlayer.rotation.y * 256) / 360) & 255,
+                ((this.connectionPlayer.rotation.x * 256) / 360) & 255,
+            ),
+            [this.connectionPlayer.id],
+        );
         this.send(new ClientboundSetChunkCacheCenterPacket(0, 0));
 
         const chunkdata = new Packet()
@@ -353,17 +372,19 @@ export default class Connection {
     }
 
     public send(data: ClientboundPacket): void {
+        const packetId = this.connectionServer.protocol.getId(this.connectionProtocolState, data);
+        if (packetId === null) return this.connectionServer.console.error('Could not find packet id!');
         const dataWrite = data.write();
         let dataChange: Buffer = dataWrite.getReadableBytes();
 
         if (this.connectionCompression) {
             if (dataChange.length >= this.connectionServer.config.compression) {
                 const uncompressed = new Packet()
-                    .writeVarInt(data.id)
+                    .writeVarInt(packetId)
                     .append(dataWrite.getReadableBytes())
                     .getReadableBytes().length;
                 const compressed = deflateSync(
-                    new Packet().writeVarInt(data.id).append(dataWrite.getReadableBytes()).getReadableBytes(),
+                    new Packet().writeVarInt(packetId).append(dataWrite.getReadableBytes()).getReadableBytes(),
                 );
                 dataChange = Buffer.concat([
                     new Packet().writeVarInt(Packet.sizeVarInt(uncompressed) + compressed.length).getReadableBytes(),
@@ -372,7 +393,7 @@ export default class Connection {
                 ]);
             } else {
                 const uncompressed = new Packet()
-                    .writeVarInt(data.id)
+                    .writeVarInt(packetId)
                     .append(dataWrite.getReadableBytes())
                     .getReadableBytes();
 
@@ -383,7 +404,7 @@ export default class Connection {
                 ]);
             }
         } else {
-            dataChange = dataWrite.buildPacket(data.id);
+            dataChange = dataWrite.buildPacket(packetId);
         }
 
         if (this.connectionEncrypted) {

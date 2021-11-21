@@ -3,16 +3,9 @@ import type ClientboundPacket from '../ClientbountPacket';
 import Packet from '../Packet';
 
 export default class ClientboundCustomPayloadPacket implements ClientboundPacket {
-    public readonly id: number = 24;
-    public identifier: string;
-    public data: Buffer;
-
-    public constructor(identifier: string, data: Buffer) {
-        this.identifier = identifier;
-        this.data = data;
-    }
+    public constructor(public identifier: string, public data: Buffer) {}
 
     public write(): Packet {
-        return new Packet().writeString(this.identifier).append(this.data);
+        return new Packet().writeIdentifier(this.identifier).append(this.data);
     }
 }

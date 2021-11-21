@@ -133,7 +133,7 @@ export default class Packet {
 
     public writeByte(value: number): this {
         const buf = Buffer.alloc(1);
-        buf.writeInt8(value);
+        buf.writeInt8(new Int8Array([value]).at(0)!);
         this.bytes = Buffer.concat([this.bytes, buf]);
         return this;
     }
@@ -258,6 +258,23 @@ export default class Packet {
         this.writeLong(uuid.readLong());
         this.writeLong(uuid.readLong());
         return this;
+    }
+
+    public writeBlockPos(blockPos: BlockPos): this {
+        this.writeLong(blockPos.toBigInt());
+        return this;
+    }
+
+    public writeNbt(nbt: Buffer): this {
+        this.bytes = Buffer.concat([this.bytes, nbt]);
+        return this;
+    }
+
+    public writeSlot(slot: Slot): this {
+        if (slot.present) {
+            return this.writeBoolean(true).writeVarInt(slot.id).writeByte(slot.count).writeNbt(slot.nbt);
+        }
+        return this.writeBoolean(false);
     }
 
     public append(data: Buffer): this {

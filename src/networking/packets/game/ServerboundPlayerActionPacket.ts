@@ -16,7 +16,7 @@ export default class ServerboundPlayerActionPacket implements ServerboundPacket 
     }
 }
 
-enum Action {
+export enum Action {
     START_DESTROY_BLOCK,
     ABORT_DESTROY_BLOCK,
     STOP_DESTROY_BLOCK,

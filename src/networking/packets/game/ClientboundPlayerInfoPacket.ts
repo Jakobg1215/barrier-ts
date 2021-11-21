@@ -6,17 +6,10 @@ import type ClientboundPacket from '../ClientbountPacket';
 import Packet from '../Packet';
 
 export default class ClientboundPlayerInfoPacket implements ClientboundPacket {
-    public readonly id: number = 54;
-    public action: Action;
-    public entries: PlayerUpdate[];
-
-    public constructor(action: Action, entries: PlayerUpdate[]) {
-        this.action = action;
-        this.entries = entries;
-    }
+    public constructor(public action: Action, public entries: PlayerUpdate[]) {}
 
     public write(): Packet {
-        const data = new Packet().writeVarInt(this.action).writeVarInt(this.entries.length);
+        const data: Packet = new Packet().writeVarInt(this.action).writeVarInt(this.entries.length);
         switch (this.action) {
             case Action.ADD_PLAYER: {
                 this.entries.forEach((element: PlayerUpdate): void => {

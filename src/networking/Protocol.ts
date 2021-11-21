@@ -53,6 +53,110 @@ import HelloHandler from './handlers/login/HelloHandler';
 import KeyHandler from './handlers/login/KeyHandler';
 import PingRequestHandler from './handlers/status/PingRequestHandler';
 import StatusRequestHandler from './handlers/status/StatusRequestHandler';
+import type ClientboundPacket from './packets/ClientbountPacket';
+import ClientboundAddEntityPacket from './packets/game/ClientboundAddEntityPacket';
+import ClientboundAddExperienceOrbPacket from './packets/game/ClientboundAddExperienceOrbPacket';
+import ClientboundAddMobPacket from './packets/game/ClientboundAddMobPacket';
+import ClientboundAddPaintingPacket from './packets/game/ClientboundAddPaintingPacket';
+import ClientboundAddPlayerPacket from './packets/game/ClientboundAddPlayerPacket';
+import ClientboundAddVibrationSignalPacket from './packets/game/ClientboundAddVibrationSignalPacket';
+import ClientboundAnimatePacket from './packets/game/ClientboundAnimatePacket';
+import ClientboundAwardStatsPacket from './packets/game/ClientboundAwardStatsPacket';
+import ClientboundBlockBreakAckPacket from './packets/game/ClientboundBlockBreakAckPacket';
+import ClientboundBlockDestructionPacket from './packets/game/ClientboundBlockDestructionPacket';
+import ClientboundBlockEntityDataPacket from './packets/game/ClientboundBlockEntityDataPacket';
+import ClientboundBlockEventPacket from './packets/game/ClientboundBlockEventPacket';
+import ClientboundBlockUpdatePacket from './packets/game/ClientboundBlockUpdatePacket';
+import ClientboundBossEventPacket from './packets/game/ClientboundBossEventPacket';
+import ClientboundChangeDifficultyPacket from './packets/game/ClientboundChangeDifficultyPacket';
+import ClientboundChatPacket from './packets/game/ClientboundChatPacket';
+import ClientboundClearTitlesPacket from './packets/game/ClientboundClearTitlesPacket';
+import ClientboundCommandsPacket from './packets/game/ClientboundCommandsPacket';
+import ClientboundCommandSuggestionsPacket from './packets/game/ClientboundCommandSuggestionsPacket';
+import ClientboundContainerClosePacket from './packets/game/ClientboundContainerClosePacket';
+import ClientboundContainerSetContentPacket from './packets/game/ClientboundContainerSetContentPacket';
+import ClientboundContainerSetDataPacket from './packets/game/ClientboundContainerSetDataPacket';
+import ClientboundContainerSetSlotPacket from './packets/game/ClientboundContainerSetSlotPacket';
+import ClientboundCooldownPacket from './packets/game/ClientboundCooldownPacket';
+import ClientboundCustomPayloadPacket from './packets/game/ClientboundCustomPayloadPacket';
+import ClientboundCustomSoundPacket from './packets/game/ClientboundCustomSoundPacket';
+import ClientboundDisconnectPacket from './packets/game/ClientboundDisconnectPacket';
+import ClientboundEntityEventPacket from './packets/game/ClientboundEntityEventPacket';
+import ClientboundExplodePacket from './packets/game/ClientboundExplodePacket';
+import ClientboundForgetLevelChunkPacket from './packets/game/ClientboundForgetLevelChunkPacket';
+import ClientboundGameEventPacket from './packets/game/ClientboundGameEventPacket';
+import ClientboundHorseScreenOpenPacket from './packets/game/ClientboundHorseScreenOpenPacket';
+import ClientboundInitializeBorderPacket from './packets/game/ClientboundInitializeBorderPacket';
+import ClientboundKeepAlivePacket from './packets/game/ClientboundKeepAlivePacket';
+import ClientboundLevelChunkPacket from './packets/game/ClientboundLevelChunkPacket';
+import ClientboundLevelEventPacket from './packets/game/ClientboundLevelEventPacket';
+import ClientboundLevelParticlesPacket from './packets/game/ClientboundLevelParticlesPacket';
+import ClientboundLightUpdatePacket from './packets/game/ClientboundLightUpdatePacket';
+import ClientboundLoginPacket from './packets/game/ClientboundLoginPacket';
+import ClientboundMapItemDataPacket from './packets/game/ClientboundMapItemDataPacket';
+import ClientboundMerchantOffersPacket from './packets/game/ClientboundMerchantOffersPacket';
+import ClientboundMoveEntityPacketPos from './packets/game/ClientboundMoveEntityPacketPos';
+import ClientboundMoveEntityPacketPosRot from './packets/game/ClientboundMoveEntityPacketPosRot';
+import ClientboundMoveEntityPacketRot from './packets/game/ClientboundMoveEntityPacketRot';
+import ClientboundMoveVehiclePacket from './packets/game/ClientboundMoveVehiclePacket';
+import ClientboundOpenBookPacket from './packets/game/ClientboundOpenBookPacket';
+import ClientboundOpenScreenPacket from './packets/game/ClientboundOpenScreenPacket';
+import ClientboundOpenSignEditorPacket from './packets/game/ClientboundOpenSignEditorPacket';
+import ClientboundPingPacket from './packets/game/ClientboundPingPacket';
+import ClientboundPlaceGhostRecipePacket from './packets/game/ClientboundPlaceGhostRecipePacket';
+import ClientboundPlayerAbilitiesPacket from './packets/game/ClientboundPlayerAbilitiesPacket';
+import ClientboundPlayerCombatEndPacket from './packets/game/ClientboundPlayerCombatEndPacket';
+import ClientboundPlayerCombatEnterPacket from './packets/game/ClientboundPlayerCombatEnterPacket';
+import ClientboundPlayerCombatKillPacket from './packets/game/ClientboundPlayerCombatKillPacket';
+import ClientboundPlayerInfoPacket from './packets/game/ClientboundPlayerInfoPacket';
+import ClientboundPlayerLookAtPacket from './packets/game/ClientboundPlayerLookAtPacket';
+import ClientboundPlayerPositionPacket from './packets/game/ClientboundPlayerPositionPacket';
+import ClientboundRecipePacket from './packets/game/ClientboundRecipePacket';
+import ClientboundRemoveEntitiesPacket from './packets/game/ClientboundRemoveEntitiesPacket';
+import ClientboundRemoveMobEffectPacket from './packets/game/ClientboundRemoveMobEffectPacket';
+import ClientboundResourcePackPacket from './packets/game/ClientboundResourcePackPacket';
+import ClientboundRespawnPacket from './packets/game/ClientboundRespawnPacket';
+import ClientboundRotateHeadPacket from './packets/game/ClientboundRotateHeadPacket';
+import ClientboundSectionBlocksUpdatePacket from './packets/game/ClientboundSectionBlocksUpdatePacket';
+import ClientboundSelectAdvancementsTabPacket from './packets/game/ClientboundSelectAdvancementsTabPacket';
+import ClientboundSetActionBarTextPacket from './packets/game/ClientboundSetActionBarTextPacket';
+import ClientboundSetBorderCenterPacket from './packets/game/ClientboundSetBorderCenterPacket';
+import ClientboundSetBorderLerpSizePacket from './packets/game/ClientboundSetBorderLerpSizePacket';
+import ClientboundSetBorderSizePacket from './packets/game/ClientboundSetBorderSizePacket';
+import ClientboundSetBorderWarningDelayPacket from './packets/game/ClientboundSetBorderWarningDelayPacket';
+import ClientboundSetBorderWarningDistancePacket from './packets/game/ClientboundSetBorderWarningDistancePacket';
+import ClientboundSetCameraPacket from './packets/game/ClientboundSetCameraPacket';
+import ClientboundSetCarriedItemPacket from './packets/game/ClientboundSetCarriedItemPacket';
+import ClientboundSetChunkCacheCenterPacket from './packets/game/ClientboundSetChunkCacheCenterPacket';
+import ClientboundSetChunkCacheRadiusPacket from './packets/game/ClientboundSetChunkCacheRadiusPacket';
+import ClientboundSetDefaultSpawnPositionPacket from './packets/game/ClientboundSetDefaultSpawnPositionPacket';
+import ClientboundSetDisplayObjectivePacket from './packets/game/ClientboundSetDisplayObjectivePacket';
+import ClientboundSetEntityDataPacket from './packets/game/ClientboundSetEntityDataPacket';
+import ClientboundSetEntityLinkPacket from './packets/game/ClientboundSetEntityLinkPacket';
+import ClientboundSetEntityMotionPacket from './packets/game/ClientboundSetEntityMotionPacket';
+import ClientboundSetEquipmentPacket from './packets/game/ClientboundSetEquipmentPacket';
+import ClientboundSetExperiencePacket from './packets/game/ClientboundSetExperiencePacket';
+import ClientboundSetHealthPacket from './packets/game/ClientboundSetHealthPacket';
+import ClientboundSetObjectivePacket from './packets/game/ClientboundSetObjectivePacket';
+import ClientboundSetPassengersPacket from './packets/game/ClientboundSetPassengersPacket';
+import ClientboundSetPlayerTeamPacket from './packets/game/ClientboundSetPlayerTeamPacket';
+import ClientboundSetScorePacket from './packets/game/ClientboundSetScorePacket';
+import ClientboundSetSubtitleTextPacket from './packets/game/ClientboundSetSubtitleTextPacket';
+import ClientboundSetTimePacket from './packets/game/ClientboundSetTimePacket';
+import ClientboundSetTitlesAnimationPacket from './packets/game/ClientboundSetTitlesAnimationPacket';
+import ClientboundSetTitleTextPacket from './packets/game/ClientboundSetTitleTextPacket';
+import ClientboundSoundEntityPacket from './packets/game/ClientboundSoundEntityPacket';
+import ClientboundSoundPacket from './packets/game/ClientboundSoundPacket';
+import ClientboundStopSoundPacket from './packets/game/ClientboundStopSoundPacket';
+import ClientboundTabListPacket from './packets/game/ClientboundTabListPacket';
+import ClientboundTagQueryPacket from './packets/game/ClientboundTagQueryPacket';
+import ClientboundTakeItemEntityPacket from './packets/game/ClientboundTakeItemEntityPacket';
+import ClientboundTeleportEntityPacket from './packets/game/ClientboundTeleportEntityPacket';
+import ClientboundUpdateAdvancementsPacket from './packets/game/ClientboundUpdateAdvancementsPacket';
+import ClientboundUpdateAttributesPacket from './packets/game/ClientboundUpdateAttributesPacket';
+import ClientboundUpdateMobEffectPacket from './packets/game/ClientboundUpdateMobEffectPacket';
+import ClientboundUpdateRecipesPacket from './packets/game/ClientboundUpdateRecipesPacket';
+import ClientboundUpdateTagsPacket from './packets/game/ClientboundUpdateTagsPacket';
 import ServerboundAcceptTeleportationPacket from './packets/game/ServerboundAcceptTeleportationPacket';
 import ServerboundBlockEntityTagQueryPacket from './packets/game/ServerboundBlockEntityTagQueryPacket';
 import ServerboundChangeDifficultyPacket from './packets/game/ServerboundChangeDifficultyPacket';
@@ -102,10 +206,17 @@ import ServerboundTeleportToEntityPacket from './packets/game/ServerboundTelepor
 import ServerboundUseItemOnPacket from './packets/game/ServerboundUseItemOnPacket';
 import ServerboundUseItemPacket from './packets/game/ServerboundUseItemPacket ';
 import ServerboundClientIntentionPacket from './packets/handshake/ServerboundClientIntentionPacket';
+import ClientboundCustomQueryPacket from './packets/login/ClientboundCustomQueryPacket';
+import ClientboundGameProfilePacket from './packets/login/ClientboundGameProfilePacket';
+import ClientboundHelloPacket from './packets/login/ClientboundHelloPacket';
+import ClientboundLoginCompressionPacket from './packets/login/ClientboundLoginCompressionPacket';
+import ClientboundLoginDisconnectPacket from './packets/login/ClientboundLoginDisconnectPacket';
 import ServerboundCustomQueryPacket from './packets/login/ServerboundCustomQueryPacket';
 import ServerboundHelloPacket from './packets/login/ServerboundHelloPacket';
 import ServerboundKeyPacket from './packets/login/ServerboundKeyPacket';
 import type ServerboundPacket from './packets/ServerboundPacket';
+import ClientboundPongResponsePacket from './packets/status/ClientboundPongResponsePacket';
+import ClientboundStatusResponsePacket from './packets/status/ClientboundStatusResponsePacket';
 import ServerboundPingRequestPacket from './packets/status/ServerboundPingRequestPacket';
 import ServerboundStatusRequestPacket from './packets/status/ServerboundStatusRequestPacket';
 
@@ -116,6 +227,7 @@ export default class Protocol {
         new ServerboundStatusRequestPacket(),
         new ServerboundPingRequestPacket(),
     ];
+    private protocolClientStatusPackets: any[] = [ClientboundStatusResponsePacket, ClientboundPongResponsePacket];
     private protocolStatusHandlers: Handler<ServerboundPacket>[] = [
         new StatusRequestHandler(),
         new PingRequestHandler(),
@@ -124,6 +236,13 @@ export default class Protocol {
         new ServerboundHelloPacket(),
         new ServerboundKeyPacket(),
         new ServerboundCustomQueryPacket(),
+    ];
+    private protocolClientLoginPackets: any[] = [
+        ClientboundLoginDisconnectPacket,
+        ClientboundHelloPacket,
+        ClientboundGameProfilePacket,
+        ClientboundLoginCompressionPacket,
+        ClientboundCustomQueryPacket,
     ];
     private protocolLoginHandlers: Handler<ServerboundPacket>[] = [
         new HelloHandler(),
@@ -179,6 +298,111 @@ export default class Protocol {
         new ServerboundTeleportToEntityPacket(),
         new ServerboundUseItemOnPacket(),
         new ServerboundUseItemPacket(),
+    ];
+    private protocolClientPlayPackets: any[] = [
+        ClientboundAddEntityPacket,
+        ClientboundAddExperienceOrbPacket,
+        ClientboundAddMobPacket,
+        ClientboundAddPaintingPacket,
+        ClientboundAddPlayerPacket,
+        ClientboundAddVibrationSignalPacket,
+        ClientboundAnimatePacket,
+        ClientboundAwardStatsPacket,
+        ClientboundBlockBreakAckPacket,
+        ClientboundBlockDestructionPacket,
+        ClientboundBlockEntityDataPacket,
+        ClientboundBlockEventPacket,
+        ClientboundBlockUpdatePacket,
+        ClientboundBossEventPacket,
+        ClientboundChangeDifficultyPacket,
+        ClientboundChatPacket,
+        ClientboundClearTitlesPacket,
+        ClientboundCommandSuggestionsPacket,
+        ClientboundCommandsPacket,
+        ClientboundContainerClosePacket,
+        ClientboundContainerSetContentPacket,
+        ClientboundContainerSetDataPacket,
+        ClientboundContainerSetSlotPacket,
+        ClientboundCooldownPacket,
+        ClientboundCustomPayloadPacket,
+        ClientboundCustomSoundPacket,
+        ClientboundDisconnectPacket,
+        ClientboundEntityEventPacket,
+        ClientboundExplodePacket,
+        ClientboundForgetLevelChunkPacket,
+        ClientboundGameEventPacket,
+        ClientboundHorseScreenOpenPacket,
+        ClientboundInitializeBorderPacket,
+        ClientboundKeepAlivePacket,
+        ClientboundLevelChunkPacket,
+        ClientboundLevelEventPacket,
+        ClientboundLevelParticlesPacket,
+        ClientboundLightUpdatePacket,
+        ClientboundLoginPacket,
+        ClientboundMapItemDataPacket,
+        ClientboundMerchantOffersPacket,
+        ClientboundMoveEntityPacketPos,
+        ClientboundMoveEntityPacketPosRot,
+        ClientboundMoveEntityPacketRot,
+        ClientboundMoveVehiclePacket,
+        ClientboundOpenBookPacket,
+        ClientboundOpenScreenPacket,
+        ClientboundOpenSignEditorPacket,
+        ClientboundPingPacket,
+        ClientboundPlaceGhostRecipePacket,
+        ClientboundPlayerAbilitiesPacket,
+        ClientboundPlayerCombatEndPacket,
+        ClientboundPlayerCombatEnterPacket,
+        ClientboundPlayerCombatKillPacket,
+        ClientboundPlayerInfoPacket,
+        ClientboundPlayerLookAtPacket,
+        ClientboundPlayerPositionPacket,
+        ClientboundRecipePacket,
+        ClientboundRemoveEntitiesPacket,
+        ClientboundRemoveMobEffectPacket,
+        ClientboundResourcePackPacket,
+        ClientboundRespawnPacket,
+        ClientboundRotateHeadPacket,
+        ClientboundSectionBlocksUpdatePacket,
+        ClientboundSelectAdvancementsTabPacket,
+        ClientboundSetActionBarTextPacket,
+        ClientboundSetBorderCenterPacket,
+        ClientboundSetBorderLerpSizePacket,
+        ClientboundSetBorderSizePacket,
+        ClientboundSetBorderWarningDelayPacket,
+        ClientboundSetBorderWarningDistancePacket,
+        ClientboundSetCameraPacket,
+        ClientboundSetCarriedItemPacket,
+        ClientboundSetChunkCacheCenterPacket,
+        ClientboundSetChunkCacheRadiusPacket,
+        ClientboundSetDefaultSpawnPositionPacket,
+        ClientboundSetDisplayObjectivePacket,
+        ClientboundSetEntityDataPacket,
+        ClientboundSetEntityLinkPacket,
+        ClientboundSetEntityMotionPacket,
+        ClientboundSetEquipmentPacket,
+        ClientboundSetExperiencePacket,
+        ClientboundSetHealthPacket,
+        ClientboundSetObjectivePacket,
+        ClientboundSetPassengersPacket,
+        ClientboundSetPlayerTeamPacket,
+        ClientboundSetScorePacket,
+        ClientboundSetSubtitleTextPacket,
+        ClientboundSetTimePacket,
+        ClientboundSetTitleTextPacket,
+        ClientboundSetTitlesAnimationPacket,
+        ClientboundSoundEntityPacket,
+        ClientboundSoundPacket,
+        ClientboundStopSoundPacket,
+        ClientboundTabListPacket,
+        ClientboundTagQueryPacket,
+        ClientboundTakeItemEntityPacket,
+        ClientboundTeleportEntityPacket,
+        ClientboundUpdateAdvancementsPacket,
+        ClientboundUpdateAttributesPacket,
+        ClientboundUpdateMobEffectPacket,
+        ClientboundUpdateRecipesPacket,
+        ClientboundUpdateTagsPacket,
     ];
     private protocolPlayHandlers: Handler<ServerboundPacket>[] = [
         new AcceptTeleportationHandler(),
@@ -271,6 +495,37 @@ export default class Protocol {
 
             case ProtocolState.LOGIN: {
                 return this.protocolLoginHandlers[id] ?? null;
+            }
+
+            default: {
+                throw new TypeError(`${state} is an invalid protocol state!`);
+            }
+        }
+    }
+
+    public getId(state: ProtocolState, packet: ClientboundPacket): number | null {
+        switch (state) {
+            case ProtocolState.HANDSHAKING: {
+                return null;
+            }
+
+            case ProtocolState.PLAY: {
+                const packetId: number = this.protocolClientPlayPackets.findIndex(element => packet instanceof element);
+                return packetId < 0 ? null : packetId;
+            }
+
+            case ProtocolState.STATUS: {
+                const packetId: number = this.protocolClientStatusPackets.findIndex(
+                    element => packet instanceof element,
+                );
+                return packetId < 0 ? null : packetId;
+            }
+
+            case ProtocolState.LOGIN: {
+                const packetId: number = this.protocolClientLoginPackets.findIndex(
+                    element => packet instanceof element,
+                );
+                return packetId < 0 ? null : packetId;
             }
 
             default: {

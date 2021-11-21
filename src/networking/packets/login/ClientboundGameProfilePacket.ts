@@ -3,12 +3,7 @@ import type ClientboundPacket from '../ClientbountPacket';
 import Packet from '../Packet';
 
 export default class ClientboundGameProfilePacket implements ClientboundPacket {
-    public readonly id: number = 2;
-    public gameProfile: GameProfile;
-
-    public constructor(gameProfile: GameProfile) {
-        this.gameProfile = gameProfile;
-    }
+    public constructor(public gameProfile: GameProfile) {}
 
     public write(): Packet {
         return new Packet().writeUUID(this.gameProfile.uuid).writeString(this.gameProfile.name);

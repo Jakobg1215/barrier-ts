@@ -3,16 +3,7 @@ import type ClientboundPacket from '../ClientbountPacket';
 import Packet from '../Packet';
 
 export default class ClientboundHelloPacket implements ClientboundPacket {
-    public readonly id: number = 1;
-    public serverId: string;
-    public publicKey: Buffer;
-    public nonce: Buffer;
-
-    public constructor(serverId: string, publicKey: Buffer, nonce: Buffer) {
-        this.serverId = serverId;
-        this.publicKey = publicKey;
-        this.nonce = nonce;
-    }
+    public constructor(public serverId: string, public publicKey: Buffer, public nonce: Buffer) {}
 
     public write(): Packet {
         return new Packet().writeString(this.serverId).writeByteArray(this.publicKey).writeByteArray(this.nonce);
