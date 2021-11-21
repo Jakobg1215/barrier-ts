@@ -4,6 +4,7 @@
         "allowUnusedLabels": false,
         "composite": true,
         "declarationMap": true,
+        "disableSizeLimit": true,
         "downlevelIteration": true,
         "emitDecoratorMetadata": true,
         "esModuleInterop": true,
@@ -34,5 +35,6 @@
         "strict": true,
         "target": "ES2021",
         "useDefineForClassFields": true
-    }
+    },
+    "include": ["src/**/*.json"]
 }
