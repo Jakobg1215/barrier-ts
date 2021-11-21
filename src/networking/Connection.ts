@@ -1,13 +1,19 @@
 import { Buffer } from 'node:buffer';
 import { Cipher, createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
 import type { Socket } from 'node:net';
+import { join } from 'node:path';
 import { deflateSync, inflateSync } from 'node:zlib';
 import type BarrierTs from '../BarrierTs';
+import BlockPos from '../types/classes/BlockPos';
 import type Chat from '../types/classes/Chat';
+import Slot from '../types/classes/Slot';
 import DimensionType from '../types/DimensionType';
 import { Difficulty } from '../types/enums/Difficulty';
 import { GameType } from '../types/enums/GameType';
 import type GameProfile from '../types/GameProfile';
+import type PlayerSave from '../types/PlayerSave';
 import RegistryHolder from '../types/RegistryHolder';
 import ObjectToNbt from '../utilities/ObjectToNbt';
 import Player from '../world/entity/Player';
@@ -15,7 +21,9 @@ import type Handler from './handlers/Handler';
 import type ClientboundPacket from './packets/ClientbountPacket';
 import ClientboundAddPlayerPacket from './packets/game/ClientboundAddPlayerPacket';
 import ClientboundChangeDifficultyPacket from './packets/game/ClientboundChangeDifficultyPacket';
+import ClientboundContainerSetSlotPacket from './packets/game/ClientboundContainerSetSlotPacket';
 import ClientboundCustomPayloadPacket from './packets/game/ClientboundCustomPayloadPacket';
+import ClientboundDisconnectPacket from './packets/game/ClientboundDisconnectPacket';
 import ClientboundKeepAlivePacket from './packets/game/ClientboundKeepAlivePacket';
 import ClientboundLevelChunkPacket from './packets/game/ClientboundLevelChunkPacket';
 import ClientboundLoginPacket from './packets/game/ClientboundLoginPacket';
@@ -23,7 +31,10 @@ import ClientboundPlayerAbilitiesPacket from './packets/game/ClientboundPlayerAb
 import ClientboundPlayerInfoPacket from './packets/game/ClientboundPlayerInfoPacket';
 import ClientboundPlayerPositionPacket from './packets/game/ClientboundPlayerPositionPacket';
 import ClientboundRemoveEntitiesPacket from './packets/game/ClientboundRemoveEntitiesPacket';
+import ClientboundSetCarriedItemPacket from './packets/game/ClientboundSetCarriedItemPacket';
 import ClientboundSetChunkCacheCenterPacket from './packets/game/ClientboundSetChunkCacheCenterPacket';
+import ClientboundSetDefaultSpawnPositionPacket from './packets/game/ClientboundSetDefaultSpawnPositionPacket';
+import ClientboundSetEquipmentPacket from './packets/game/ClientboundSetEquipmentPacket';
 import ClientboundGameProfilePacket from './packets/login/ClientboundGameProfilePacket';
 import ClientboundLoginDisconnectPacket from './packets/login/ClientboundLoginDisconnectPacket';
 import Packet from './packets/Packet';
@@ -188,6 +199,7 @@ export default class Connection {
                 this.connectionServer.brodcast(new ClientboundRemoveEntitiesPacket([this.connectionPlayer.id]));
             }
             clearInterval(this.connectionkeepAliveLoop);
+            if (this.protocolState === ProtocolState.PLAY) this.save();
             this.connectionServer.connections.delete(this);
         });
 
@@ -219,6 +231,7 @@ export default class Connection {
             }
 
             case ProtocolState.PLAY: {
+                this.send(new ClientboundDisconnectPacket(reason));
                 break;
             }
         }
@@ -261,7 +274,9 @@ export default class Connection {
             ),
         );
         this.send(new ClientboundChangeDifficultyPacket(Difficulty.NORMAL, true));
-        this.send(new ClientboundPlayerAbilitiesPacket(true, false, true, true, 0.05, 0.1));
+        const playerData: PlayerSave = this.getSave();
+        this.connectionPlayer.isFlying = playerData.isFlying;
+        this.send(new ClientboundPlayerAbilitiesPacket(true, playerData.isFlying, true, true, 0.05, 0.1));
         this.send(
             new ClientboundPlayerInfoPacket(
                 0,
@@ -299,8 +314,8 @@ export default class Connection {
                         element.player.position.x,
                         element.player.position.y,
                         element.player.position.z,
-                        ((element.player.rotation.y * 256) / 360) & 255,
-                        ((element.player.rotation.x * 256) / 360) & 255,
+                        (element.player.rotation.y * 256) / 360,
+                        (element.player.rotation.x * 256) / 360,
                     ),
                 );
             });
@@ -308,11 +323,11 @@ export default class Connection {
             new ClientboundAddPlayerPacket(
                 this.connectionPlayer.id,
                 this.connectionPlayer.gameProfile.uuid,
-                this.connectionPlayer.position.x,
-                this.connectionPlayer.position.y,
-                this.connectionPlayer.position.z,
-                ((this.connectionPlayer.rotation.y * 256) / 360) & 255,
-                ((this.connectionPlayer.rotation.x * 256) / 360) & 255,
+                playerData.position.x,
+                playerData.position.y,
+                playerData.position.z,
+                (playerData.rotation.y * 256) / 360,
+                (playerData.rotation.x * 256) / 360,
             ),
             [this.connectionPlayer.id],
         );
@@ -356,10 +371,66 @@ export default class Connection {
                 );
             }
         }
-
+        this.send(new ClientboundSetDefaultSpawnPositionPacket(new BlockPos(0, 4, 0), 0));
         this.send(
-            new ClientboundPlayerPositionPacket(0.5, 4, 0.5, 0, 0, 0, this.connectionTeleportId.readInt32BE(), false),
-        ); // this should be the last packet
+            new ClientboundPlayerPositionPacket(
+                playerData.position.x,
+                playerData.position.y,
+                playerData.position.z,
+                playerData.rotation.y,
+                playerData.rotation.x,
+                0,
+                this.connectionTeleportId.readInt32BE(),
+                false,
+            ),
+        ); // this should be the last packet for initialisation
+
+        this.send(new ClientboundSetCarriedItemPacket(playerData.heldItemSlot));
+
+        const equipment: { pos: number; item: Slot }[] = [];
+
+        playerData.inventory.forEach(item => {
+            this.connectionPlayer.inventory.set(item.slot, new Slot(true, item.id, item.count, Buffer.from(item.nbt)));
+            switch (item.slot) {
+                case 5: {
+                    equipment.push({ pos: 5, item: new Slot(true, item.id, item.count, Buffer.from(item.nbt)) });
+                    break;
+                }
+                case 6: {
+                    equipment.push({ pos: 4, item: new Slot(true, item.id, item.count, Buffer.from(item.nbt)) });
+                    break;
+                }
+                case 7: {
+                    equipment.push({ pos: 3, item: new Slot(true, item.id, item.count, Buffer.from(item.nbt)) });
+                    break;
+                }
+                case 8: {
+                    equipment.push({ pos: 2, item: new Slot(true, item.id, item.count, Buffer.from(item.nbt)) });
+                    break;
+                }
+                case 45: {
+                    equipment.push({ pos: 1, item: new Slot(true, item.id, item.count, Buffer.from(item.nbt)) });
+                    break;
+                }
+                case playerData.heldItemSlot + 36: {
+                    equipment.push({ pos: 0, item: new Slot(true, item.id, item.count, Buffer.from(item.nbt)) });
+                }
+            }
+
+            this.send(
+                new ClientboundContainerSetSlotPacket(
+                    0,
+                    0,
+                    item.slot,
+                    new Slot(true, item.id, item.count, Buffer.from(item.nbt)),
+                ),
+            );
+        });
+
+        if (equipment.length > 0)
+            this.connectionServer.brodcast(new ClientboundSetEquipmentPacket(this.connectionPlayer.id, equipment), [
+                this.connectionPlayer.id,
+            ]);
 
         if (!this.connectionConnected) return;
         this.connectionServer.addPlayer();
@@ -432,6 +503,97 @@ export default class Connection {
 
     public enableCompression(): void {
         this.connectionCompression = true;
+    }
+
+    public save(): void {
+        this.checkSaves();
+        const data: PlayerSave = {
+            position: {
+                x: this.connectionPlayer.position.x,
+                y: this.connectionPlayer.position.y,
+                z: this.connectionPlayer.position.z,
+            },
+            rotation: {
+                x: this.connectionPlayer.rotation.x,
+                y: this.connectionPlayer.rotation.y,
+            },
+            isFlying: this.connectionPlayer.isFlying,
+            heldItemSlot: this.connectionPlayer.heldItemSlot,
+            inventory: Array.from(this.connectionPlayer.inventory)
+                .filter(item => item[1].present)
+                .map(
+                    ([place, item]): {
+                        slot: number;
+                        id: number;
+                        count: number;
+                        nbt: number[];
+                    } => {
+                        return { slot: place, id: item.id, count: item.count, nbt: item.nbt.toJSON().data };
+                    },
+                ),
+        };
+        writeFile(
+            join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`),
+            JSON.stringify(data),
+            { encoding: 'utf-8' },
+        );
+    }
+
+    private createSave(): void {
+        const data: PlayerSave = {
+            position: {
+                x: 0.5,
+                y: 4,
+                z: 0.5,
+            },
+            rotation: {
+                x: 0,
+                y: 0,
+            },
+            isFlying: false,
+            heldItemSlot: 0,
+            inventory: [],
+        };
+
+        writeFileSync(
+            join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`),
+            JSON.stringify(data),
+            { encoding: 'utf-8' },
+        );
+    }
+
+    private checkSaves(): void {
+        if (!existsSync(join(__dirname, '../../world'))) {
+            mkdirSync(join(__dirname, '../../world'));
+            mkdirSync(join(__dirname, '../../world/players'));
+        }
+        if (!existsSync(join(__dirname, '../../world/players'))) {
+            mkdirSync(join(__dirname, '../../world/players'));
+        }
+        if (!existsSync(join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`)))
+            this.createSave();
+    }
+
+    public getSave(): PlayerSave {
+        this.checkSaves();
+        try {
+            return JSON.parse(
+                readFileSync(join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`), {
+                    encoding: 'utf-8',
+                }),
+            );
+        } catch {
+            this.createSave();
+            this.connectionServer.console.error(
+                `Failed to read player data for ${this.connectionPlayer.gameProfile.uuid}!`,
+            );
+            this.connectionServer.console.debug('Falling back to default save.');
+            return JSON.parse(
+                readFileSync(join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`), {
+                    encoding: 'utf-8',
+                }),
+            );
+        }
     }
 
     public get protocolState(): ProtocolState {

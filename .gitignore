@@ -2,3 +2,4 @@ dist
 node_modules
 server.properties
 tsconfig.tsbuildinfo
+world

@@ -5,6 +5,6 @@ import type Handler from '../Handler';
 
 export default class ContainerCloseHandler implements Handler<ServerboundContainerClosePacket> {
     public hander(_packet: ServerboundContainerClosePacket, _connection: Connection, _server: BarrierTs): void {
-        throw new Error('Method not implemented.');
+        // This can be an event for later
     }
 }
