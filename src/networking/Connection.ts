@@ -9,6 +9,8 @@ import type BarrierTs from '../BarrierTs';
 import BlockPos from '../types/classes/BlockPos';
 import type Chat from '../types/classes/Chat';
 import Slot from '../types/classes/Slot';
+import Vector2 from '../types/classes/Vector2';
+import Vector3 from '../types/classes/Vector3';
 import DimensionType from '../types/DimensionType';
 import { Difficulty } from '../types/enums/Difficulty';
 import { GameType } from '../types/enums/GameType';
@@ -276,6 +278,10 @@ export default class Connection {
         this.send(new ClientboundChangeDifficultyPacket(Difficulty.NORMAL, true));
         const playerData: PlayerSave = this.getSave();
         this.connectionPlayer.isFlying = playerData.isFlying;
+        this.connectionPlayer.updatePosition(
+            new Vector3(playerData.position.x, playerData.position.y, playerData.position.z),
+        );
+        this.connectionPlayer.updateRotation(new Vector2(playerData.rotation.x, playerData.rotation.y));
         this.send(new ClientboundPlayerAbilitiesPacket(true, playerData.isFlying, true, true, 0.05, 0.1));
         this.send(
             new ClientboundPlayerInfoPacket(
@@ -323,11 +329,11 @@ export default class Connection {
             new ClientboundAddPlayerPacket(
                 this.connectionPlayer.id,
                 this.connectionPlayer.gameProfile.uuid,
-                playerData.position.x,
-                playerData.position.y,
-                playerData.position.z,
-                (playerData.rotation.y * 256) / 360,
-                (playerData.rotation.x * 256) / 360,
+                this.connectionPlayer.position.x,
+                this.connectionPlayer.position.y,
+                this.connectionPlayer.position.z,
+                (this.connectionPlayer.rotation.y * 256) / 360,
+                (this.connectionPlayer.rotation.x * 256) / 360,
             ),
             [this.connectionPlayer.id],
         );
@@ -374,11 +380,11 @@ export default class Connection {
         this.send(new ClientboundSetDefaultSpawnPositionPacket(new BlockPos(0, 4, 0), 0));
         this.send(
             new ClientboundPlayerPositionPacket(
-                playerData.position.x,
-                playerData.position.y,
-                playerData.position.z,
-                playerData.rotation.y,
-                playerData.rotation.x,
+                this.connectionPlayer.position.x,
+                this.connectionPlayer.position.y,
+                this.connectionPlayer.position.z,
+                this.connectionPlayer.rotation.y,
+                this.connectionPlayer.rotation.x,
                 0,
                 this.connectionTeleportId.readInt32BE(),
                 false,

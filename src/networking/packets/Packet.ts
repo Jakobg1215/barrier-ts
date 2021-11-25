@@ -98,17 +98,7 @@ export default class Packet {
     }
 
     public readBlockPos(): BlockPos {
-        const bits: string = this.bytes
-            .slice(this.offset, this.addOffset(8, true))
-            .toJSON()
-            .data.map(byte => byte.toString(2).padStart(8, '0'))
-            .join('');
-
-        return new BlockPos(
-            bits.slice(0, 1) === '0' ? parseInt(bits.slice(0, 26), 2) : parseInt(bits.slice(0, 26), 2) - 67108864,
-            parseInt(bits.slice(52, 64), 2), // TODO: Need to handle negitive numbers
-            bits.slice(27, 28) === '0' ? parseInt(bits.slice(27, 52), 2) : parseInt(bits.slice(27, 52), 2) - 33554432,
-        );
+        return BlockPos.fromBuffer(this.bytes.slice(this.offset, this.addOffset(8, true)));
     }
 
     public readSlot(): Slot {
@@ -261,7 +251,7 @@ export default class Packet {
     }
 
     public writeBlockPos(blockPos: BlockPos): this {
-        this.writeLong(blockPos.toBigInt());
+        this.writeUnsignedLong(blockPos.toBigInt());
         return this;
     }
 
