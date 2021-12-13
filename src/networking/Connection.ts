@@ -27,7 +27,7 @@ import ClientboundContainerSetSlotPacket from './packets/game/ClientboundContain
 import ClientboundCustomPayloadPacket from './packets/game/ClientboundCustomPayloadPacket';
 import ClientboundDisconnectPacket from './packets/game/ClientboundDisconnectPacket';
 import ClientboundKeepAlivePacket from './packets/game/ClientboundKeepAlivePacket';
-import ClientboundLevelChunkPacket from './packets/game/ClientboundLevelChunkPacket';
+import ClientboundLevelChunkWithLightPacket from './packets/game/ClientboundLevelChunkWithLightPacket';
 import ClientboundLoginPacket from './packets/game/ClientboundLoginPacket';
 import ClientboundPlayerAbilitiesPacket from './packets/game/ClientboundPlayerAbilitiesPacket';
 import ClientboundPlayerInfoPacket from './packets/game/ClientboundPlayerInfoPacket';
@@ -257,6 +257,7 @@ export default class Connection {
                 'minecraft:overworld',
                 this.connectionServer.config.maxplayers,
                 8,
+                8,
                 false,
                 true,
                 false,
@@ -343,36 +344,57 @@ export default class Connection {
             .writeShort(1024)
             .writeUnsignedByte(4)
             .writeVarInt(4)
-            .writeVarInt(0)
             .writeVarInt(33)
             .writeVarInt(10)
             .writeVarInt(9)
+            .writeVarInt(0)
             .writeVarInt(256);
 
         for (let bedrock = 0; bedrock < 16; bedrock++) {
-            chunkdata.writeLong(1229782938247303441n);
+            chunkdata.writeLong(0n);
         }
         for (let dirt = 0; dirt < 32; dirt++) {
-            chunkdata.writeLong(2459565876494606882n);
+            chunkdata.writeLong(1229782938247303441n);
         }
         for (let grass = 0; grass < 16; grass++) {
-            chunkdata.writeLong(3689348814741910323n);
+            chunkdata.writeLong(2459565876494606882n);
         }
         for (let air = 0; air < 192; air++) {
-            chunkdata.writeLong(0n);
+            chunkdata.writeLong(3689348814741910323n);
+        }
+
+        chunkdata.writeUnsignedByte(0).writeVarInt(0).writeVarInt(0);
+
+        for (let index = 0; index < 27; index++) {
+            chunkdata
+                .writeShort(0)
+                .writeUnsignedByte(0)
+                .writeVarInt(0)
+                .writeVarInt(0)
+                .writeUnsignedByte(0)
+                .writeVarInt(0)
+                .writeVarInt(0);
         }
 
         for (let x = -8; x < 8; x++) {
             for (let z = -8; z < 8; z++) {
                 this.send(
-                    new ClientboundLevelChunkPacket(
+                    new ClientboundLevelChunkWithLightPacket(
                         x,
                         z,
-                        [1n],
                         ObjectToNbt({}),
-                        Array(1024).fill(127),
                         chunkdata.getReadableBytes(),
                         [],
+                        [3n],
+                        [0n],
+                        [2n],
+                        [7n],
+                        [
+                            Array.from({ length: 2048 }).fill(0) as number[],
+                            Array.from({ length: 2048 }).fill(255) as number[],
+                        ],
+                        [],
+                        true,
                     ),
                 );
             }
@@ -549,7 +571,7 @@ export default class Connection {
         const data: PlayerSave = {
             position: {
                 x: 0.5,
-                y: 4,
+                y: -60,
                 z: 0.5,
             },
             rotation: {

@@ -88,7 +88,7 @@ import ClientboundGameEventPacket from './packets/game/ClientboundGameEventPacke
 import ClientboundHorseScreenOpenPacket from './packets/game/ClientboundHorseScreenOpenPacket';
 import ClientboundInitializeBorderPacket from './packets/game/ClientboundInitializeBorderPacket';
 import ClientboundKeepAlivePacket from './packets/game/ClientboundKeepAlivePacket';
-import ClientboundLevelChunkPacket from './packets/game/ClientboundLevelChunkPacket';
+import ClientboundLevelChunkWithLightPacket from './packets/game/ClientboundLevelChunkWithLightPacket';
 import ClientboundLevelEventPacket from './packets/game/ClientboundLevelEventPacket';
 import ClientboundLevelParticlesPacket from './packets/game/ClientboundLevelParticlesPacket';
 import ClientboundLightUpdatePacket from './packets/game/ClientboundLightUpdatePacket';
@@ -141,6 +141,7 @@ import ClientboundSetObjectivePacket from './packets/game/ClientboundSetObjectiv
 import ClientboundSetPassengersPacket from './packets/game/ClientboundSetPassengersPacket';
 import ClientboundSetPlayerTeamPacket from './packets/game/ClientboundSetPlayerTeamPacket';
 import ClientboundSetScorePacket from './packets/game/ClientboundSetScorePacket';
+import ClientboundSetSimulationDistancePacket from './packets/game/ClientboundSetSimulationDistancePacket';
 import ClientboundSetSubtitleTextPacket from './packets/game/ClientboundSetSubtitleTextPacket';
 import ClientboundSetTimePacket from './packets/game/ClientboundSetTimePacket';
 import ClientboundSetTitlesAnimationPacket from './packets/game/ClientboundSetTitlesAnimationPacket';
@@ -334,7 +335,7 @@ export default class Protocol {
         ClientboundHorseScreenOpenPacket,
         ClientboundInitializeBorderPacket,
         ClientboundKeepAlivePacket,
-        ClientboundLevelChunkPacket,
+        ClientboundLevelChunkWithLightPacket,
         ClientboundLevelEventPacket,
         ClientboundLevelParticlesPacket,
         ClientboundLightUpdatePacket,
@@ -387,6 +388,7 @@ export default class Protocol {
         ClientboundSetPassengersPacket,
         ClientboundSetPlayerTeamPacket,
         ClientboundSetScorePacket,
+        ClientboundSetSimulationDistancePacket,
         ClientboundSetSubtitleTextPacket,
         ClientboundSetTimePacket,
         ClientboundSetTitleTextPacket,

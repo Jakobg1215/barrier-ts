@@ -16,6 +16,7 @@ export default class ClientboundLoginPacket implements ClientboundPacket {
         public dimension: string,
         public maxPlayers: number,
         public chunkRadius: number,
+        public simulationRadius: number,
         public reducedDebugInfo: boolean,
         public showDeathScreen: boolean,
         public isDebug: boolean,
@@ -38,6 +39,7 @@ export default class ClientboundLoginPacket implements ClientboundPacket {
             .writeLong(this.seed)
             .writeVarInt(this.maxPlayers)
             .writeVarInt(this.chunkRadius)
+            .writeVarInt(this.simulationRadius)
             .writeBoolean(this.reducedDebugInfo)
             .writeBoolean(this.showDeathScreen)
             .writeBoolean(this.isDebug)

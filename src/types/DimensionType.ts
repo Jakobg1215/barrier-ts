@@ -8,10 +8,10 @@ export default {
     bed_works: '1b',
     effects: 'minecraft:overworld',
     has_raids: '1b',
-    logical_height: 256,
+    logical_height: 384,
     coordinate_scale: '1d',
-    min_y: 0,
+    min_y: -64,
     has_ceiling: '0b',
     ultrawarm: '0b',
-    height: 256,
+    height: 384,
 };
