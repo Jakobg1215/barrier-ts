@@ -7,10 +7,14 @@ export default class ClientboundSetEquipmentPacket implements ClientboundPacket 
 
     public write(): Packet {
         const data: Packet = new Packet().writeVarInt(this.entity);
-        this.slots.forEach(slot => {
-            data.writeByte(slot.pos);
-            data.writeSlot(slot.item);
-        });
+
+        for (let item = 0; item < this.slots.length; item++) {
+            const flag = item !== this.slots.length - 1;
+            if (!this.slots[item]) throw 'Invalid item index!';
+            data.writeByte(flag ? this.slots[item]!.pos | -128 : this.slots[item]!.pos).writeSlot(
+                this.slots[item]!.item,
+            );
+        }
         return data;
     }
 }
