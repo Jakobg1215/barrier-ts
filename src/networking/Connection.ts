@@ -560,8 +560,16 @@ export default class Connection {
                     },
                 ),
         };
+        if (this.connectionServer.config.online) {
+            writeFile(
+                join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`),
+                JSON.stringify(data),
+                { encoding: 'utf-8' },
+            );
+            return;
+        }
         writeFile(
-            join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`),
+            join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.name}`),
             JSON.stringify(data),
             { encoding: 'utf-8' },
         );
@@ -582,9 +590,16 @@ export default class Connection {
             heldItemSlot: 0,
             inventory: [],
         };
-
+        if (this.connectionServer.config.online) {
+            writeFileSync(
+                join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`),
+                JSON.stringify(data),
+                { encoding: 'utf-8' },
+            );
+            return;
+        }
         writeFileSync(
-            join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`),
+            join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.name}`),
             JSON.stringify(data),
             { encoding: 'utf-8' },
         );
@@ -598,26 +613,43 @@ export default class Connection {
         if (!existsSync(join(__dirname, '../../world/players'))) {
             mkdirSync(join(__dirname, '../../world/players'));
         }
-        if (!existsSync(join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`)))
+        if (this.connectionServer.config.online) {
+            if (!existsSync(join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`)))
+                return this.createSave();
+            return;
+        }
+        if (!existsSync(join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.name}`)))
             this.createSave();
     }
 
     public getSave(): PlayerSave {
         this.checkSaves();
         try {
+            if (this.connectionServer.config.online)
+                return JSON.parse(
+                    readFileSync(join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`), {
+                        encoding: 'utf-8',
+                    }),
+                );
             return JSON.parse(
-                readFileSync(join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`), {
+                readFileSync(join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.name}`), {
                     encoding: 'utf-8',
                 }),
             );
         } catch {
             this.createSave();
             this.connectionServer.console.error(
-                `Failed to read player data for ${this.connectionPlayer.gameProfile.uuid}!`,
+                `Failed to read player data for ${this.connectionPlayer.gameProfile.name}!`,
             );
             this.connectionServer.console.debug('Falling back to default save.');
+            if (this.connectionServer.config.online)
+                return JSON.parse(
+                    readFileSync(join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`), {
+                        encoding: 'utf-8',
+                    }),
+                );
             return JSON.parse(
-                readFileSync(join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.uuid}`), {
+                readFileSync(join(__dirname, `../../world/players/${this.connectionPlayer.gameProfile.name}`), {
                     encoding: 'utf-8',
                 }),
             );
