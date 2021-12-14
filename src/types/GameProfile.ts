@@ -2,6 +2,7 @@ export default interface GameProfile {
     name: string;
     uuid: string;
     properties: property[] | null;
+    skinCustomization: number;
 }
 
 export interface property {

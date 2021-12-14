@@ -11,6 +11,7 @@ export default class ServerboundHelloPacket implements ServerboundPacket {
             name: data.readString(),
             uuid: randomUUID(),
             properties: null,
+            skinCustomization: 0,
         };
         return this;
     }

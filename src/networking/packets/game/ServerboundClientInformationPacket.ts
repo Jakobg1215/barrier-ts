@@ -9,6 +9,7 @@ export default class ServerboundClientInformationPacket implements ServerboundPa
     public modelCustomisation!: number;
     public mainHand!: HumanoidArm;
     public textFilteringEnabled!: boolean;
+    public allowsListing!: boolean;
 
     public read(data: Packet): this {
         this.language = data.readString();
@@ -18,6 +19,7 @@ export default class ServerboundClientInformationPacket implements ServerboundPa
         this.modelCustomisation = data.readUnsignedByte();
         this.mainHand = data.readVarInt();
         this.textFilteringEnabled = data.readBoolean();
+        this.allowsListing = data.readBoolean();
         return this;
     }
 }

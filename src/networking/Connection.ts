@@ -51,7 +51,7 @@ export default class Connection {
     private readonly connectionServer: BarrierTs;
     private connectionName: string = 'OFFLINE';
     private connectionPlayer: Player = new Player(
-        { name: 'OFFLINE', uuid: '00000000000000000000000000000000', properties: [] },
+        { name: 'OFFLINE', uuid: '00000000000000000000000000000000', properties: [], skinCustomization: 0 },
         -1,
     );
     private connectionEncrypted: boolean = false;

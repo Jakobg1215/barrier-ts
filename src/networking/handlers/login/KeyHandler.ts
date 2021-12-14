@@ -95,6 +95,7 @@ export default class KeyHandler implements Handler<ServerboundKeyPacket> {
                         name: playerdata.name,
                         uuid: playerdata.id,
                         properties: playerdata.properties,
+                        skinCustomization: 0,
                     });
                     connection.enableEncryption();
                     if (server.config.compression >= 0) {
