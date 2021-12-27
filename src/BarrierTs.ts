@@ -5,8 +5,8 @@ import Connection from './networking/Connection';
 import type ClientboundPacket from './networking/packets/ClientbountPacket';
 import Protocol from './networking/Protocol';
 import type Config from './types/Config';
-import ConfigReader from './utilities/ConfigReader';
 import Console from './utilities/Console';
+import getConfigurations from './utilities/getConfigurations';
 import World from './world/World';
 
 export default class BarrierTs {
@@ -16,7 +16,7 @@ export default class BarrierTs {
     };
     private readonly serverConsole: Console = new Console(this);
     private readonly serverWorld: World = new World();
-    private serverConfigurations: Config = ConfigReader.getConfigurations(this);
+    private serverConfigurations: Config = getConfigurations(this);
     private readonly serverProtocol: Protocol = new Protocol();
     private readonly serverPadLock: KeyPairSyncResult<Buffer, Buffer> = generateKeyPairSync('rsa', {
         modulusLength: 1024,
@@ -54,7 +54,7 @@ export default class BarrierTs {
     }
 
     public reload(): void {
-        this.serverConfigurations = ConfigReader.getConfigurations(this);
+        this.serverConfigurations = getConfigurations(this);
     }
 
     public addPlayer(): void {
