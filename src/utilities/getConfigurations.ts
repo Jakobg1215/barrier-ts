@@ -1,4 +1,4 @@
-import { createReadStream, createWriteStream, existsSync } from 'node:fs';
+import { createReadStream, createWriteStream, existsSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline';
 import type BarrierTs from '../BarrierTs';
@@ -7,21 +7,21 @@ import type Config from '../types/Config';
 const filePath = join(__dirname, '../../server.properties');
 
 const createConfigFile = (values: Config) => {
+    writeFileSync(filePath, '');
     const file = createWriteStream(filePath);
-
     const formatOption = (option: string, value: any, comment?: string) => {
         file.write(comment ? `${option}=${value} # ${comment}\r\n` : `${option}=${value}\r\n`);
     };
-    formatOption('port', values.port, 'The port the server will listening on.');
-    formatOption('host', values.host);
+    formatOption('port', values.port, 'The port the server will listen on.');
+    formatOption('host', values.host, 'The ip the server will listen on.');
     formatOption('debug', values.debug, 'To enable debug logs.');
     formatOption('online', values.online, 'Validate players with Mojang servers.');
     formatOption('compression', values.compression, 'The threshold before packets are compressed.');
     formatOption('serverId', values.serverId, 'Shows in the debug menu.');
-    formatOption('maxplayers', values.maxplayers, 'The max amunt of players that can join.');
+    formatOption('maxplayers', values.maxplayers, 'The max amount of players that can join.');
     formatOption('motd', values.motd, 'The message of the day.');
     formatOption('icon', values.icon, 'The path to the server icon. (must be 64*64 png)');
-    file.end();
+    return file.end();
 }
 
 export default function getConfigurations(server: BarrierTs) {
@@ -42,6 +42,7 @@ export default function getConfigurations(server: BarrierTs) {
 
     createInterface(createReadStream(filePath)).on('line', line => {
         const [property] = line.split('#') as [string];
+        if (property.trim().length === 0) return;
         if (!property.includes('=')) return server.console.error(`Property ${property} does not have a value!`);
         const [option, value] = property.trim().split('=') as [string, string];
         if (!(option in defaultValues)) return server.console.warn(`Property ${option} is not a valid property!`);
