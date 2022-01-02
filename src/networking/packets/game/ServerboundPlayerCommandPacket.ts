@@ -14,7 +14,7 @@ export default class ServerboundPlayerCommandPacket implements ServerboundPacket
     }
 }
 
-enum Action {
+export enum Action {
     PRESS_SHIFT_KEY,
     RELEASE_SHIFT_KEY,
     STOP_SLEEPING,
