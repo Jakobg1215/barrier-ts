@@ -4,6 +4,7 @@ export default interface Config {
     debug: boolean;
     online: boolean;
     compression: number;
+    serverName: string;
     serverId: string;
     maxplayers: number;
     motd: string;

@@ -1,3 +1,4 @@
+import type { Hand } from '../../../types/enums/Hand';
 import type Packet from '../Packet';
 import type ServerboundPacket from '../ServerboundPacket';
 
@@ -7,7 +8,7 @@ export default class ServerboundClientInformationPacket implements ServerboundPa
     public chatVisibility!: ChatVisiblity;
     public chatColors!: boolean;
     public modelCustomisation!: number;
-    public mainHand!: HumanoidArm;
+    public mainHand!: Hand;
     public textFilteringEnabled!: boolean;
     public allowsListing!: boolean;
 
@@ -28,9 +29,4 @@ enum ChatVisiblity {
     FULL,
     SYSTEM,
     HIDDEN,
-}
-
-enum HumanoidArm {
-    LEFT,
-    RIGHT,
 }

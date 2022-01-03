@@ -1,8 +1,8 @@
 export default interface GameProfile {
     name: string;
     uuid: string;
-    properties: property[] | null;
-    skinCustomization: number;
+    properties: property[];
+    legacy: boolean;
 }
 
 export interface property {

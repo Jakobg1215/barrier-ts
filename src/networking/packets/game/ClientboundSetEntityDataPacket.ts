@@ -37,6 +37,7 @@ export default class ClientboundSetEntityDataPacket implements ClientboundPacket
                 case 5: {
                     if (item.value === null) {
                         data.writeBoolean(false);
+                        break;
                     }
                     data.writeBoolean(true).writeChat(item.value);
                     break;

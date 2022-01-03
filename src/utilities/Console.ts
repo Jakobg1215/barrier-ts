@@ -1,41 +1,25 @@
-import { clear, log } from 'node:console';
+import { log } from 'node:console';
 import { stdin } from 'node:process';
-import { createInterface, Interface } from 'node:readline';
-import type BarrierTs from '../BarrierTs';
+import { createInterface } from 'node:readline';
 
 export default class Console {
-    private consoleInterface: Interface = createInterface(stdin);
-    private consoleServer: BarrierTs;
+    private consoleInterface = createInterface(stdin);
 
-    public constructor(server: BarrierTs) {
-        this.consoleServer = server;
-        clear();
-        this.consoleInterface.on('line', (line: string): void => {
-            if (line === '/reload') {
-                this.log('reloading');
-                return this.consoleServer.reload();
-            }
-            if (line === '/clear') {
-                clear();
-                return;
-            }
+    public constructor() {
+        this.consoleInterface.on('line', line => {
             this.warn(line);
         });
     }
 
-    public log(text: string): void {
+    public log(text: string) {
         log(`\x1b[32m[LOG]\x1b[0m ${text}`);
     }
 
-    public warn(text: string): void {
+    public warn(text: string) {
         log(`\x1b[33m[WARN]\x1b[0m ${text}`);
     }
 
-    public error(text: string): void {
+    public error(text: string) {
         log(`\x1b[31m[ERROR]\x1b[0m ${text}`);
-    }
-
-    public debug(text: string): void {
-        if (this.consoleServer.config.debug) log(`\x1b[35m[DEBUG]\x1b[0m ${text}`);
     }
 }

@@ -2,7 +2,7 @@ import type { Buffer } from 'node:buffer';
 import { TagIds } from '../types/enums/NbtTags';
 import NbtWriter from './NbtWriter';
 
-export default function ObjectToNbt(data: object): Buffer {
+export default function objectToNbt(data: object): Buffer {
     const elements: [string, any][] = Object.entries(data);
     const nbtData: NbtWriter = new NbtWriter();
 

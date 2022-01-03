@@ -1,12 +1,10 @@
-import type { Buffer } from 'node:buffer';
-import { generateKeyPairSync, KeyPairSyncResult } from 'node:crypto';
-import { createServer, isIP, Server, Socket } from 'node:net';
+import { createServer, isIP } from 'node:net';
 import Connection from './networking/Connection';
-import type ClientboundPacket from './networking/packets/ClientbountPacket';
 import Protocol from './networking/Protocol';
-import type Config from './types/Config';
 import Console from './utilities/Console';
 import getConfigurations from './utilities/getConfigurations';
+import Player from './world/entity/Player/Player';
+import PlayerManager from './world/entity/Player/PlayerManager';
 import World from './world/World';
 
 export default class BarrierTs {
@@ -14,90 +12,48 @@ export default class BarrierTs {
         version: '1.18.1',
         protocol: 757,
     };
-    private readonly serverConsole: Console = new Console(this);
-    private readonly serverWorld: World = new World();
-    private serverConfigurations: Config = getConfigurations(this);
-    private readonly serverProtocol: Protocol = new Protocol();
-    private readonly serverPadLock: KeyPairSyncResult<Buffer, Buffer> = generateKeyPairSync('rsa', {
-        modulusLength: 1024,
-        publicKeyEncoding: {
-            type: 'spki',
-            format: 'der',
-        },
-        privateKeyEncoding: {
-            type: 'pkcs1',
-            format: 'der',
-        },
-    });
-    private readonly serverNetworking: Server = createServer();
-    private readonly serverConnections: Set<Connection> = new Set();
-    private serverPlayerCount: number = 0;
+    public readonly console = new Console();
+    private serverWorld = new World();
+    private serverConfigurations = getConfigurations(this);
+    public readonly protocol = new Protocol();
+    public readonly networking = createServer();
+    public readonly playerManager = new PlayerManager();
 
     public constructor() {
         if (isIP(this.serverConfigurations.host))
-            this.serverNetworking.listen(this.serverConfigurations.port, this.serverConfigurations.host);
-        else this.serverNetworking.listen(this.serverConfigurations.port, '0.0.0.0');
+            this.networking.listen(this.serverConfigurations.port, this.serverConfigurations.host);
+        else this.networking.listen(this.serverConfigurations.port, '0.0.0.0');
 
-        this.serverNetworking.on('listening', (): void => {
-            this.serverConsole.log(
+        this.networking.on('listening', () => {
+            this.console.log(
                 `Server listening on port ${this.serverConfigurations.port} on host ${
                     isIP(this.serverConfigurations.host) ? this.serverConfigurations.host : '0.0.0.0'
                 }!`,
             );
         });
 
-        this.serverNetworking.on('connection', (socket: Socket): void => {
-            this.serverConsole.debug(`A client is connecting to the server!`);
-
-            this.serverConnections.add(new Connection(socket, this));
+        this.networking.on('connection', socket => {
+            const connection = new Connection(socket, this);
+            const player = new Player(connection);
+            this.playerManager.players.set(connection, player);
         });
+
+        setInterval(() => {
+            this.tick();
+        }, 50);
     }
 
-    public reload(): void {
+    public reload() {
         this.serverConfigurations = getConfigurations(this);
     }
 
-    public addPlayer(): void {
-        ++this.serverPlayerCount;
-    }
+    private tick() {}
 
-    public removePlayer(): void {
-        --this.serverPlayerCount;
-    }
-
-    public brodcast(data: ClientboundPacket, exclude: number[] = []) {
-        this.serverConnections.forEach((con: Connection) => {
-            if (!exclude.includes(con.player.id)) {
-                con.send(data);
-            }
-        });
-    }
-
-    public get console(): Console {
-        return this.serverConsole;
-    }
-
-    public get config(): Config {
+    public get config() {
         return this.serverConfigurations;
     }
 
-    public get protocol(): Protocol {
-        return this.serverProtocol;
-    }
-
-    public get padLock(): KeyPairSyncResult<Buffer, Buffer> {
-        return this.serverPadLock;
-    }
-
-    public get playerCount(): number {
-        return this.serverPlayerCount;
-    }
-
-    public get connections(): Set<Connection> {
-        return this.serverConnections;
-    }
-
-    public get world(): World {
+    public get world() {
         return this.serverWorld;
     }
 }

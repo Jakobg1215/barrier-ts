@@ -1,5 +1,5 @@
 import Vector3 from '../../../types/classes/Vector3';
-import type { InteractionHand } from '../../../types/enums/InteractionHand';
+import type { Hand } from '../../../types/enums/Hand';
 import type Packet from '../Packet';
 import type ServerboundPacket from '../ServerboundPacket';
 
@@ -7,7 +7,7 @@ export default class ServerboundInteractPacket implements ServerboundPacket {
     public entityId!: number;
     public action!: Action;
     public usingSecondaryAction!: boolean;
-    public hand!: InteractionHand | null;
+    public hand!: Hand | null;
     public location!: Vector3 | null;
 
     public read(data: Packet): this {

@@ -1,9 +1,9 @@
-import type { InteractionHand } from '../../../types/enums/InteractionHand';
+import type { Hand } from '../../../types/enums/Hand';
 import type Packet from '../Packet';
 import type ServerboundPacket from '../ServerboundPacket';
 
 export default class ServerboundSwingPacket implements ServerboundPacket {
-    public hand!: InteractionHand;
+    public hand!: Hand;
 
     public read(data: Packet): this {
         this.hand = data.readVarInt();

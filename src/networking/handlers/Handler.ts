@@ -1,6 +1,6 @@
 import type BarrierTs from '../../BarrierTs';
-import type Connection from '../Connection';
+import type Player from '../../world/entity/Player/Player';
 
 export default interface Handler<ServerPacket> {
-    hander(packet: ServerPacket, connection: Connection, server: BarrierTs): void;
+    hander(packet: ServerPacket, connection: Player, server: BarrierTs): void;
 }
