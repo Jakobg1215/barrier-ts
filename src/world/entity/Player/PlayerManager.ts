@@ -1,6 +1,7 @@
 import { generateKeyPairSync, randomBytes } from 'node:crypto';
 import type Connection from '../../../networking/Connection';
 import type ClientboundPacket from '../../../networking/packets/ClientbountPacket';
+import ClientboundKeepAlivePacket from '../../../networking/packets/game/ClientboundKeepAlivePacket';
 import { ProtocolState } from '../../../networking/Protocol';
 import type Player from './Player';
 
@@ -20,11 +21,10 @@ export default class PlayerManager {
     public keepAliveId = randomBytes(8);
 
     public constructor() {
-        /*
         setInterval(() => {
             this.sendAll(new ClientboundKeepAlivePacket(this.keepAliveId.readBigInt64BE()));
             this.keepAliveId = randomBytes(8);
-        }, 15000);*/
+        }, 15000);
     }
 
     public sendAll(data: ClientboundPacket, ...execlude: number[]) {
