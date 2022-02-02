@@ -1,53 +1,85 @@
-import { createServer, isIP } from 'node:net';
-import Connection from './networking/Connection';
-import Protocol from './networking/Protocol';
-import Console from './utilities/Console';
-import getConfigurations from './utilities/getConfigurations';
-import Player from './world/entity/Player/Player';
-import PlayerManager from './world/entity/Player/PlayerManager';
+import { readFileSync } from 'node:fs';
+import { createServer } from 'node:net';
+import { join } from 'node:path';
+import Connection from './network/Connection';
+import HandshakePacketListener from './network/HandshakePacketListener';
+import Protocol from './network/Protocol';
+import type ServerStatus from './network/protocol/status/ServerStatus';
+import type Config from './types/Config';
+import Console from './utilitys/Console';
+import getConfigurations from './utilitys/getConfigurations';
+import PlayerManager from './world/PlayerManager';
 import World from './world/World';
 
 export default class BarrierTs {
     public readonly minecraftVersion = {
-        version: '1.18.1',
+        name: '1.18.1',
         protocol: 757,
     };
     public readonly console = new Console();
-    private serverWorld = new World();
-    private serverConfigurations = getConfigurations(this);
+    private serverConfigurations!: Config;
     public readonly protocol = new Protocol();
     public readonly networking = createServer();
-    public readonly playerManager = new PlayerManager();
+    public readonly playerManager = new PlayerManager(this);
+    private serverWorld = new World(this);
+    private iconData!: string | null;
 
     public constructor() {
-        if (isIP(this.serverConfigurations.host))
-            this.networking.listen(this.serverConfigurations.port, this.serverConfigurations.host);
-        else this.networking.listen(this.serverConfigurations.port, '0.0.0.0');
+        this.init();
 
-        this.networking.on('listening', () => {
+        this.networking.on('listening', (): void => {
             this.console.log(
-                `Server listening on port ${this.serverConfigurations.port} on host ${
-                    isIP(this.serverConfigurations.host) ? this.serverConfigurations.host : '0.0.0.0'
-                }!`,
+                'Server listening on port %s on host %s!',
+                this.serverConfigurations.port,
+                this.serverConfigurations.host,
             );
         });
 
-        this.networking.on('connection', socket => {
+        this.networking.on('connection', (socket): void => {
             const connection = new Connection(socket, this);
-            const player = new Player(connection);
-            this.playerManager.players.set(connection, player);
+            connection.setListener(new HandshakePacketListener(this, connection));
+            this.playerManager.connections.add(connection);
         });
+    }
 
-        setInterval(() => {
+    private async init(): Promise<void> {
+        this.serverConfigurations = await getConfigurations(this);
+        if (this.serverConfigurations.icon.length > 0) {
+            try {
+                this.iconData = readFileSync(join(__dirname, '../', this.serverConfigurations.icon)).toString('base64');
+            } catch {
+                this.iconData = null;
+                this.console.error('Failed to get server icon!');
+            }
+        } else this.iconData = null;
+
+        this.networking.listen(this.serverConfigurations.port, this.serverConfigurations.host);
+
+        setInterval((): void => {
             this.tick();
         }, 50);
     }
 
-    public reload() {
-        this.serverConfigurations = getConfigurations(this);
+    public async reload(): Promise<void> {
+        this.serverConfigurations = await getConfigurations(this);
     }
 
-    private tick() {}
+    private tick(): void {
+        this.playerManager.tick();
+        this.world.tick();
+    }
+
+    public getStatus(): ServerStatus {
+        return {
+            version: this.minecraftVersion,
+            players: {
+                max: this.serverConfigurations.maxplayers,
+                online: this.playerManager.players.size,
+            },
+            description: this.serverConfigurations.motd,
+            ...(this.iconData ? { favicon: `data:image/png;base64,${this.iconData}` } : {}),
+        };
+    }
 
     public get config() {
         return this.serverConfigurations;
@@ -57,5 +89,3 @@ export default class BarrierTs {
         return this.serverWorld;
     }
 }
-
-new BarrierTs();

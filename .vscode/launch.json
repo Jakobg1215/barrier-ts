@@ -5,7 +5,7 @@
             "type": "node",
             "request": "launch",
             "name": "Build and Run",
-            "program": "${workspaceFolder}/src/BarrierTs.ts",
+            "program": "${workspaceFolder}/src/index.ts",
             "preLaunchTask": "tsc: build - tsconfig.json",
             "outFiles": ["${workspaceFolder}/dist/**/*.js"],
             "console": "integratedTerminal",
@@ -15,11 +15,13 @@
             "type": "node",
             "request": "launch",
             "name": "Watch",
-            "program": "${workspaceFolder}/src/BarrierTs.ts",
+            "program": "${workspaceFolder}/src/index.ts",
             "preLaunchTask": "tsc: watch - tsconfig.json",
             "outFiles": ["${workspaceFolder}/dist/**/*.js"],
             "console": "integratedTerminal",
-            "runtimeExecutable": "nodemon"
+            "internalConsoleOptions": "neverOpen",
+            "runtimeExecutable": "npx",
+            "runtimeArgs": ["nodemon"]
         }
     ]
 }
