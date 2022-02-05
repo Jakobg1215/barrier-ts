@@ -94,50 +94,12 @@ export default class PlayerManager {
 
         gamelistener.send(new ClientBoundSetChunkCacheCenterPacket(chunkX, chunkZ));
 
-        this.server.world.sendWorldData(gamelistener.connection);
-
-        const chunkdata = new DataBuffer()
-            .writeShort(1024)
-            .writeUnsignedByte(4)
-            .writeVarInt(4)
-            .writeVarInt(33)
-            .writeVarInt(10)
-            .writeVarInt(9)
-            .writeVarInt(0)
-            .writeVarInt(256);
-
-        for (let bedrock = 0; bedrock < 16; bedrock++) {
-            chunkdata.writeLong(0n);
-        }
-        for (let dirt = 0; dirt < 32; dirt++) {
-            chunkdata.writeLong(1229782938247303441n);
-        }
-        for (let grass = 0; grass < 16; grass++) {
-            chunkdata.writeLong(2459565876494606882n);
-        }
-        for (let air = 0; air < 192; air++) {
-            chunkdata.writeLong(3689348814741910323n);
-        }
-
-        chunkdata.writeUnsignedByte(0).writeVarInt(0).writeVarInt(0);
-
-        for (let index = 0; index < 27; index++) {
-            chunkdata
-                .writeShort(0)
-                .writeUnsignedByte(0)
-                .writeVarInt(0)
-                .writeVarInt(0)
-                .writeUnsignedByte(0)
-                .writeVarInt(0)
-                .writeVarInt(0);
-        }
-
         gamelistener.send(
             new ClientBoundLevelChunkWithLightPacket(
                 chunkX,
                 chunkZ,
                 objectToNbt({}),
-                chunkdata.buffer,
+                this.server.world.levelChunks.get((BigInt(chunkX) << 32n) | (BigInt(chunkZ) & 0xffffffffn))!.toBuffer(),
                 [],
                 [3n],
                 [0n],
@@ -149,6 +111,8 @@ export default class PlayerManager {
             ),
         );
 
+        this.server.world.sendWorldData(gamelistener.connection);
+
         gamelistener.teleport(
             playerData.position.x,
             playerData.position.y,
@@ -156,30 +120,6 @@ export default class PlayerManager {
             playerData.rotation.y,
             playerData.rotation.x,
         );
-
-        for (let x = chunkX - 8; x < chunkX + 8; x++) {
-            for (let z = chunkZ - 8; z < chunkZ + 8; z++) {
-                gamelistener.send(
-                    new ClientBoundLevelChunkWithLightPacket(
-                        x,
-                        z,
-                        objectToNbt({}),
-                        chunkdata.buffer,
-                        [],
-                        [3n],
-                        [0n],
-                        [2n],
-                        [7n],
-                        [
-                            Array.from({ length: 2048 }).fill(0) as number[],
-                            Array.from({ length: 2048 }).fill(255) as number[],
-                        ],
-                        [],
-                        true,
-                    ),
-                );
-            }
-        }
     }
 
     private async getPlayerData(conn: Connection): Promise<SavedData> {

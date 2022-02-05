@@ -15,7 +15,7 @@ export default class DataBuffer {
     }
 
     public readBlockPos(): BlockPos {
-        return BlockPos.fromBuffer(this.bytes.slice(this.offset, this.getOffset(8, true)));
+        return BlockPos.fromBuffer(this.bytes.readBigUInt64BE(this.getOffset(8)));
     }
 
     public readBoolean(): boolean {

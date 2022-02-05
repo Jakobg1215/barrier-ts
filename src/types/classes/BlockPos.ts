@@ -1,20 +1,11 @@
 import Vector3 from '../../utilitys/Vector3';
 
 export default class BlockPos extends Vector3 {
-    public static fromBuffer(value: Buffer): BlockPos {
-        const bitval: string = value
-            .toJSON()
-            .data.map(byte => byte.toString(2).padStart(8, '0'))
-            .join('');
-        return new BlockPos(
-            bitval.slice(0, 26).at(0) === '1'
-                ? -(-parseInt(bitval.slice(0, 26), 2) & 0x1ffffff)
-                : parseInt(bitval.slice(0, 26), 2),
-            bitval.slice(52).at(0) === '1' ? -(-parseInt(bitval.slice(52), 2) & 0x7ff) : parseInt(bitval.slice(52), 2),
-            bitval.slice(26, 52).at(0) === '1'
-                ? -(-parseInt(bitval.slice(26, 52), 2) & 0x1ffffff)
-                : parseInt(bitval.slice(26, 52), 2),
-        );
+    public static fromBuffer(value: bigint): BlockPos {
+        const x = (Number(value >> 38n) << 24) >> 24;
+        const y = (Number(value & 0xfffn) << 24) >> 24;
+        const z = (Number((value >> 12n) & 0x3ffffffn) << 24) >> 24;
+        return new BlockPos(x, y, z);
     }
 
     public toBigInt(): bigint {
