@@ -113,8 +113,8 @@ export default class GamePacketListener implements PacketListener {
         throw new Error('Method not implemented.');
     }
 
-    public handleClientInformation(_clientInformation: ServerBoundClientInformationPacket): void {
-        throw new Error('Method not implemented.');
+    public handleClientInformation(clientInformation: ServerBoundClientInformationPacket): void {
+        this.player.updateOptions(clientInformation);
     }
 
     public handleCommandSuggestions(_CommandSuggestions: ServerBoundCommandSuggestionPacket): void {
