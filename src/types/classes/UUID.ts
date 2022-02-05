@@ -2,6 +2,10 @@ import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
 
 export default class UUID {
+    public static get EMPTY() {
+        return new this('00000000000000000000000000000000');
+    }
+
     public static createFakeUUID(name: string): UUID {
         const data = createHash('md5').update(Buffer.from(name)).digest();
         data[6] = (data[6]! & 0x0f) | 0x30;
@@ -25,7 +29,7 @@ export default class UUID {
     public toFormatedString(): string {
         return `${this.data.slice(0, 8)}-${this.data.slice(8, 12)}-${this.data.slice(12, 16)}-${this.data.slice(
             16,
-            32,
-        )}`;
+            20,
+        )}-${this.data.slice(20, 32)}`;
     }
 }

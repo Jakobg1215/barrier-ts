@@ -1,13 +1,19 @@
 import { randomBytes } from 'node:crypto';
 import type BarrierTs from '../BarrierTs';
+import BlockPos from '../types/classes/BlockPos';
 import Chat, { ChatType } from '../types/classes/Chat';
+import { ChatPermission } from '../types/enums/ChatPermission';
+import { Direction } from '../types/enums/Direction';
 import { InteractionHand } from '../types/enums/InteractionHand';
 import type Player from '../world/entities/Player';
 import type Connection from './Connection';
 import type PacketListener from './PacketListener';
 import type ClientBoundPacket from './protocol/ClientBoundPacket';
 import ClientBoundAnimatePacket, { Action as SwingAction } from './protocol/game/ClientBoundAnimatePacket';
+import ClientBoundBlockUpdatePacket from './protocol/game/ClientBoundBlockUpdatePacket';
+import ClientBoundChatPacket from './protocol/game/ClientBoundChatPacket';
 import ClientBoundKeepAlivePacket from './protocol/game/ClientBoundKeepAlivePacket';
+import ClientBoundLevelEventPacket from './protocol/game/ClientBoundLevelEventPacket';
 import ClientBoundPlayerPositionPacket from './protocol/game/ClientBoundPlayerPositionPacket';
 import ClientBoundTeleportEntityPacket from './protocol/game/ClientBoundTeleportEntityPacket';
 import type ServerBoundAcceptTeleportationPacket from './protocol/game/ServerBoundAcceptTeleportationPacket';
@@ -90,8 +96,17 @@ export default class GamePacketListener implements PacketListener {
 
     public teleport(x: number, y: number, z: number, yRot: number, xRot: number): void {
         this.player.updatePos(x, y, z);
-        this.connection.send(
-            new ClientBoundPlayerPositionPacket(x, y, z, yRot, xRot, 0, this.teleportId.readInt32BE(), false),
+        this.send(new ClientBoundPlayerPositionPacket(x, y, z, yRot, xRot, 0, this.teleportId.readInt32BE(), false));
+        this.server.playerManager.sendAll(
+            new ClientBoundTeleportEntityPacket(
+                this.player.id,
+                x,
+                y,
+                z,
+                Math.floor((yRot * 256) / 360),
+                Math.floor((xRot * 256) / 360),
+                true,
+            ),
         );
     }
 
@@ -109,8 +124,15 @@ export default class GamePacketListener implements PacketListener {
         throw new Error('Method not implemented.');
     }
 
-    public handleChat(_chat: ServerBoundChatPacket): void {
-        throw new Error('Method not implemented.');
+    public handleChat(chat: ServerBoundChatPacket): void {
+        this.server.console.log('<%s> %s', this.player.gameProfile.name, chat.message);
+        this.server.playerManager.sendAll(
+            new ClientBoundChatPacket(
+                new Chat(ChatType.TRANSLATE, 'chat.type.text', { with: [this.player.gameProfile.name, chat.message] }),
+                ChatPermission.CHAT,
+                this.player.gameProfile.id,
+            ),
+        );
     }
 
     public handleClientCommand(_clientCommand: ServerBoundClientCommandPacket): void {
@@ -222,8 +244,13 @@ export default class GamePacketListener implements PacketListener {
         this.player.isFlying = playerAbilities.isFlying;
     }
 
-    public handlePlayerAction(_playerAction: ServerBoundPlayerActionPacket): void {
-        throw new Error('Method not implemented.');
+    public handlePlayerAction(playerAction: ServerBoundPlayerActionPacket): void {
+        this.server.world.setBlock(playerAction.pos.x, playerAction.pos.y, playerAction.pos.z, 0);
+        this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(playerAction.pos, 0), this.player.id);
+        this.server.playerManager.sendAll(
+            new ClientBoundLevelEventPacket(2001, playerAction.pos, 1, false),
+            this.player.id,
+        );
     }
 
     public handlePlayerCommand(playerCommand: ServerBoundPlayerCommandPacket): void {
@@ -338,7 +365,49 @@ export default class GamePacketListener implements PacketListener {
         throw new Error('Method not implemented.');
     }
 
-    public handleUseItemOn(_useItemOn: ServerBoundUseItemOnPacket): void {
-        throw new Error('Method not implemented.');
+    public handleUseItemOn(useItemOn: ServerBoundUseItemOnPacket): void {
+        switch (useItemOn.direction) {
+            case Direction.UP: {
+                const newBlock = new BlockPos(useItemOn.blockPos.x, useItemOn.blockPos.y + 1, useItemOn.blockPos.z);
+                this.server.world.setBlock(newBlock.x, newBlock.y, newBlock.z, 1);
+                this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(newBlock, 1));
+                break;
+            }
+
+            case Direction.DOWN: {
+                const newBlock = new BlockPos(useItemOn.blockPos.x, useItemOn.blockPos.y - 1, useItemOn.blockPos.z);
+                this.server.world.setBlock(newBlock.x, newBlock.y, newBlock.z, 1);
+                this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(newBlock, 1));
+                break;
+            }
+
+            case Direction.NORTH: {
+                const newBlock = new BlockPos(useItemOn.blockPos.x, useItemOn.blockPos.y, useItemOn.blockPos.z - 1);
+                this.server.world.setBlock(newBlock.x, newBlock.y, newBlock.z, 1);
+                this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(newBlock, 1));
+                break;
+            }
+
+            case Direction.SOUTH: {
+                const newBlock = new BlockPos(useItemOn.blockPos.x, useItemOn.blockPos.y, useItemOn.blockPos.z + 1);
+                this.server.world.setBlock(newBlock.x, newBlock.y, newBlock.z, 1);
+                this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(newBlock, 1));
+                break;
+            }
+
+            case Direction.EAST: {
+                const newBlock = new BlockPos(useItemOn.blockPos.x + 1, useItemOn.blockPos.y, useItemOn.blockPos.z);
+                this.server.world.setBlock(newBlock.x, newBlock.y, newBlock.z, 1);
+                this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(newBlock, 1));
+                break;
+            }
+
+            case Direction.WEST: {
+                const newBlock = new BlockPos(useItemOn.blockPos.x - 1, useItemOn.blockPos.y, useItemOn.blockPos.z);
+                this.server.world.setBlock(newBlock.x, newBlock.y, newBlock.z, 1);
+                this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(newBlock, 1));
+                break;
+            }
+        }
     }
 }

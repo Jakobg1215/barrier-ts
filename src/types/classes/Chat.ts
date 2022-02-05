@@ -22,7 +22,7 @@ export enum ChatType {
 }
 
 interface ChatOptions {
-    with?: Chat;
+    with?: Chat | string[];
     color?: TextColor | string;
     bold?: boolean;
     italic?: boolean;

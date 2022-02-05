@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:net';
 import { join } from 'node:path';
 import Connection from './network/Connection';
@@ -17,7 +17,7 @@ export default class BarrierTs {
         name: '1.18.1',
         protocol: 757,
     };
-    public readonly console = new Console();
+    public readonly console = new Console(this);
     private serverConfigurations!: Config;
     public readonly protocol = new Protocol();
     public readonly networking = createServer();
@@ -47,7 +47,9 @@ export default class BarrierTs {
         this.serverConfigurations = await getConfigurations(this);
         if (this.serverConfigurations.icon.length > 0) {
             try {
-                this.iconData = readFileSync(join(__dirname, '../', this.serverConfigurations.icon)).toString('base64');
+                this.iconData = (await readFile(join(__dirname, '../', this.serverConfigurations.icon))).toString(
+                    'base64',
+                );
             } catch {
                 this.iconData = null;
                 this.console.error('Failed to get server icon!');
@@ -63,6 +65,16 @@ export default class BarrierTs {
 
     public async reload(): Promise<void> {
         this.serverConfigurations = await getConfigurations(this);
+        if (this.serverConfigurations.icon.length > 0) {
+            try {
+                this.iconData = (await readFile(join(__dirname, '../', this.serverConfigurations.icon))).toString(
+                    'base64',
+                );
+            } catch {
+                this.iconData = null;
+                this.console.error('Failed to get server icon!');
+            }
+        } else this.iconData = null;
     }
 
     private tick(): void {
@@ -76,6 +88,7 @@ export default class BarrierTs {
         if (this.config.playerlisting) {
             for (const player of this.playerManager.players.values()) {
                 if (!player.allowsListing) continue;
+                if (playerList.length >= 10) continue;
                 playerList.push({ name: player.gameProfile.name, id: player.gameProfile.id.toFormatedString() });
             }
         }

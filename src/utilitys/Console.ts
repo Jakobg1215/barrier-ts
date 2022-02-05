@@ -1,13 +1,31 @@
 import { stdin, stdout } from 'node:process';
 import { createInterface } from 'node:readline';
 import { format } from 'node:util';
+import type BarrierTs from '../BarrierTs';
+import ClientBoundChatPacket from '../network/protocol/game/ClientBoundChatPacket';
+import Chat, { ChatType } from '../types/classes/Chat';
+import UUID from '../types/classes/UUID';
+import { ChatPermission } from '../types/enums/ChatPermission';
 
 export default class Console {
     private consoleInterface = createInterface(stdin);
 
-    public constructor() {
+    public constructor(server: BarrierTs) {
         this.consoleInterface.on('line', (line): void => {
-            this.warn(line);
+            if (!line.startsWith('/')) {
+                server.playerManager.sendAll(
+                    new ClientBoundChatPacket(
+                        new Chat(ChatType.TRANSLATE, 'chat.type.text', {
+                            with: ['CONSOLE', line],
+                        }),
+                        ChatPermission.SYSTEM,
+                        UUID.EMPTY,
+                    ),
+                );
+                return;
+            }
+
+            server.reload();
         });
     }
 
