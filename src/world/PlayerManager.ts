@@ -7,14 +7,20 @@ import DataBuffer from '../network/DataBuffer';
 import DimensionType from '../network/DimensionType';
 import type GamePacketListener from '../network/GamePacketListener';
 import type ClientBoundPacket from '../network/protocol/ClientBoundPacket';
+import ClientBoundAddPlayerPacket from '../network/protocol/game/ClientBoundAddPlayerPacket';
 import ClientBoundChangeDifficultyPacket from '../network/protocol/game/ClientBoundChangeDifficultyPacket';
 import ClientBoundCustomPayloadPacket from '../network/protocol/game/ClientBoundCustomPayloadPacket';
 import ClientBoundLevelChunkWithLightPacket from '../network/protocol/game/ClientBoundLevelChunkWithLightPacket';
 import ClientBoundLoginPacket from '../network/protocol/game/ClientBoundLoginPacket';
 import ClientBoundPlayerAbilitiesPacket from '../network/protocol/game/ClientBoundPlayerAbilitiesPacket';
+import ClientBoundPlayerInfoPacket, {
+    Action,
+    PlayerUpdate,
+} from '../network/protocol/game/ClientBoundPlayerInfoPacket';
 import ClientBoundSetCarriedItemPacket from '../network/protocol/game/ClientBoundSetCarriedItemPacket';
 import ClientBoundSetChunkCacheCenterPacket from '../network/protocol/game/ClientBoundSetChunkCacheCenterPacket';
 import RegistryHolder from '../network/RegistryHolder';
+import Chat, { ChatType } from '../types/classes/Chat';
 import NameSpace from '../types/classes/NameSpace';
 import { Difficulty } from '../types/enums/Difficulty';
 import { GameType } from '../types/enums/GameType';
@@ -60,12 +66,16 @@ export default class PlayerManager {
 
         gamelistener.send(
             new ClientBoundLoginPacket(
-                0,
+                gamelistener.player.id,
                 0n,
                 false,
                 GameType.CREATIVE,
                 GameType.CREATIVE,
-                [new NameSpace('minecraft', 'overworld')],
+                [
+                    new NameSpace('minecraft', 'overworld'),
+                    new NameSpace('minecraft', 'the_nether'),
+                    new NameSpace('minecraft', 'the_end'),
+                ],
                 objectToNbt(RegistryHolder),
                 objectToNbt(DimensionType),
                 new NameSpace('minecraft', 'overworld'),
@@ -112,6 +122,55 @@ export default class PlayerManager {
         );
 
         this.server.world.sendWorldData(gamelistener.connection);
+
+        this.sendAll(
+            new ClientBoundPlayerInfoPacket(Action.ADD_PLAYER, [
+                {
+                    latency: 0,
+                    gameMode: GameType.CREATIVE,
+                    profile: gamelistener.player.gameProfile,
+                    displayName: new Chat(ChatType.TEXT, gamelistener.player.gameProfile.name),
+                },
+            ]),
+        );
+
+        const players: PlayerUpdate[] = [];
+
+        this.players.forEach(player =>
+            players.push({
+                latency: 0,
+                gameMode: GameType.CREATIVE,
+                profile: player.gameProfile,
+                displayName: new Chat(ChatType.TEXT, player.gameProfile.name),
+            }),
+        );
+
+        this.sendAll(
+            new ClientBoundAddPlayerPacket(
+                gamelistener.player.id,
+                gamelistener.player.gameProfile.id,
+                gamelistener.player.pos.x,
+                gamelistener.player.pos.y,
+                gamelistener.player.pos.z,
+                (gamelistener.player.rot.y * 256.0) / 360.0,
+                (gamelistener.player.rot.x * 256.0) / 360.0,
+            ),
+            gamelistener.player.id,
+        );
+        this.players.forEach(player => {
+            if (player.id === gamelistener.player.id) return;
+            gamelistener.send(
+                new ClientBoundAddPlayerPacket(
+                    player.id,
+                    player.gameProfile.id,
+                    player.pos.x,
+                    player.pos.y,
+                    player.pos.z,
+                    (player.rot.y * 256.0) / 360.0,
+                    (player.rot.x * 256.0) / 360.0,
+                ),
+            );
+        });
 
         gamelistener.teleport(
             playerData.position.x,

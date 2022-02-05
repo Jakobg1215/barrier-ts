@@ -1,9 +1,9 @@
-import type UUID from '../../../types/classes/UUID';
+import UUID from '../../../types/classes/UUID';
 
 export default class GameProfile {
     public readonly properties: property[] = [];
 
-    public constructor(public readonly id: UUID | null, public name: string) {}
+    public constructor(public name: string, public readonly id = UUID.createFakeUUID(name)) {}
 
     public isComplete(): boolean {
         return this.id !== null;

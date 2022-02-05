@@ -3,6 +3,7 @@ import type { Socket } from 'node:net';
 import { deflateSync, inflateSync } from 'node:zlib';
 import type BarrierTs from '../BarrierTs';
 import Chat, { ChatType } from '../types/classes/Chat';
+import { GameType } from '../types/enums/GameType';
 import DataBuffer from './DataBuffer';
 import GamePacketListener from './GamePacketListener';
 import LoginPacketListener from './LoginPacketListener';
@@ -10,6 +11,8 @@ import type PacketListener from './PacketListener';
 import type ClientBoundPacket from './protocol/ClientBoundPacket';
 import { ConnectionProtocol } from './protocol/ConnectionProtocol';
 import ClientBoundDisconnectPacket from './protocol/game/ClientBoundDisconnectPacket';
+import ClientBoundPlayerInfoPacket, { Action } from './protocol/game/ClientBoundPlayerInfoPacket';
+import ClientBoundRemoveEntitiesPacket from './protocol/game/ClientBoundRemoveEntitiesPacket';
 import ClientBoundLoginCompressionPacket from './protocol/login/ClientBoundLoginCompressionPacket';
 import ClientBoundLoginDisconnectPacket from './protocol/login/ClientBoundLoginDisconnectPacket';
 
@@ -67,8 +70,21 @@ export default class Connection {
 
         this.networking.on('end', () => {
             this.server.playerManager.savePlayer(this);
+            const player = this.server.playerManager.players.get(this);
             this.server.playerManager.players.delete(this);
             this.server.playerManager.connections.delete(this);
+            if (!player) return;
+            this.server.playerManager.sendAll(new ClientBoundRemoveEntitiesPacket([player.id]));
+            this.server.playerManager.sendAll(
+                new ClientBoundPlayerInfoPacket(Action.REMOVE_PLAYER, [
+                    {
+                        latency: 0,
+                        gameMode: GameType.CREATIVE,
+                        profile: player.gameProfile,
+                        displayName: new Chat(ChatType.TEXT, player.gameProfile.name),
+                    },
+                ]),
+            );
         });
 
         this.networking.on('error', this.server.console.error);

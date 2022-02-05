@@ -1,7 +1,7 @@
 import type DataBuffer from '../../DataBuffer';
 import type ClientBoundPacket from '../ClientBoundPacket';
 
-export default class ClientBoundSetEntitypacket implements ClientBoundPacket {
+export default class ClientBoundSetEntityDatapacket implements ClientBoundPacket {
     public constructor(public id: number, public packedItems: packetItem[]) {}
 
     public write(packet: DataBuffer): DataBuffer {

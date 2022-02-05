@@ -38,10 +38,7 @@ export default class LoginPacketListener implements PacketListener {
 
     private loginPlayer(): void {
         if (!this.gameProfile?.isComplete()) {
-            this.gameProfile = new GameProfile(
-                UUID.createFakeUUID(`OfflinePlayer:${this.gameProfile?.name}`),
-                this.gameProfile?.name!,
-            );
+            this.gameProfile = new GameProfile(this.gameProfile!.name!);
         }
 
         this.state = State.ACCEPTED;
@@ -126,7 +123,7 @@ export default class LoginPacketListener implements PacketListener {
             res => {
                 res.on('data', (data: Buffer): void => {
                     const resData: Responce = JSON.parse(data.toString());
-                    this.gameProfile = new GameProfile(new UUID(resData.id), resData.name);
+                    this.gameProfile = new GameProfile(resData.name, new UUID(resData.id));
                     for (let index = 0; index < resData.properties.length; index++)
                         this.gameProfile.properties.push(resData.properties.at(index) as property);
 

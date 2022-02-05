@@ -14,7 +14,7 @@ export default class ClientBoundPlayerInfoPacket implements ClientBoundPacket {
         switch (this.action) {
             case Action.ADD_PLAYER: {
                 this.entries.forEach((element: PlayerUpdate): void => {
-                    packet.writeUUID(element.profile.id!);
+                    packet.writeUUID(element.profile.id);
                     packet.writeString(element.profile.name);
                     packet.writeVarInt(element.profile.properties ? element.profile.properties.length : 0);
                     if (element.profile.properties) {
@@ -43,7 +43,7 @@ export default class ClientBoundPlayerInfoPacket implements ClientBoundPacket {
 
             case Action.UPDATE_GAME_MODE: {
                 this.entries.forEach((element: PlayerUpdate): void => {
-                    packet.writeUUID(element.profile.id!);
+                    packet.writeUUID(element.profile.id);
                     packet.writeVarInt(element.gameMode);
                 });
                 break;
@@ -51,7 +51,7 @@ export default class ClientBoundPlayerInfoPacket implements ClientBoundPacket {
 
             case Action.UPDATE_LATENCY: {
                 this.entries.forEach((element: PlayerUpdate): void => {
-                    packet.writeUUID(element.profile.id!);
+                    packet.writeUUID(element.profile.id);
                     packet.writeVarInt(element.latency);
                 });
                 break;
@@ -59,7 +59,7 @@ export default class ClientBoundPlayerInfoPacket implements ClientBoundPacket {
 
             case Action.UPDATE_DISPLAY_NAME: {
                 this.entries.forEach((element: PlayerUpdate): void => {
-                    packet.writeUUID(element.profile.id!);
+                    packet.writeUUID(element.profile.id);
                     if (!element.displayName) {
                         packet.writeBoolean(false);
                         return;
@@ -72,7 +72,7 @@ export default class ClientBoundPlayerInfoPacket implements ClientBoundPacket {
 
             case Action.REMOVE_PLAYER: {
                 this.entries.forEach((element: PlayerUpdate) => {
-                    packet.writeUUID(element.profile.id!);
+                    packet.writeUUID(element.profile.id);
                 });
                 break;
             }
@@ -81,7 +81,7 @@ export default class ClientBoundPlayerInfoPacket implements ClientBoundPacket {
     }
 }
 
-enum Action {
+export enum Action {
     ADD_PLAYER,
     UPDATE_GAME_MODE,
     UPDATE_LATENCY,
@@ -89,7 +89,7 @@ enum Action {
     REMOVE_PLAYER,
 }
 
-interface PlayerUpdate {
+export interface PlayerUpdate {
     latency: number;
     gameMode: GameType;
     profile: GameProfile;

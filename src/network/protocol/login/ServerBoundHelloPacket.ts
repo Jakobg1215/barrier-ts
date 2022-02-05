@@ -7,7 +7,7 @@ export default class ServerBoundHelloPacket implements ServerBoundPacket<LoginPa
     public readonly gameProfile: GameProfile;
 
     public constructor(data: DataBuffer) {
-        this.gameProfile = new GameProfile(null, data.readString(16));
+        this.gameProfile = new GameProfile(data.readString(16));
     }
 
     public handle(handler: LoginPacketListener): void {
