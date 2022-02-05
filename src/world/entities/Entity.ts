@@ -1,4 +1,5 @@
 import { FieldType } from '../../network/protocol/game/ClientBoundSetEntityDataPacket';
+import { Pose } from '../../types/enums/Pose';
 import Vector2 from '../../utilitys/Vector2';
 import Vector3 from '../../utilitys/Vector3';
 import SynchedEntitiyData from './SynchedEntityData';
@@ -12,9 +13,11 @@ export default class Entity {
     protected onGround = true;
     protected sprinting = false;
     protected crouching = false;
+    protected pose = Pose.STANDING;
 
     public constructor() {
         this.synchedData.define(0, FieldType.BYTE, 0);
+        this.synchedData.define(6, 18, Pose.STANDING);
     }
 
     public tick(): void {}
@@ -26,12 +29,18 @@ export default class Entity {
         this.synchedData.set(0, status);
     }
 
+    private updatePose(pose: Pose): void {
+        this.pose = pose;
+        this.synchedData.set(6, pose);
+    }
+
     public get isCrouching() {
         return this.crouching;
     }
 
     public set isCrouching(crouching: boolean) {
         this.crouching = crouching;
+        crouching ? this.updatePose(Pose.CROUCHING) : this.updatePose(Pose.STANDING);
         this.updateStatusData();
     }
 
