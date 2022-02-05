@@ -6,8 +6,17 @@ export default class Entity {
     public readonly id = Entity.idGenerator++;
     protected postion = Vector3.ZERO;
     protected rotation = Vector2.ZERO;
+    protected onGround = true;
 
     public tick(): void {}
+
+    public get isOnGround() {
+        return this.onGround;
+    }
+
+    public set isOnGround(onGround: boolean) {
+        this.onGround = onGround;
+    }
 
     public get pos() {
         return this.postion;

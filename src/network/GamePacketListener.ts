@@ -7,6 +7,7 @@ import type PacketListener from './PacketListener';
 import type ClientBoundPacket from './protocol/ClientBoundPacket';
 import ClientBoundKeepAlivePacket from './protocol/game/ClientBoundKeepAlivePacket';
 import ClientBoundPlayerPositionPacket from './protocol/game/ClientBoundPlayerPositionPacket';
+import ClientBoundTeleportEntityPacket from './protocol/game/ClientBoundTeleportEntityPacket';
 import type ServerBoundAcceptTeleportationPacket from './protocol/game/ServerBoundAcceptTeleportationPacket';
 import type ServerBoundBlockEntityTagQuery from './protocol/game/ServerBoundBlockEntityTagQuery';
 import type ServerBoundChangeDifficultyPacket from './protocol/game/ServerBoundChangeDifficultyPacket';
@@ -182,8 +183,20 @@ export default class GamePacketListener implements PacketListener {
         this.player.rotateTo(movePlayerRot.yRot, movePlayerRot.xRot, movePlayerRot.onGround);
     }
 
-    public handleMovePlayerStatusOnly(_movePlayerStatusOnly: ServerBoundMovePlayerStatusOnlyPacket): void {
-        throw new Error('Method not implemented.');
+    public handleMovePlayerStatusOnly(movePlayerStatusOnly: ServerBoundMovePlayerStatusOnlyPacket): void {
+        this.player.isOnGround = movePlayerStatusOnly.onGround;
+        this.server.playerManager.sendAll(
+            new ClientBoundTeleportEntityPacket(
+                this.player.id,
+                this.player.pos.x,
+                this.player.pos.y,
+                this.player.pos.z,
+                Math.floor((this.player.rot.y * 256) / 360),
+                Math.floor((this.player.rot.x * 256) / 360),
+                movePlayerStatusOnly.onGround,
+            ),
+            this.player.id,
+        );
     }
 
     public handleMoveVehicle(_moveVehicle: ServerBoundMoveVehiclePacket): void {
