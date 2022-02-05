@@ -4,14 +4,16 @@ import Chunk from './Chunk';
 export default class ChunkColumn {
     private readonly chunks: Chunk[] = [];
     private readonly sections: number;
+    private readonly maxY: number;
 
-    public constructor(private readonly minY: number, private readonly maxY: number) {
-        this.sections = (Math.abs(minY) + maxY) >> 4;
+    public constructor(private readonly minY: number, hight: number) {
+        this.maxY = hight + minY;
+        this.sections = (Math.abs(minY) + hight) >> 4;
         for (let index = 0; index < this.sections; index++) this.chunks.push(Chunk.EMPTY);
     }
 
     public setBlock(x: number, y: number, z: number, state: number): void {
-        if (y > this.maxY || y < this.minY)
+        if (y > this.maxY - 1 || y < this.minY)
             throw new RangeError(
                 `Position y is out of bounds of the ChunkColumn! Number must be between ${this.minY} and ${this.maxY}`,
             );
