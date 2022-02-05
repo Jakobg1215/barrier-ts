@@ -3,7 +3,7 @@ import ClientBoundMoveEntityPosPacket from '../../network/protocol/game/ClientBo
 import ClientBoundMoveEntityPosRotPacket from '../../network/protocol/game/ClientBoundMoveEntityPosRotPacket';
 import ClientBoundMoveEntityRotPacket from '../../network/protocol/game/ClientBoundMoveEntityRotPacket';
 import ClientBoundRotateHeadPacket from '../../network/protocol/game/ClientBoundRotateHeadPacket';
-import ClientBoundSetEntityDatapacket from '../../network/protocol/game/ClientBoundSetEntityDataPacket';
+import ClientBoundSetEntityDatapacket, { FieldType } from '../../network/protocol/game/ClientBoundSetEntityDataPacket';
 import type ServerBoundClientInformationPacket from '../../network/protocol/game/ServerBoundClientInformationPacket';
 import type GameProfile from '../../network/protocol/login/GameProfile';
 import { ChatVisiblity } from '../../types/enums/ChatVisiblity';
@@ -23,10 +23,18 @@ export default class Player extends LivingEntity {
 
     public constructor(private readonly server: BarrierTs, public readonly gameProfile: GameProfile) {
         super();
+        this.synchedData.define(17, FieldType.BYTE, 0);
+        this.synchedData.define(18, FieldType.BYTE, 1);
     }
 
     public override tick(): void {
         super.tick();
+
+        if (this.synchedData.changed) {
+            this.server.playerManager.sendAll(
+                new ClientBoundSetEntityDatapacket(this.id, this.synchedData.getChangedData()),
+            );
+        }
     }
 
     public updateOptions(clientInformation: ServerBoundClientInformationPacket): void {
@@ -34,12 +42,8 @@ export default class Player extends LivingEntity {
         this.canChatColor = clientInformation.chatColors;
         this.textFilteringEnabled = clientInformation.textFilteringEnabled;
         this.allowsListing = clientInformation.allowsListing;
-        const update = new ClientBoundSetEntityDatapacket(this.id, []);
-        if (clientInformation.modelCustomisation !== this.skinCustomisation)
-            update.packedItems.push({ index: 17, type: 0, value: clientInformation.modelCustomisation });
-        if (clientInformation.mainHand !== this.mainHand)
-            update.packedItems.push({ index: 18, type: 0, value: clientInformation.mainHand }); // TODO: Add a check if its being spammed
-        if (update.packedItems.length > 0) this.server.playerManager.sendAll(update);
+        this.synchedData.set(17, clientInformation.modelCustomisation);
+        this.synchedData.set(18, clientInformation.mainHand); // TODO: Add a check if its being spammed
         this.skinCustomisation = clientInformation.modelCustomisation;
         this.mainHand = clientInformation.mainHand;
     }

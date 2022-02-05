@@ -36,6 +36,7 @@ import type ServerBoundPlaceRecipePacket from './protocol/game/ServerBoundPlaceR
 import type ServerBoundPlayerAbilitiesPacket from './protocol/game/ServerBoundPlayerAbilitiesPacket';
 import type ServerBoundPlayerActionPacket from './protocol/game/ServerBoundPlayerActionPacket';
 import type ServerBoundPlayerCommandPacket from './protocol/game/ServerBoundPlayerCommandPacket';
+import { Action } from './protocol/game/ServerBoundPlayerCommandPacket';
 import type ServerBoundPlayerInputPacket from './protocol/game/ServerBoundPlayerInputPacket';
 import type ServerBoundPongPacket from './protocol/game/ServerBoundPongPacket';
 import type ServerBoundRecipeBookChangeSettingsPacket from './protocol/game/ServerBoundRecipeBookChangeSettingsPacket';
@@ -223,8 +224,32 @@ export default class GamePacketListener implements PacketListener {
         throw new Error('Method not implemented.');
     }
 
-    public handlePlayerCommand(_playerCommand: ServerBoundPlayerCommandPacket): void {
-        throw new Error('Method not implemented.');
+    public handlePlayerCommand(playerCommand: ServerBoundPlayerCommandPacket): void {
+        switch (playerCommand.action) {
+            case Action.PRESS_SHIFT_KEY: {
+                this.player.isCrouching = true;
+                break;
+            }
+
+            case Action.RELEASE_SHIFT_KEY: {
+                this.player.isCrouching = false;
+                break;
+            }
+
+            case Action.START_SPRINTING: {
+                this.player.isSprinting = true;
+                break;
+            }
+
+            case Action.STOP_SPRINTING: {
+                this.player.isSprinting = false;
+                break;
+            }
+
+            default: {
+                throw new Error(`Need to handle action ${playerCommand.action}`);
+            }
+        }
     }
 
     public handlePlayerInput(_playerInput: ServerBoundPlayerInputPacket): void {

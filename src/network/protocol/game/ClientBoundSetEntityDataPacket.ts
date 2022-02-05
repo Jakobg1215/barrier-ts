@@ -2,7 +2,7 @@ import type DataBuffer from '../../DataBuffer';
 import type ClientBoundPacket from '../ClientBoundPacket';
 
 export default class ClientBoundSetEntityDatapacket implements ClientBoundPacket {
-    public constructor(public id: number, public packedItems: packetItem[]) {}
+    public constructor(public id: number, public packedItems: PacketItem[]) {}
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeVarInt(this.id);
@@ -130,7 +130,29 @@ export default class ClientBoundSetEntityDatapacket implements ClientBoundPacket
     }
 }
 
-interface packetItem {
+export enum FieldType {
+    BYTE,
+    VARINT,
+    FLOAT,
+    STRING,
+    CHAT,
+    OPTCHAT,
+    ITEM,
+    BOOLEAN,
+    ROTATION,
+    POSITION,
+    OPTPOSTITON,
+    DIRECTION,
+    OPTUUID,
+    OPTBLOCKID,
+    NBT,
+    PARTICLE,
+    VILLAGER_DATA,
+    OPTVARINT,
+    POSE,
+}
+
+export interface PacketItem {
     index: number;
     type: number;
     value: any;
