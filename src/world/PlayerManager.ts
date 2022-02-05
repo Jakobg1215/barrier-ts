@@ -53,7 +53,7 @@ export default class PlayerManager {
 
     public sendAll(packet: ClientBoundPacket, ...execlude: number[]) {
         for (const [connection, player] of this.players.entries()) {
-            if (execlude.includes(player.id)) return;
+            if (execlude.includes(player.id)) continue;
             connection.send(packet);
         }
     }
@@ -123,15 +123,10 @@ export default class PlayerManager {
 
         this.server.world.sendWorldData(gamelistener.connection);
 
-        this.sendAll(
-            new ClientBoundPlayerInfoPacket(Action.ADD_PLAYER, [
-                {
-                    latency: 0,
-                    gameMode: GameType.CREATIVE,
-                    profile: gamelistener.player.gameProfile,
-                    displayName: new Chat(ChatType.TEXT, gamelistener.player.gameProfile.name),
-                },
-            ]),
+        this.server.console.log(
+            '%s (%s) has joined the server!',
+            gamelistener.player.gameProfile.name,
+            gamelistener.player.id,
         );
 
         const players: PlayerUpdate[] = [];
@@ -145,6 +140,8 @@ export default class PlayerManager {
             }),
         );
 
+        this.sendAll(new ClientBoundPlayerInfoPacket(Action.ADD_PLAYER, players));
+
         this.sendAll(
             new ClientBoundAddPlayerPacket(
                 gamelistener.player.id,
@@ -157,6 +154,7 @@ export default class PlayerManager {
             ),
             gamelistener.player.id,
         );
+
         this.players.forEach(player => {
             if (player.id === gamelistener.player.id) return;
             gamelistener.send(
