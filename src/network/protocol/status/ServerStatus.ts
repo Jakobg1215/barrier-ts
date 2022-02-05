@@ -5,18 +5,18 @@ export default interface ServerStatus {
     favicon?: string;
 }
 
-interface Players {
+export interface Players {
     max: number;
     online: number;
     sample?: PlayersSample[];
 }
 
-interface PlayersSample {
+export interface PlayersSample {
     id: string;
     name: string;
 }
 
-interface Version {
+export interface Version {
     name: string;
     protocol: number;
 }

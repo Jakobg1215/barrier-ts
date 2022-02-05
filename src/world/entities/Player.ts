@@ -17,7 +17,7 @@ export default class Player extends LivingEntity {
     public chatVisibility = ChatVisiblity.FULL;
     public canChatColor = true; // TODO: Need to put getters and setters
     public textFilteringEnabled = false; // There are public for development.
-    public allowsListing = true;
+    public allowsListing = false;
     public skinCustomisation = 0;
     public mainHand = HumanoidArm.RIGHT;
 

@@ -5,6 +5,7 @@ import Connection from './network/Connection';
 import HandshakePacketListener from './network/HandshakePacketListener';
 import Protocol from './network/Protocol';
 import type ServerStatus from './network/protocol/status/ServerStatus';
+import type { PlayersSample } from './network/protocol/status/ServerStatus';
 import type Config from './types/Config';
 import Console from './utilitys/Console';
 import getConfigurations from './utilitys/getConfigurations';
@@ -70,11 +71,21 @@ export default class BarrierTs {
     }
 
     public getStatus(): ServerStatus {
+        const playerList: PlayersSample[] = [];
+
+        if (this.config.playerlisting) {
+            for (const player of this.playerManager.players.values()) {
+                if (!player.allowsListing) continue;
+                playerList.push({ name: player.gameProfile.name, id: player.gameProfile.id.toFormatedString() });
+            }
+        }
+
         return {
             version: this.minecraftVersion,
             players: {
                 max: this.serverConfigurations.maxplayers,
                 online: this.playerManager.players.size,
+                ...(playerList.length > 0 ? { sample: playerList } : {}),
             },
             description: this.serverConfigurations.motd,
             ...(this.iconData ? { favicon: `data:image/png;base64,${this.iconData}` } : {}),

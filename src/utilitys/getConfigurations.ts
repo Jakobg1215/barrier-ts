@@ -22,6 +22,7 @@ const createConfigFile = (values: Config) => {
     formatOption('maxplayers', values.maxplayers, 'The max amount of players that can join.');
     formatOption('motd', values.motd, 'The message of the day.');
     formatOption('icon', values.icon, 'The path to the server icon. (must be 64*64 png)');
+    formatOption('playerlisting', values.playerlisting, 'Shows players in the server on the selection screen.');
     return file.end();
 };
 
@@ -39,6 +40,7 @@ export default function getConfigurations(server: BarrierTs): Promise<Config> {
             motd: 'A BarrierTs Server',
             difficulty: 2,
             icon: '',
+            playerlisting: true,
         };
 
         if (!existsSync(filePath)) createConfigFile(defaultValues);

@@ -10,4 +10,5 @@ export default interface Config {
     motd: string;
     difficulty: number;
     icon: string;
+    playerlisting: boolean;
 }

@@ -68,7 +68,7 @@ export default class Connection {
             } while (inData.getReadableBytes().buffer.length > 0);
         });
 
-        this.networking.on('end', () => {
+        this.networking.on('close', () => {
             this.server.playerManager.savePlayer(this);
             const player = this.server.playerManager.players.get(this);
             this.server.playerManager.players.delete(this);
