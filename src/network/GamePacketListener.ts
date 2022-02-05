@@ -1,10 +1,12 @@
 import { randomBytes } from 'node:crypto';
 import type BarrierTs from '../BarrierTs';
 import Chat, { ChatType } from '../types/classes/Chat';
+import { InteractionHand } from '../types/enums/InteractionHand';
 import type Player from '../world/entities/Player';
 import type Connection from './Connection';
 import type PacketListener from './PacketListener';
 import type ClientBoundPacket from './protocol/ClientBoundPacket';
+import ClientBoundAnimatePacket, { Action as SwingAction } from './protocol/game/ClientBoundAnimatePacket';
 import ClientBoundKeepAlivePacket from './protocol/game/ClientBoundKeepAlivePacket';
 import ClientBoundPlayerPositionPacket from './protocol/game/ClientBoundPlayerPositionPacket';
 import ClientBoundTeleportEntityPacket from './protocol/game/ClientBoundTeleportEntityPacket';
@@ -36,7 +38,7 @@ import type ServerBoundPlaceRecipePacket from './protocol/game/ServerBoundPlaceR
 import type ServerBoundPlayerAbilitiesPacket from './protocol/game/ServerBoundPlayerAbilitiesPacket';
 import type ServerBoundPlayerActionPacket from './protocol/game/ServerBoundPlayerActionPacket';
 import type ServerBoundPlayerCommandPacket from './protocol/game/ServerBoundPlayerCommandPacket';
-import { Action } from './protocol/game/ServerBoundPlayerCommandPacket';
+import { Action as PlayerCommandAction } from './protocol/game/ServerBoundPlayerCommandPacket';
 import type ServerBoundPlayerInputPacket from './protocol/game/ServerBoundPlayerInputPacket';
 import type ServerBoundPongPacket from './protocol/game/ServerBoundPongPacket';
 import type ServerBoundRecipeBookChangeSettingsPacket from './protocol/game/ServerBoundRecipeBookChangeSettingsPacket';
@@ -226,22 +228,22 @@ export default class GamePacketListener implements PacketListener {
 
     public handlePlayerCommand(playerCommand: ServerBoundPlayerCommandPacket): void {
         switch (playerCommand.action) {
-            case Action.PRESS_SHIFT_KEY: {
+            case PlayerCommandAction.PRESS_SHIFT_KEY: {
                 this.player.isCrouching = true;
                 break;
             }
 
-            case Action.RELEASE_SHIFT_KEY: {
+            case PlayerCommandAction.RELEASE_SHIFT_KEY: {
                 this.player.isCrouching = false;
                 break;
             }
 
-            case Action.START_SPRINTING: {
+            case PlayerCommandAction.START_SPRINTING: {
                 this.player.isSprinting = true;
                 break;
             }
 
-            case Action.STOP_SPRINTING: {
+            case PlayerCommandAction.STOP_SPRINTING: {
                 this.player.isSprinting = false;
                 break;
             }
@@ -318,8 +320,14 @@ export default class GamePacketListener implements PacketListener {
         throw new Error('Method not implemented.');
     }
 
-    public handleSwing(_swing: ServerBoundSwingPacket): void {
-        throw new Error('Method not implemented.');
+    public handleSwing(swing: ServerBoundSwingPacket): void {
+        this.server.playerManager.sendAll(
+            new ClientBoundAnimatePacket(
+                this.player.id,
+                swing.hand === InteractionHand.MAIN_HAND ? SwingAction.SWING_MAIN_HAND : SwingAction.SWING_OFF_HAND,
+            ),
+            this.player.id,
+        );
     }
 
     public handleTeleportToEntity(_teleportToEntity: ServerBoundTeleportToEntityPacket): void {
