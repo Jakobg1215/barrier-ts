@@ -2,9 +2,9 @@ import Vector3 from '../../utilitys/Vector3';
 
 export default class BlockPos extends Vector3 {
     public static fromBuffer(value: bigint): BlockPos {
-        const x = (Number(value >> 38n) << 24) >> 24;
-        const y = (Number(value & 0xfffn) << 24) >> 24;
-        const z = (Number((value >> 12n) & 0x3ffffffn) << 24) >> 24;
+        const x = (Number(value >> 38n) << 6) >> 6;
+        const y = (Number(value & 0xfffn) << 20) >> 20;
+        const z = (Number((value >> 12n) & 0x3ffffffn) << 6) >> 6;
         return new BlockPos(x, y, z);
     }
 
