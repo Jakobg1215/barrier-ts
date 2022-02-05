@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import type BarrierTs from '../BarrierTs';
 import Chat, { ChatType } from '../types/classes/Chat';
 import type Player from '../world/entities/Player';
@@ -58,6 +59,7 @@ import type ServerBoundUseItemPacket from './protocol/game/ServerBoundUseItemPac
 export default class GamePacketListener implements PacketListener {
     private keepAlive = Date.now();
     private keepAlivePending = false;
+    private teleportId = randomBytes(4);
 
     public constructor(
         public readonly server: BarrierTs,
@@ -84,11 +86,15 @@ export default class GamePacketListener implements PacketListener {
 
     public teleport(x: number, y: number, z: number, yRot: number, xRot: number): void {
         this.player.updatePos(x, y, z);
-        this.connection.send(new ClientBoundPlayerPositionPacket(x, y, z, yRot, xRot, 0, 0, false));
+        this.connection.send(
+            new ClientBoundPlayerPositionPacket(x, y, z, yRot, xRot, 0, this.teleportId.readInt32BE(), false),
+        );
     }
 
-    public handleAcceptTeleport(_acceptTeleport: ServerBoundAcceptTeleportationPacket): void {
-        throw new Error('Method not implemented.');
+    public handleAcceptTeleport(acceptTeleport: ServerBoundAcceptTeleportationPacket): void {
+        if (acceptTeleport.id !== this.teleportId.readInt32BE())
+            return this.server.console.warn('Player invalid teleport id!');
+        this.teleportId = randomBytes(4);
     }
 
     public handleBlockEntityTagQuery(_blockEntityTagQuery: ServerBoundBlockEntityTagQuery): void {
