@@ -59,30 +59,28 @@ export default class World {
     public sendWorldData(conn: Connection): void {
         conn.send(new ClientBoundSetTimePacket(this.ticks, this.time));
 
-        queueMicrotask(() => {
-            for (const [location, chunk] of this.levelChunks.entries()) {
-                const x = Number(location >> 32n);
-                const z = (Number(location & 0xffffffffn) << 24) >> 24;
-                conn.send(
-                    new ClientBoundLevelChunkWithLightPacket(
-                        x,
-                        z,
-                        objectToNbt({}),
-                        chunk.toBuffer(),
-                        [],
-                        [3n],
-                        [0n],
-                        [2n],
-                        [7n],
-                        [
-                            Array.from({ length: 2048 }).fill(0) as number[],
-                            Array.from({ length: 2048 }).fill(255) as number[],
-                        ],
-                        [],
-                        true,
-                    ),
-                );
-            }
-        });
+        for (const [location, chunk] of this.levelChunks.entries()) {
+            const x = Number(location >> 32n);
+            const z = (Number(location & 0xffffffffn) << 24) >> 24;
+            conn.send(
+                new ClientBoundLevelChunkWithLightPacket(
+                    x,
+                    z,
+                    objectToNbt({}),
+                    chunk.toBuffer(),
+                    [],
+                    [3n],
+                    [0n],
+                    [2n],
+                    [7n],
+                    [
+                        Array.from({ length: 2048 }).fill(0) as number[],
+                        Array.from({ length: 2048 }).fill(255) as number[],
+                    ],
+                    [],
+                    true,
+                ),
+            );
+        }
     }
 }
