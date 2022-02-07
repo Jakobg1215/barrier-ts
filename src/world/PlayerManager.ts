@@ -56,9 +56,9 @@ export default class PlayerManager {
         this.players.forEach(player => player.tick());
     }
 
-    public sendAll(packet: ClientBoundPacket, ...execlude: number[]) {
+    public sendAll(packet: ClientBoundPacket, ...exclude: number[]) {
         for (const [connection, player] of this.players.entries()) {
-            if (execlude.includes(player.id)) continue;
+            if (exclude.includes(player.id)) continue;
             connection.send(packet);
         }
     }
