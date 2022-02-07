@@ -16,12 +16,12 @@ export default class ServerBoundInteractPacket implements ServerBoundPacket<Game
         this.action = data.readVarInt();
         switch (this.action) {
             case ActionType.INTERACT: {
-                this.location = new Vector3(data.readFloat(), data.readFloat(), data.readFloat());
                 this.hand = data.readVarInt();
                 break;
             }
 
             case ActionType.INTERACT_AT: {
+                this.location = new Vector3(data.readFloat(), data.readFloat(), data.readFloat());
                 this.hand = data.readVarInt();
                 break;
             }
