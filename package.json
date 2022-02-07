@@ -1,4 +1,5 @@
 {
+    "name": "Barrierts",
     "devDependencies": {
         "@types/node": "^17.0.15",
         "nodemon": "^2.0.15",

@@ -13,6 +13,7 @@
         "forceConsistentCasingInFileNames": true,
         "importsNotUsedAsValues": "error",
         "isolatedModules": true,
+        "incremental": true,
         "lib": ["ES2021"],
         "module": "CommonJS",
         "newLine": "crlf",
