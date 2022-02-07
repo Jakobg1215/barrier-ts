@@ -52,10 +52,36 @@ export default class Chunk {
 
             if (bitsPerValue > 4 && bitsPerValue <= 8) {
                 data.writeUnsignedByte(bitsPerValue);
+                data.writeVarInt(uniqueBlockId.length);
+                uniqueBlockId.forEach(blockId => data.writeVarInt(blockId));
+                const dataToBits = this.data.reduce(
+                    (pre, cur) => pre + uniqueBlockId.indexOf(cur).toString(2).padStart(4, '0'),
+                    '',
+                );
+                const longDataBits = dataToBits.match(/.{1,64}/g) as string[];
+                const longData = new BigUint64Array(longDataBits.map(val => BigInt(`0b${val}`)));
+                const longBuffer = Buffer.from(longData.buffer);
+
+                if (endianness() === 'LE') longBuffer.swap64();
+
+                data.writeVarInt(longData.length);
+                data.append(longBuffer);
             }
 
             if (bitsPerValue > 8) {
                 data.writeUnsignedByte(bitsPerValue);
+                const dataToBits = this.data.reduce(
+                    (pre, cur) => pre + uniqueBlockId.indexOf(cur).toString(2).padStart(4, '0'),
+                    '',
+                );
+                const longDataBits = dataToBits.match(/.{1,64}/g) as string[];
+                const longData = new BigUint64Array(longDataBits.map(val => BigInt(`0b${val}`)));
+                const longBuffer = Buffer.from(longData.buffer);
+
+                if (endianness() === 'LE') longBuffer.swap64();
+
+                data.writeVarInt(longData.length);
+                data.append(longBuffer);
             }
         }
 
