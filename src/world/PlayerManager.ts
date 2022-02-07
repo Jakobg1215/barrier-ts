@@ -10,13 +10,14 @@ import type ClientBoundPacket from '../network/protocol/ClientBoundPacket';
 import ClientBoundAddPlayerPacket from '../network/protocol/game/ClientBoundAddPlayerPacket';
 import ClientBoundChangeDifficultyPacket from '../network/protocol/game/ClientBoundChangeDifficultyPacket';
 import ClientBoundContainerSetContentPacket from '../network/protocol/game/ClientBoundContainerSetContentPacket';
+import ClientBoundChatPacket from '../network/protocol/game/ClientBoundChatPacket';
 import ClientBoundCustomPayloadPacket from '../network/protocol/game/ClientBoundCustomPayloadPacket';
 import ClientBoundLevelChunkWithLightPacket from '../network/protocol/game/ClientBoundLevelChunkWithLightPacket';
 import ClientBoundLoginPacket from '../network/protocol/game/ClientBoundLoginPacket';
 import ClientBoundPlayerAbilitiesPacket from '../network/protocol/game/ClientBoundPlayerAbilitiesPacket';
 import ClientBoundPlayerInfoPacket, {
     Action,
-    PlayerUpdate,
+    PlayerUpdate
 } from '../network/protocol/game/ClientBoundPlayerInfoPacket';
 import ClientBoundRotateHeadPacket from '../network/protocol/game/ClientBoundRotateHeadPacket';
 import ClientBoundSetCarriedItemPacket from '../network/protocol/game/ClientBoundSetCarriedItemPacket';
@@ -27,12 +28,15 @@ import RegistryHolder from '../network/RegistryHolder';
 import Chat, { ChatType } from '../types/classes/Chat';
 import Item from '../types/classes/Item';
 import NameSpace from '../types/classes/NameSpace';
+import UUID from '../types/classes/UUID';
+import { ChatPermission } from '../types/enums/ChatPermission';
 import { Difficulty } from '../types/enums/Difficulty';
 import { GameType } from '../types/enums/GameType';
 import type SavedData from '../types/SavedData';
 import NbtReader from '../utilitys/NbtReader';
 import objectToNbt from '../utilitys/objectToNbt';
 import type Player from './entities/Player';
+
 
 export default class PlayerManager {
     public readonly connections = new Set<Connection>();
@@ -129,6 +133,15 @@ export default class PlayerManager {
 
         this.server.world.sendWorldData(gamelistener.connection);
 
+        this.sendAll(
+            new ClientBoundChatPacket(
+                new Chat(ChatType.TRANSLATE, 'multiplayer.player.joined', {
+                    with: [gamelistener.player.gameProfile.name],
+                }),
+                ChatPermission.SYSTEM,
+                UUID.EMPTY,
+            ),
+        );
         this.server.console.log(
             '%s (%s) has joined the server!',
             gamelistener.player.gameProfile.name,
