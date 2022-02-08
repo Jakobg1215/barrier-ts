@@ -15,9 +15,15 @@ export default class Chunk {
         return index ? index : 0;
     }
 
+    public removeBlock(x: number, y: number, z: number): void {
+        this.data[this.getBlockIndex(x, y, z)] = 0;
+        this.blockCount--;
+    }
+
     public setBlock(x: number, y: number, z: number, state: number): void {
+        if (this.data[this.getBlockIndex(x, y, z)] !== 0) return;
         this.data[this.getBlockIndex(x, y, z)] = state;
-        state === 0 ? this.blockCount-- : this.blockCount++;
+        this.blockCount++;
     }
 
     public toBuffer(): DataBuffer {

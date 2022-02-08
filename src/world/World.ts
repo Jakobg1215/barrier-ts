@@ -56,6 +56,14 @@ export default class World {
         chunk.setBlock(x, y, z, block);
     }
 
+    public removeBlock(x: number, y: number, z: number): void {
+        const chunkX = Math.floor(x / 16);
+        const chunkZ = Math.floor(z / 16);
+        const chunk = this.levelChunks.get((BigInt(chunkX) << 32n) | (BigInt(chunkZ) & 0xffffffffn));
+        if (!chunk) return this.server.console.error(`Can't get chunk ${chunkX}, ${chunkZ}!`);
+        chunk.removeBlock(x, y, z);
+    }
+
     public sendWorldData(conn: Connection): void {
         conn.send(new ClientBoundSetTimePacket(this.ticks, this.time));
 

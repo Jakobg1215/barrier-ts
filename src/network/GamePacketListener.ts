@@ -268,7 +268,7 @@ export default class GamePacketListener implements PacketListener {
     }
 
     public handlePlayerAction(playerAction: ServerBoundPlayerActionPacket): void {
-        this.server.world.setBlock(playerAction.pos.x, playerAction.pos.y, playerAction.pos.z, 0);
+        this.server.world.removeBlock(playerAction.pos.x, playerAction.pos.y, playerAction.pos.z);
         this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(playerAction.pos, 0), this.player.id);
         this.server.playerManager.sendAll(
             new ClientBoundLevelEventPacket(2001, playerAction.pos, 1, false),
