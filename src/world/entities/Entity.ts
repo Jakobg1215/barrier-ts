@@ -57,15 +57,15 @@ export default class Entity {
         return this.onGround;
     }
 
-    public set isOnGround(onGround: boolean) {
-        this.onGround = onGround;
-    }
-
     public get pos() {
         return this.postion;
     }
 
     public get rot() {
         return this.rotation;
+    }
+
+    public get data() {
+        return this.synchedData;
     }
 }

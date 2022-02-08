@@ -9,4 +9,14 @@ export default interface SavedData {
         y: number;
     };
     flying: boolean;
+    inventory: Slot[];
+    selectedSlot: number;
+}
+
+interface Slot {
+    slot: number;
+    present: boolean;
+    id: number;
+    count: number;
+    nbt: number[];
 }

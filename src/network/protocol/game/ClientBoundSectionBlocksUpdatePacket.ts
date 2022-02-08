@@ -14,7 +14,7 @@ export default class ClientBoundSectionBlocksUpdatePacket implements ClientBound
         packet.writeBoolean(this.suppressLightUpdates);
         packet.writeVarInt(this.positions.length);
         this.positions.forEach((pos, index) => {
-            packet.writeVarLong(BigInt(this.states[index] ?? 0 | pos));
+            packet.writeVarLong(BigInt((this.states[index] ?? 0 << 12) | pos));
         });
         return packet;
     }

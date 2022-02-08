@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import type BarrierTs from '../BarrierTs';
 import BlockPos from '../types/classes/BlockPos';
 import Chat, { ChatType } from '../types/classes/Chat';
+import Item from '../types/classes/Item';
 import { ChatPermission } from '../types/enums/ChatPermission';
 import { Direction } from '../types/enums/Direction';
 import { InteractionHand } from '../types/enums/InteractionHand';
@@ -15,6 +16,7 @@ import ClientBoundChatPacket from './protocol/game/ClientBoundChatPacket';
 import ClientBoundKeepAlivePacket from './protocol/game/ClientBoundKeepAlivePacket';
 import ClientBoundLevelEventPacket from './protocol/game/ClientBoundLevelEventPacket';
 import ClientBoundPlayerPositionPacket from './protocol/game/ClientBoundPlayerPositionPacket';
+import ClientBoundSetEquipmentPacket from './protocol/game/ClientBoundSetEquipmentPacket';
 import ClientBoundTeleportEntityPacket from './protocol/game/ClientBoundTeleportEntityPacket';
 import type ServerBoundAcceptTeleportationPacket from './protocol/game/ServerBoundAcceptTeleportationPacket';
 import type ServerBoundBlockEntityTagQuery from './protocol/game/ServerBoundBlockEntityTagQuery';
@@ -95,8 +97,19 @@ export default class GamePacketListener implements PacketListener {
     }
 
     public teleport(x: number, y: number, z: number, yRot: number, xRot: number): void {
-        this.player.updatePos(x, y, z);
-        this.send(new ClientBoundPlayerPositionPacket(x, y, z, yRot, xRot, 0, this.teleportId.readInt32BE(), false));
+        this.player.updatePostionAbs({ x, y, z, rotY: yRot, rotX: xRot, onGround: false });
+        this.send(
+            new ClientBoundPlayerPositionPacket(
+                x,
+                y,
+                z,
+                yRot,
+                xRot,
+                0,
+                this.teleportId.readInt32BE(),
+                this.player.isOnGround,
+            ),
+        );
         this.server.playerManager.sendAll(
             new ClientBoundTeleportEntityPacket(
                 this.player.id,
@@ -107,6 +120,7 @@ export default class GamePacketListener implements PacketListener {
                 Math.floor((xRot * 256) / 360),
                 true,
             ),
+            this.player.id,
         );
     }
 
@@ -156,7 +170,7 @@ export default class GamePacketListener implements PacketListener {
     }
 
     public handleContainerClose(_containerClose: ServerBoundContainerClosePacket): void {
-        throw new Error('Method not implemented.');
+        // This can probly be a event for plugins
     }
 
     public handleCustomPayload(_customPayload: ServerBoundCustomPayloadPacket): void {}
@@ -190,26 +204,35 @@ export default class GamePacketListener implements PacketListener {
     }
 
     public handleMovePlayerPos(movePlayerPos: ServerBoundMovePlayerPosPacket): void {
-        this.player.movePos(movePlayerPos.x, movePlayerPos.y, movePlayerPos.z, movePlayerPos.onGround);
+        this.player.updatePostion({
+            x: movePlayerPos.x,
+            y: movePlayerPos.y,
+            z: movePlayerPos.z,
+            onGround: movePlayerPos.onGround,
+        });
     }
 
     public handleMovePlayerPosRot(movePlayerPosRot: ServerBoundMovePlayerPosRotPacket): void {
-        this.player.moveRotate(
-            movePlayerPosRot.x,
-            movePlayerPosRot.y,
-            movePlayerPosRot.z,
-            movePlayerPosRot.yRot,
-            movePlayerPosRot.xRot,
-            movePlayerPosRot.onGround,
-        );
+        this.player.updatePostion({
+            x: movePlayerPosRot.x,
+            y: movePlayerPosRot.y,
+            z: movePlayerPosRot.z,
+            rotY: movePlayerPosRot.yRot,
+            rotX: movePlayerPosRot.xRot,
+            onGround: movePlayerPosRot.onGround,
+        });
     }
 
     public handleMovePlayerRot(movePlayerRot: ServerBoundMovePlayerRotPacket): void {
-        this.player.rotateTo(movePlayerRot.yRot, movePlayerRot.xRot, movePlayerRot.onGround);
+        this.player.updatePostion({
+            rotY: movePlayerRot.yRot,
+            rotX: movePlayerRot.xRot,
+            onGround: movePlayerRot.onGround,
+        });
     }
 
     public handleMovePlayerStatusOnly(movePlayerStatusOnly: ServerBoundMovePlayerStatusOnlyPacket): void {
-        this.player.isOnGround = movePlayerStatusOnly.onGround;
+        this.player.updatePostion({ onGround: movePlayerStatusOnly.onGround });
         this.server.playerManager.sendAll(
             new ClientBoundTeleportEntityPacket(
                 this.player.id,
@@ -319,8 +342,15 @@ export default class GamePacketListener implements PacketListener {
         throw new Error('Method not implemented.');
     }
 
-    public handleSetCarriedItem(_setCarriedItem: ServerBoundSetCarriedItemPacket): void {
-        throw new Error('Method not implemented.');
+    public handleSetCarriedItem(setCarriedItem: ServerBoundSetCarriedItemPacket): void {
+        this.player.inventory.selectedHand = setCarriedItem.slot;
+
+        const item = this.player.inventory.getSlot(36 + setCarriedItem.slot);
+
+        this.server.playerManager.sendAll(
+            new ClientBoundSetEquipmentPacket(this.player.id, [{ pos: 0, item: item ? item : Item.Empty }]),
+            this.player.id,
+        );
     }
 
     public handleSetCommandBlock(_setCommandBlock: ServerBoundSetCommandBlockPacket): void {
@@ -331,8 +361,8 @@ export default class GamePacketListener implements PacketListener {
         throw new Error('Method not implemented.');
     }
 
-    public handleSetCreativeModeSlot(_setCreativeModeSlot: ServerBoundSetCreativeModeSlotPacket): void {
-        throw new Error('Method not implemented.');
+    public handleSetCreativeModeSlot(setCreativeModeSlot: ServerBoundSetCreativeModeSlotPacket): void {
+        this.player.inventory.setSlot(setCreativeModeSlot.slotNum, setCreativeModeSlot.itemStack);
     }
 
     public handleSetJigsawBlock(_setJigsawBlock: ServerBoundSetJigsawBlockPacket): void {

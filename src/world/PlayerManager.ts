@@ -9,6 +9,7 @@ import type GamePacketListener from '../network/GamePacketListener';
 import type ClientBoundPacket from '../network/protocol/ClientBoundPacket';
 import ClientBoundAddPlayerPacket from '../network/protocol/game/ClientBoundAddPlayerPacket';
 import ClientBoundChangeDifficultyPacket from '../network/protocol/game/ClientBoundChangeDifficultyPacket';
+import ClientBoundContainerSetContentPacket from '../network/protocol/game/ClientBoundContainerSetContentPacket';
 import ClientBoundCustomPayloadPacket from '../network/protocol/game/ClientBoundCustomPayloadPacket';
 import ClientBoundLevelChunkWithLightPacket from '../network/protocol/game/ClientBoundLevelChunkWithLightPacket';
 import ClientBoundLoginPacket from '../network/protocol/game/ClientBoundLoginPacket';
@@ -17,10 +18,14 @@ import ClientBoundPlayerInfoPacket, {
     Action,
     PlayerUpdate,
 } from '../network/protocol/game/ClientBoundPlayerInfoPacket';
+import ClientBoundRotateHeadPacket from '../network/protocol/game/ClientBoundRotateHeadPacket';
 import ClientBoundSetCarriedItemPacket from '../network/protocol/game/ClientBoundSetCarriedItemPacket';
 import ClientBoundSetChunkCacheCenterPacket from '../network/protocol/game/ClientBoundSetChunkCacheCenterPacket';
+import ClientBoundSetEntityDatapacket from '../network/protocol/game/ClientBoundSetEntityDataPacket';
+import ClientBoundSetEquipmentPacket from '../network/protocol/game/ClientBoundSetEquipmentPacket';
 import RegistryHolder from '../network/RegistryHolder';
 import Chat, { ChatType } from '../types/classes/Chat';
+import Item from '../types/classes/Item';
 import NameSpace from '../types/classes/NameSpace';
 import { Difficulty } from '../types/enums/Difficulty';
 import { GameType } from '../types/enums/GameType';
@@ -59,10 +64,9 @@ export default class PlayerManager {
     }
 
     public async loginPlayer(gamelistener: GamePacketListener): Promise<void> {
-        const playerData = await this.getPlayerData(gamelistener.connection);
-        const chunkX = Math.floor(playerData.position.x / 16);
-        const chunkZ = Math.floor(playerData.position.z / 16);
-        gamelistener.player.isFlying = playerData.flying;
+        gamelistener.player.setDataFromSave(await this.getPlayerData(gamelistener.connection));
+        const chunkX = Math.floor(gamelistener.player.pos.x / 16);
+        const chunkZ = Math.floor(gamelistener.player.pos.z / 16);
 
         gamelistener.send(
             new ClientBoundLoginPacket(
@@ -98,7 +102,9 @@ export default class PlayerManager {
 
         gamelistener.send(new ClientBoundChangeDifficultyPacket(Difficulty.HARD, true));
 
-        gamelistener.send(new ClientBoundPlayerAbilitiesPacket(true, !!playerData.flying, true, true, 0.05, 0.1));
+        gamelistener.send(
+            new ClientBoundPlayerAbilitiesPacket(true, gamelistener.player.isFlying, true, true, 0.05, 0.1),
+        );
 
         gamelistener.send(new ClientBoundSetCarriedItemPacket(0));
 
@@ -149,14 +155,23 @@ export default class PlayerManager {
                 gamelistener.player.pos.x,
                 gamelistener.player.pos.y,
                 gamelistener.player.pos.z,
-                (gamelistener.player.rot.y * 256.0) / 360.0,
-                (gamelistener.player.rot.x * 256.0) / 360.0,
+                Math.floor((gamelistener.player.rot.y * 256) / 360),
+                Math.floor((gamelistener.player.rot.x * 256) / 360),
             ),
             gamelistener.player.id,
         );
 
+        gamelistener.teleport(
+            gamelistener.player.pos.x,
+            gamelistener.player.pos.y,
+            gamelistener.player.pos.z,
+            gamelistener.player.rot.y,
+            gamelistener.player.rot.x,
+        );
+
         this.players.forEach(player => {
             if (player.id === gamelistener.player.id) return;
+
             gamelistener.send(
                 new ClientBoundAddPlayerPacket(
                     player.id,
@@ -164,19 +179,58 @@ export default class PlayerManager {
                     player.pos.x,
                     player.pos.y,
                     player.pos.z,
-                    (player.rot.y * 256.0) / 360.0,
-                    (player.rot.x * 256.0) / 360.0,
+                    Math.floor((player.rot.y * 256) / 360),
+                    Math.floor((player.rot.x * 256) / 360),
                 ),
             );
+
+            gamelistener.send(new ClientBoundRotateHeadPacket(player.id, Math.floor((player.rot.y * 256) / 360)));
+
+            gamelistener.send(new ClientBoundSetEntityDatapacket(player.id, player.data.getData()));
+
+            const equipment: { pos: number; item: Item }[] = [];
+            player.inventory.getItemSlots().forEach((slot, index) => {
+                switch (index) {
+                    case 5: {
+                        if (!slot.present) return;
+                        equipment.push({ pos: 5, item: slot });
+                        break;
+                    }
+                    case 6: {
+                        if (!slot.present) return;
+                        equipment.push({ pos: 4, item: slot });
+                        break;
+                    }
+                    case 7: {
+                        if (!slot.present) return;
+                        equipment.push({ pos: 3, item: slot });
+                        break;
+                    }
+                    case 8: {
+                        if (!slot.present) return;
+                        equipment.push({ pos: 2, item: slot });
+                        break;
+                    }
+                    case 45: {
+                        if (!slot.present) return;
+                        equipment.push({ pos: 1, item: slot });
+                        break;
+                    }
+                    case player.inventory.selectedHand + 36: {
+                        if (!slot.present) return;
+                        equipment.push({ pos: 0, item: slot });
+                        break;
+                    }
+                }
+            });
+            if (equipment.length > 0) gamelistener.send(new ClientBoundSetEquipmentPacket(player.id, equipment));
         });
 
-        gamelistener.teleport(
-            playerData.position.x,
-            playerData.position.y,
-            playerData.position.z,
-            playerData.rotation.y,
-            playerData.rotation.x,
+        gamelistener.send(
+            new ClientBoundContainerSetContentPacket(0, 0, gamelistener.player.inventory.getItemSlots(), Item.Empty),
         );
+
+        gamelistener.send(new ClientBoundSetCarriedItemPacket(gamelistener.player.inventory.selectedHand));
     }
 
     private async getPlayerData(conn: Connection): Promise<SavedData> {
@@ -206,6 +260,8 @@ export default class PlayerManager {
                 y: 0,
             },
             flying: false,
+            inventory: [],
+            selectedSlot: 0,
         };
     }
 
@@ -223,6 +279,8 @@ export default class PlayerManager {
                 y: player.rot.y + 'f',
             },
             flying: player.isFlying ? '1b' : '0b',
+            inventory: player.inventory.toNBT(),
+            selectedSlot: player.inventory.selectedHand + 'b',
         };
         mkdir(join(__dirname, '../../world/players'), { recursive: true }).then(_path => {
             writeFile(

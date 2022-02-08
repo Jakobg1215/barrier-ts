@@ -25,6 +25,14 @@ export default class SynchedEntitiyData {
         return dataValues;
     }
 
+    public getData(): PacketItem[] {
+        const dataValues: PacketItem[] = [];
+        for (const [index, data] of this.dataValues.entries()) {
+            dataValues.push({ index, type: data.type, value: data.data });
+        }
+        return dataValues;
+    }
+
     public get changed() {
         return this.changedValues.size > 0;
     }
