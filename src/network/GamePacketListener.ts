@@ -139,6 +139,18 @@ export default class GamePacketListener implements PacketListener {
     }
 
     public handleChat(chat: ServerBoundChatPacket): void {
+        if (chat.message.startsWith('/')) {
+            // TODO: handle commands properly on the server then implement this
+            this.send(
+                new ClientBoundChatPacket(
+                    new Chat(ChatType.TEXT, 'TODO'),
+                    ChatPermission.SYSTEM,
+                    this.player.gameProfile.id,
+                ),
+            );
+            return;
+        }
+
         this.server.console.log('<%s> %s', this.player.gameProfile.name, chat.message);
         this.server.playerManager.sendAll(
             new ClientBoundChatPacket(

@@ -1,11 +1,14 @@
 {
+    "name": "Barrierts",
     "devDependencies": {
         "@types/node": "^17.0.15",
         "nodemon": "^2.0.15",
-        "typescript": "^4.5.5"
+        "typescript": "^4.5.5",
+        "ts-node-dev": "^1.1.8"
     },
     "scripts": {
-        "start": "node dist/index",
+        "start": "node dist/index.js",
+        "dev": "ts-node-dev --respawn src/index.ts",
         "build": "tsc"
     }
 }
