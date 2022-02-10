@@ -3,6 +3,8 @@ import type { Socket } from 'node:net';
 import { deflateSync, inflateSync } from 'node:zlib';
 import type BarrierTs from '../BarrierTs';
 import Chat, { ChatType } from '../types/classes/Chat';
+import UUID from '../types/classes/UUID';
+import { ChatPermission } from '../types/enums/ChatPermission';
 import { GameType } from '../types/enums/GameType';
 import DataBuffer from './DataBuffer';
 import GamePacketListener from './GamePacketListener';
@@ -10,6 +12,7 @@ import LoginPacketListener from './LoginPacketListener';
 import type PacketListener from './PacketListener';
 import type ClientBoundPacket from './protocol/ClientBoundPacket';
 import { ConnectionProtocol } from './protocol/ConnectionProtocol';
+import ClientBoundChatPacket from './protocol/game/ClientBoundChatPacket';
 import ClientBoundDisconnectPacket from './protocol/game/ClientBoundDisconnectPacket';
 import ClientBoundPlayerInfoPacket, { Action } from './protocol/game/ClientBoundPlayerInfoPacket';
 import ClientBoundRemoveEntitiesPacket from './protocol/game/ClientBoundRemoveEntitiesPacket';
@@ -84,6 +87,33 @@ export default class Connection {
                         displayName: new Chat(ChatType.TEXT, player.gameProfile.name),
                     },
                 ]),
+            );
+            this.server.playerManager.sendAll(
+                new ClientBoundChatPacket(
+                    new Chat(ChatType.TRANSLATE, 'multiplayer.player.joined', {
+                        color: 'yellow',
+                        with: [
+                            {
+                                text: player.gameProfile.name,
+                                insertion: player.gameProfile.name,
+                                clickEvent: {
+                                    action: 'suggest_command',
+                                    value: `/tell ${player.gameProfile.name} `,
+                                },
+                                hoverEvent: {
+                                    action: 'show_entity',
+                                    contents: {
+                                        type: 'minecraft:player',
+                                        id: player.gameProfile.id.toFormatedString(),
+                                        name: { text: player.gameProfile.name },
+                                    },
+                                },
+                            },
+                        ],
+                    }),
+                    ChatPermission.SYSTEM,
+                    UUID.EMPTY,
+                ),
             );
         });
 

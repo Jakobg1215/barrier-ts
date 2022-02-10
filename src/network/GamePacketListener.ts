@@ -154,7 +154,27 @@ export default class GamePacketListener implements PacketListener {
         this.server.console.log('<%s> %s', this.player.gameProfile.name, chat.message);
         this.server.playerManager.sendAll(
             new ClientBoundChatPacket(
-                new Chat(ChatType.TRANSLATE, 'chat.type.text', { with: [this.player.gameProfile.name, chat.message] }),
+                new Chat(ChatType.TRANSLATE, 'chat.type.text', {
+                    with: [
+                        {
+                            text: this.player.gameProfile.name,
+                            insertion: this.player.gameProfile.name,
+                            clickEvent: {
+                                action: 'suggest_command',
+                                value: `/tell ${this.player.gameProfile.name} `,
+                            },
+                            hoverEvent: {
+                                action: 'show_entity',
+                                contents: {
+                                    type: 'minecraft:player',
+                                    id: this.player.gameProfile.id.toFormatedString(),
+                                    name: { text: this.player.gameProfile.name },
+                                },
+                            },
+                        },
+                        chat.message,
+                    ],
+                }),
                 ChatPermission.CHAT,
                 this.player.gameProfile.id,
             ),
