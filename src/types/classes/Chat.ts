@@ -22,7 +22,7 @@ export enum ChatType {
 }
 
 interface ChatOptions {
-    with?: Chat | string[];
+    with?: Chat | Array<string | object>;
     color?: TextColor | string;
     bold?: boolean;
     italic?: boolean;
@@ -36,22 +36,23 @@ interface ChatOptions {
 }
 
 type TextColor =
-    | 'BLACK'
-    | 'DARK_BLUE'
-    | 'DARK_GREEN'
-    | 'DARK_AQUA'
-    | 'DARK_RED'
-    | 'DARK_PURPLE'
-    | 'GOLD'
-    | 'GRAY'
-    | 'DARK_GRAY'
-    | 'BLUE'
-    | 'GREEN'
-    | 'AQUA'
-    | 'RED'
-    | 'LIGHT_PURPLE'
-    | 'YELLOW'
-    | 'WHITE';
+    | 'black'
+    | 'dark_blue'
+    | 'dark_green'
+    | 'dark_aqua'
+    | 'dark_red'
+    | 'dark_purple'
+    | 'gold'
+    | 'gray'
+    | 'dark_gray'
+    | 'blue'
+    | 'green'
+    | 'aqua'
+    | 'red'
+    | 'light_purple'
+    | 'purple'
+    | 'yellow'
+    | 'white';
 
 interface ClickEvent {}
 
