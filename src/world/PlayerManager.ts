@@ -136,7 +136,14 @@ export default class PlayerManager {
         this.sendAll(
             new ClientBoundChatPacket(
                 new Chat(ChatType.TRANSLATE, 'multiplayer.player.joined', {
-                    with: [gamelistener.player.gameProfile.name],
+                    color: 'yellow',
+                    with: [{
+                        text: gamelistener.player.gameProfile.name,
+                        hoverEvent: {
+                            action: "show_text",
+                            value: gamelistener.player.gameProfile.id.toFormatedString(),
+                        }
+                    }]
                 }),
                 ChatPermission.SYSTEM,
                 UUID.EMPTY,
