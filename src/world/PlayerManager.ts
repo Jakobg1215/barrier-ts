@@ -295,28 +295,30 @@ export default class PlayerManager {
         };
     }
 
-    public savePlayer(conn: Connection) {
-        const player = this.players.get(conn);
-        if (!player) return;
-        const data = {
-            position: {
-                x: player.pos.x + 'd',
-                y: player.pos.y + 'd',
-                z: player.pos.z + 'd',
-            },
-            rotation: {
-                x: player.rot.x + 'f',
-                y: player.rot.y + 'f',
-            },
-            flying: player.isFlying ? '1b' : '0b',
-            inventory: player.inventory.toNBT(),
-            selectedSlot: player.inventory.selectedHand + 'b',
-        };
-        mkdir(join(__dirname, '../../world/players'), { recursive: true }).then(_path => {
-            writeFile(
-                join(__dirname, '../../world/players', player.gameProfile.id?.toString()! + '.nbt'),
-                objectToNbt(data),
-            );
+    public savePlayer(conn: Connection): Promise<void> {
+        return new Promise(resolve => {
+            const player = this.players.get(conn);
+            if (!player) return;
+            const data = {
+                position: {
+                    x: player.pos.x + 'd',
+                    y: player.pos.y + 'd',
+                    z: player.pos.z + 'd',
+                },
+                rotation: {
+                    x: player.rot.x + 'f',
+                    y: player.rot.y + 'f',
+                },
+                flying: player.isFlying ? '1b' : '0b',
+                inventory: player.inventory.toNBT(),
+                selectedSlot: player.inventory.selectedHand + 'b',
+            };
+            mkdir(join(__dirname, '../../world/players'), { recursive: true }).then(_path => {
+                writeFile(
+                    join(__dirname, '../../world/players', player.gameProfile.id?.toString()! + '.nbt'),
+                    objectToNbt(data),
+                ).then(() => resolve());
+            });
         });
     }
 }

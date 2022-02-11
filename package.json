@@ -1,14 +1,16 @@
 {
-    "name": "Barrierts",
+    "name": "barrierts",
     "devDependencies": {
-        "@types/node": "^17.0.15",
+        "@types/node": "^17.0.17",
+        "concurrently": "^7.0.0",
         "nodemon": "^2.0.15",
-        "typescript": "^4.5.5",
-        "ts-node-dev": "^1.1.8"
+        "typescript": "^4.5.5"
     },
     "scripts": {
         "start": "node dist/index.js",
-        "dev": "ts-node-dev --respawn src/index.ts",
+        "dev": "concurrently -i --default-input-target dev:watch -r npm:dev:*",
+        "dev:watch": "nodemon --signal SIGHUP dist/index",
+        "dev:build": "tsc -w",
         "build": "tsc"
     }
 }

@@ -21,7 +21,7 @@
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
             "runtimeExecutable": "npx",
-            "runtimeArgs": ["nodemon"]
+            "runtimeArgs": ["nodemon", "--signal", "SIGHUP"]
         }
     ]
 }

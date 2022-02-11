@@ -6,6 +6,7 @@ import HandshakePacketListener from './network/HandshakePacketListener';
 import Protocol from './network/Protocol';
 import type ServerStatus from './network/protocol/status/ServerStatus';
 import type { PlayersSample } from './network/protocol/status/ServerStatus';
+import Chat, { ChatType } from './types/classes/Chat';
 import type Config from './types/Config';
 import Console from './utilitys/Console';
 import getConfigurations from './utilitys/getConfigurations';
@@ -61,6 +62,17 @@ export default class BarrierTs {
         setInterval((): void => {
             this.tick();
         }, 50);
+    }
+
+    public stop(): Promise<void> {
+        return new Promise(async resolve => {
+            this.playerManager.connections.forEach(async conn => {
+                await this.playerManager.savePlayer(conn);
+                conn.disconnect(new Chat(ChatType.TRANSLATE, 'multiplayer.disconnect.server_shutdown'));
+            });
+
+            this.networking.close(() => resolve(this.console.log('Server Closed')));
+        });
     }
 
     public async reload(): Promise<void> {
