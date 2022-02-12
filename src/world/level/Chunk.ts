@@ -99,6 +99,6 @@ export default class Chunk {
     }
 
     private getBlockIndex(x: number, y: number, z: number): number {
-        return (y << 8) | (z << 4) | x;
+        return (y << 8) | (z << 4) | (x ^ 15);
     }
 }

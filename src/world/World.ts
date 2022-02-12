@@ -11,8 +11,8 @@ export default class World {
     public readonly levelChunks = new Map<bigint, ChunkColumn>();
 
     public constructor(private readonly server: BarrierTs) {
-        for (let x = -8n; x <= 8n; x++) {
-            for (let z = -8n; z <= 8n; z++) {
+        for (let x = -9n; x <= 8n; x++) {
+            for (let z = -9n; z <= 8n; z++) {
                 const chunk = new ChunkColumn(-64, 384);
                 for (let bedrockX = 0; bedrockX < 16; bedrockX++) {
                     for (let bedrockZ = 0; bedrockZ < 16; bedrockZ++) {

@@ -21,7 +21,7 @@ export default class ChunkColumn {
         const chunk = this.chunks.at((y - this.minY) >> 4);
         if (!chunk) throw new Error(`Can not get section ${(y - this.minY) >> 4}!`);
 
-        chunk.setBlock(Math.abs((x & 15) - 15), y & 15, z & 15, state);
+        chunk.setBlock(x & 15, y & 15, z & 15, state);
     }
 
     public removeBlock(x: number, y: number, z: number): void {
@@ -33,7 +33,7 @@ export default class ChunkColumn {
         const chunk = this.chunks.at((y - this.minY) >> 4);
         if (!chunk) throw new Error(`Can not get section ${(y - this.minY) >> 4}!`);
 
-        chunk.removeBlock(Math.abs((x & 15) - 15), y & 15, z & 15);
+        chunk.removeBlock(x & 15, y & 15, z & 15);
     }
 
     public toBuffer() {
