@@ -8,7 +8,7 @@ export default class ChunkColumn {
 
     public constructor(private readonly minY: number, hight: number) {
         this.maxY = hight + minY;
-        this.sections = (Math.abs(minY) + hight) >> 4;
+        this.sections = hight >> 4;
         for (let index = 0; index < this.sections; index++) this.chunks.push(Chunk.EMPTY);
     }
 
