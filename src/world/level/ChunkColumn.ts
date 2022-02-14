@@ -13,10 +13,7 @@ export default class ChunkColumn {
     }
 
     public setBlock(x: number, y: number, z: number, state: number): void {
-        if (y > this.maxY - 1 || y < this.minY)
-            throw new RangeError(
-                `Position y is out of bounds of the ChunkColumn! Number must be between ${this.minY} and ${this.maxY}`,
-            );
+        if (y > this.maxY || y < this.minY) throw new RangeError(`Y must be between ${this.minY} and ${this.maxY}!`);
 
         const chunk = this.chunks.at((y - this.minY) >> 4);
         if (!chunk) throw new Error(`Can not get section ${(y - this.minY) >> 4}!`);
@@ -25,10 +22,7 @@ export default class ChunkColumn {
     }
 
     public removeBlock(x: number, y: number, z: number): void {
-        if (y > this.maxY - 1 || y < this.minY)
-            throw new RangeError(
-                `Position y is out of bounds of the ChunkColumn! Number must be between ${this.minY} and ${this.maxY}`,
-            );
+        if (y > this.maxY || y < this.minY) throw new RangeError(`Y must be between ${this.minY} and ${this.maxY}!`);
 
         const chunk = this.chunks.at((y - this.minY) >> 4);
         if (!chunk) throw new Error(`Can not get section ${(y - this.minY) >> 4}!`);

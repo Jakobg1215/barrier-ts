@@ -6,6 +6,8 @@ import Item from '../types/classes/Item';
 import { ChatPermission } from '../types/enums/ChatPermission';
 import { Direction } from '../types/enums/Direction';
 import { InteractionHand } from '../types/enums/InteractionHand';
+import Vector2 from '../utilitys/Vector2';
+import Vector3 from '../utilitys/Vector3';
 import type Player from '../world/entities/Player';
 import type Connection from './Connection';
 import type PacketListener from './PacketListener';
@@ -15,7 +17,12 @@ import ClientBoundBlockUpdatePacket from './protocol/game/ClientBoundBlockUpdate
 import ClientBoundChatPacket from './protocol/game/ClientBoundChatPacket';
 import ClientBoundKeepAlivePacket from './protocol/game/ClientBoundKeepAlivePacket';
 import ClientBoundLevelEventPacket from './protocol/game/ClientBoundLevelEventPacket';
+import ClientBoundMoveEntityPacketPos from './protocol/game/ClientBoundMoveEntityPosPacket';
+import ClientBoundMoveEntityPacketPosRot from './protocol/game/ClientBoundMoveEntityPosRotPacket';
+import ClientBoundMoveEntityPacketRot from './protocol/game/ClientBoundMoveEntityRotPacket';
 import ClientBoundPlayerPositionPacket from './protocol/game/ClientBoundPlayerPositionPacket';
+import ClientBoundRotateHeadPacket from './protocol/game/ClientBoundRotateHeadPacket';
+import ClientBoundSetChunkCacheCenterPacket from './protocol/game/ClientBoundSetChunkCacheCenterPacket';
 import ClientBoundSetEquipmentPacket from './protocol/game/ClientBoundSetEquipmentPacket';
 import ClientBoundTeleportEntityPacket from './protocol/game/ClientBoundTeleportEntityPacket';
 import type ServerBoundAcceptTeleportationPacket from './protocol/game/ServerBoundAcceptTeleportationPacket';
@@ -72,6 +79,10 @@ export default class GamePacketListener implements PacketListener {
     private keepAlive = Date.now();
     private keepAlivePending = false;
     private teleportId = randomBytes(4);
+    private previousPosition = Vector3.ZERO;
+    private previousRotation = Vector2.ZERO;
+    private previousChunkX = 0;
+    private previousChunkZ = 0;
 
     public constructor(
         public readonly server: BarrierTs,
@@ -90,6 +101,82 @@ export default class GamePacketListener implements PacketListener {
                 this.connection.send(new ClientBoundKeepAlivePacket(BigInt(timeNow)));
             }
         }
+
+        if (
+            this.player.pos.x !== this.previousPosition.x ||
+            this.player.pos.y !== this.previousPosition.y ||
+            this.player.pos.z !== this.previousPosition.z
+        ) {
+            if (this.player.rot.x !== this.previousRotation.x || this.player.rot.y !== this.previousRotation.y) {
+                this.server.playerManager.sendAll(
+                    new ClientBoundMoveEntityPacketPosRot(
+                        this.player.id,
+                        (this.player.pos.x * 32 - this.previousPosition.x * 32) * 128,
+                        (this.player.pos.y * 32 - this.previousPosition.y * 32) * 128,
+                        (this.player.pos.z * 32 - this.previousPosition.z * 32) * 128,
+                        Math.floor((this.player.rot.y * 256) / 360),
+                        Math.floor((this.player.rot.x * 256) / 360),
+                        this.player.isOnGround,
+                    ),
+                    this.player.id,
+                );
+                this.server.playerManager.sendAll(
+                    new ClientBoundRotateHeadPacket(this.player.id, Math.floor((this.player.rot.y * 256) / 360)),
+                    this.player.id,
+                );
+                this.previousPosition = this.player.pos;
+                this.previousRotation = this.player.rot;
+            } else {
+                this.server.playerManager.sendAll(
+                    new ClientBoundMoveEntityPacketPos(
+                        this.player.id,
+                        (this.player.pos.x * 32 - this.previousPosition.x * 32) * 128,
+                        (this.player.pos.y * 32 - this.previousPosition.y * 32) * 128,
+                        (this.player.pos.z * 32 - this.previousPosition.z * 32) * 128,
+                        this.player.isOnGround,
+                    ),
+                    this.player.id,
+                );
+                this.previousPosition = this.player.pos;
+            }
+        } else if (this.player.rot.x !== this.previousRotation.x || this.player.rot.y !== this.previousRotation.y) {
+            this.server.playerManager.sendAll(
+                new ClientBoundMoveEntityPacketRot(
+                    this.player.id,
+                    Math.floor((this.player.rot.y * 256) / 360),
+                    Math.floor((this.player.rot.x * 256) / 360),
+                    this.player.isOnGround,
+                ),
+                this.player.id,
+            );
+            this.server.playerManager.sendAll(
+                new ClientBoundRotateHeadPacket(this.player.id, Math.floor((this.player.rot.y * 256) / 360)),
+                this.player.id,
+            );
+            this.previousRotation = this.player.rot;
+        }
+
+        const currentChunkX = this.player.pos.x >> 4;
+        const currentChunkZ = this.player.pos.z >> 4;
+
+        if (currentChunkX !== this.previousChunkX || currentChunkZ !== this.previousChunkZ) {
+            this.send(new ClientBoundSetChunkCacheCenterPacket(currentChunkX, currentChunkZ));
+
+            if (currentChunkX > this.previousChunkX) {
+            }
+
+            if (currentChunkX < this.previousChunkX) {
+            }
+
+            if (currentChunkZ > this.previousChunkZ) {
+            }
+
+            if (currentChunkZ < this.previousChunkZ) {
+            }
+
+            this.previousChunkX = currentChunkX;
+            this.previousChunkZ = currentChunkZ;
+        }
     }
 
     public send(packet: ClientBoundPacket): void {
@@ -97,7 +184,11 @@ export default class GamePacketListener implements PacketListener {
     }
 
     public teleport(x: number, y: number, z: number, yRot: number, xRot: number): void {
-        this.player.updatePostionAbs({ x, y, z, rotY: yRot, rotX: xRot, onGround: false });
+        this.player.updatePostion({ x, y, z, rotY: yRot, rotX: xRot, onGround: false });
+        this.previousPosition = new Vector3(x, y, z);
+        this.previousRotation = new Vector2(xRot, yRot);
+        this.previousChunkX = x >> 4;
+        this.previousChunkZ = z >> 4;
         this.send(
             new ClientBoundPlayerPositionPacket(
                 x,

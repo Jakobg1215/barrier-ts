@@ -12,7 +12,6 @@ import ClientBoundChangeDifficultyPacket from '../network/protocol/game/ClientBo
 import ClientBoundChatPacket from '../network/protocol/game/ClientBoundChatPacket';
 import ClientBoundContainerSetContentPacket from '../network/protocol/game/ClientBoundContainerSetContentPacket';
 import ClientBoundCustomPayloadPacket from '../network/protocol/game/ClientBoundCustomPayloadPacket';
-import ClientBoundLevelChunkWithLightPacket from '../network/protocol/game/ClientBoundLevelChunkWithLightPacket';
 import ClientBoundLoginPacket from '../network/protocol/game/ClientBoundLoginPacket';
 import ClientBoundPlayerAbilitiesPacket from '../network/protocol/game/ClientBoundPlayerAbilitiesPacket';
 import ClientBoundPlayerInfoPacket, {
@@ -68,8 +67,8 @@ export default class PlayerManager {
 
     public async loginPlayer(gamelistener: GamePacketListener): Promise<void> {
         gamelistener.player.setDataFromSave(await this.getPlayerData(gamelistener.connection));
-        const chunkX = Math.floor(gamelistener.player.pos.x / 16);
-        const chunkZ = Math.floor(gamelistener.player.pos.z / 16);
+        const chunkX = gamelistener.player.pos.x >> 4;
+        const chunkZ = gamelistener.player.pos.z >> 4;
 
         gamelistener.send(
             new ClientBoundLoginPacket(
@@ -113,24 +112,7 @@ export default class PlayerManager {
 
         gamelistener.send(new ClientBoundSetChunkCacheCenterPacket(chunkX, chunkZ));
 
-        gamelistener.send(
-            new ClientBoundLevelChunkWithLightPacket(
-                chunkX,
-                chunkZ,
-                objectToNbt({}),
-                this.server.world.levelChunks.get((BigInt(chunkX) << 32n) | (BigInt(chunkZ) & 0xffffffffn))!.toBuffer(),
-                [],
-                [3n],
-                [0n],
-                [2n],
-                [7n],
-                [Array.from({ length: 2048 }).fill(0) as number[], Array.from({ length: 2048 }).fill(255) as number[]],
-                [],
-                true,
-            ),
-        );
-
-        this.server.world.sendWorldData(gamelistener.connection);
+        this.server.world.sendWorldData(gamelistener);
 
         this.sendAll(
             new ClientBoundChatPacket(
