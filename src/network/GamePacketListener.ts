@@ -6,6 +6,7 @@ import Item from '../types/classes/Item';
 import { ChatPermission } from '../types/enums/ChatPermission';
 import { Direction } from '../types/enums/Direction';
 import { InteractionHand } from '../types/enums/InteractionHand';
+import objectToNbt from '../utilitys/objectToNbt';
 import Vector2 from '../utilitys/Vector2';
 import Vector3 from '../utilitys/Vector3';
 import type Player from '../world/entities/Player';
@@ -15,7 +16,9 @@ import type ClientBoundPacket from './protocol/ClientBoundPacket';
 import ClientBoundAnimatePacket, { Action as SwingAction } from './protocol/game/ClientBoundAnimatePacket';
 import ClientBoundBlockUpdatePacket from './protocol/game/ClientBoundBlockUpdatePacket';
 import ClientBoundChatPacket from './protocol/game/ClientBoundChatPacket';
+import ClientBoundForgetLevelChunkPacket from './protocol/game/ClientBoundForgetLevelChunkPacket';
 import ClientBoundKeepAlivePacket from './protocol/game/ClientBoundKeepAlivePacket';
+import ClientBoundLevelChunkWithLightPacket from './protocol/game/ClientBoundLevelChunkWithLightPacket';
 import ClientBoundLevelEventPacket from './protocol/game/ClientBoundLevelEventPacket';
 import ClientBoundMoveEntityPacketPos from './protocol/game/ClientBoundMoveEntityPosPacket';
 import ClientBoundMoveEntityPacketPosRot from './protocol/game/ClientBoundMoveEntityPosRotPacket';
@@ -163,15 +166,111 @@ export default class GamePacketListener implements PacketListener {
             this.send(new ClientBoundSetChunkCacheCenterPacket(currentChunkX, currentChunkZ));
 
             if (currentChunkX > this.previousChunkX) {
+                const x = currentChunkX + 9;
+                for (let z = -9 + currentChunkZ; z <= 9 + currentChunkZ; z++) {
+                    const chunk = this.server.world.getChunk(x, z);
+                    this.send(new ClientBoundForgetLevelChunkPacket(x, z));
+                    this.send(
+                        new ClientBoundLevelChunkWithLightPacket(
+                            x,
+                            z,
+                            objectToNbt({}),
+                            chunk.toBuffer(),
+                            [],
+                            [3n],
+                            [0n],
+                            [2n],
+                            [7n],
+                            [
+                                Array.from({ length: 2048 }).fill(0) as number[],
+                                Array.from({ length: 2048 }).fill(255) as number[],
+                            ],
+                            [],
+                            true,
+                        ),
+                    );
+                }
             }
 
             if (currentChunkX < this.previousChunkX) {
+                const x = currentChunkX - 9;
+                for (let z = -9 + currentChunkZ; z <= 9 + currentChunkZ; z++) {
+                    const chunk = this.server.world.getChunk(x, z);
+                    this.send(new ClientBoundForgetLevelChunkPacket(x, z));
+                    this.send(
+                        new ClientBoundLevelChunkWithLightPacket(
+                            x,
+                            z,
+                            objectToNbt({}),
+                            chunk.toBuffer(),
+                            [],
+                            [3n],
+                            [0n],
+                            [2n],
+                            [7n],
+                            [
+                                Array.from({ length: 2048 }).fill(0) as number[],
+                                Array.from({ length: 2048 }).fill(255) as number[],
+                            ],
+                            [],
+                            true,
+                        ),
+                    );
+                }
             }
 
             if (currentChunkZ > this.previousChunkZ) {
+                const z = currentChunkZ + 9;
+                for (let x = -9 + currentChunkX; x <= 9 + currentChunkX; x++) {
+                    const chunk = this.server.world.getChunk(x, z);
+                    this.send(new ClientBoundForgetLevelChunkPacket(x, z));
+                    this.send(
+                        new ClientBoundLevelChunkWithLightPacket(
+                            x,
+                            z,
+                            objectToNbt({}),
+                            chunk.toBuffer(),
+                            [],
+                            [3n],
+                            [0n],
+                            [2n],
+                            [7n],
+                            [
+                                Array.from({ length: 2048 }).fill(0) as number[],
+                                Array.from({ length: 2048 }).fill(255) as number[],
+                            ],
+                            [],
+                            true,
+                        ),
+                    );
+                }
             }
 
             if (currentChunkZ < this.previousChunkZ) {
+                const z = currentChunkZ - 9;
+                for (let x = -9 + currentChunkX; x <= 9 + currentChunkX; x++) {
+                    const chunk = this.server.world.getChunk(x, z);
+                    this.send(new ClientBoundForgetLevelChunkPacket(x, z));
+                    this.send(
+                        new ClientBoundLevelChunkWithLightPacket(
+                            x,
+                            z,
+                            objectToNbt({}),
+                            chunk.toBuffer(),
+                            [],
+                            [3n],
+                            [0n],
+                            [2n],
+                            [7n],
+                            [
+                                Array.from({ length: 2048 }).fill(0) as number[],
+                                Array.from({ length: 2048 }).fill(255) as number[],
+                            ],
+                            [],
+                            true,
+                        ),
+                    );
+                }
             }
 
             this.previousChunkX = currentChunkX;

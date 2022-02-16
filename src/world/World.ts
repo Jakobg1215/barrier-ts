@@ -77,9 +77,6 @@ export default class World {
 
         for (let x = -9 + chunkX; x <= 9 + chunkX; x++) {
             for (let z = -9 + chunkZ; z <= 9 + chunkZ; z++) {
-                if (!(Math.floor((x - chunkX) ** 2 / 15) * 15 + Math.floor((z - chunkZ) ** 2 / 15) * 15 <= 9 ** 2))
-                    continue;
-
                 const chunk = this.getChunk(x, z);
                 player.send(
                     new ClientBoundLevelChunkWithLightPacket(
