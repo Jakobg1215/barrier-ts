@@ -90,7 +90,7 @@ export default class Connection {
             );
             this.server.playerManager.sendAll(
                 new ClientBoundChatPacket(
-                    new Chat(ChatType.TRANSLATE, 'multiplayer.player.joined', {
+                    new Chat(ChatType.TRANSLATE, 'multiplayer.player.left', {
                         color: 'yellow',
                         with: [
                             {
