@@ -2,7 +2,7 @@ export default {
     piglin_safe: '0b',
     natural: '1b',
     ambient_light: '0f',
-    infiniburn: 'minecraft:infiniburn_overworld',
+    infiniburn: '#minecraft:infiniburn_overworld',
     respawn_anchor_works: '0b',
     has_skylight: '1b',
     bed_works: '1b',

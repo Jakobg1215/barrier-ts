@@ -12,7 +12,7 @@ export default class ClientBoundUpdateMobEffectPacket implements ClientBoundPack
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeVarInt(this.entityId);
-        packet.writeByte(this.effectId);
+        packet.writeVarInt(this.effectId);
         packet.writeByte(this.effectAmplifier);
         packet.writeVarInt(this.effectDurationTicks);
         packet.writeByte(this.flags);

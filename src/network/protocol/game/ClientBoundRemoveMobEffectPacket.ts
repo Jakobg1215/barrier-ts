@@ -7,7 +7,7 @@ export default class ClientBoundRemoveMobEffectPacket implements ClientBoundPack
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeVarInt(this.entityId);
-        packet.writeUnsignedByte(this.effect);
+        packet.writeVarInt(this.effect);
         return packet;
     }
 }
