@@ -65,6 +65,14 @@ export default class PlayerManager {
         }
     }
 
+    public getPlayerById(id: number): Player | null {
+        for (const player of this.players.values()) {
+            if (player.id === id) return player;
+            // Should do a binary serch here
+        }
+        return null;
+    }
+
     public async loginPlayer(gamelistener: GamePacketListener): Promise<void> {
         gamelistener.player.setDataFromSave(await this.getPlayerData(gamelistener.connection));
         const chunkX = gamelistener.player.pos.x >> 4;

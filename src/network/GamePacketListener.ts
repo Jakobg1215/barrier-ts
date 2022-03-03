@@ -3,19 +3,24 @@ import type BarrierTs from '../BarrierTs';
 import BlockPos from '../types/classes/BlockPos';
 import Chat, { ChatType } from '../types/classes/Chat';
 import Item from '../types/classes/Item';
+import NameSpace from '../types/classes/NameSpace';
 import { ChatPermission } from '../types/enums/ChatPermission';
 import { Direction } from '../types/enums/Direction';
+import { GameType } from '../types/enums/GameType';
 import { InteractionHand } from '../types/enums/InteractionHand';
 import objectToNbt from '../utilitys/objectToNbt';
 import Vector2 from '../utilitys/Vector2';
 import Vector3 from '../utilitys/Vector3';
 import type Player from '../world/entities/Player';
 import type Connection from './Connection';
+import DimensionType from './DimensionType';
 import type PacketListener from './PacketListener';
 import type ClientBoundPacket from './protocol/ClientBoundPacket';
+import ClientBoundAddPlayerPacket from './protocol/game/ClientBoundAddPlayerPacket';
 import ClientBoundAnimatePacket, { Action as SwingAction } from './protocol/game/ClientBoundAnimatePacket';
 import ClientBoundBlockUpdatePacket from './protocol/game/ClientBoundBlockUpdatePacket';
 import ClientBoundChatPacket from './protocol/game/ClientBoundChatPacket';
+import ClientBoundEntityEventPacket from './protocol/game/ClientBoundEntityEventPacket';
 import ClientBoundForgetLevelChunkPacket from './protocol/game/ClientBoundForgetLevelChunkPacket';
 import ClientBoundKeepAlivePacket from './protocol/game/ClientBoundKeepAlivePacket';
 import ClientBoundLevelChunkWithLightPacket from './protocol/game/ClientBoundLevelChunkWithLightPacket';
@@ -24,15 +29,20 @@ import ClientBoundMoveEntityPacketPos from './protocol/game/ClientBoundMoveEntit
 import ClientBoundMoveEntityPacketPosRot from './protocol/game/ClientBoundMoveEntityPosRotPacket';
 import ClientBoundMoveEntityPacketRot from './protocol/game/ClientBoundMoveEntityRotPacket';
 import ClientBoundPlayerPositionPacket from './protocol/game/ClientBoundPlayerPositionPacket';
+import ClientBoundRemoveEntitiesPacket from './protocol/game/ClientBoundRemoveEntitiesPacket';
+import ClientBoundRespawnPacket from './protocol/game/ClientBoundRespawnPacket';
 import ClientBoundRotateHeadPacket from './protocol/game/ClientBoundRotateHeadPacket';
 import ClientBoundSetChunkCacheCenterPacket from './protocol/game/ClientBoundSetChunkCacheCenterPacket';
 import ClientBoundSetEquipmentPacket from './protocol/game/ClientBoundSetEquipmentPacket';
+import ClientBoundSetHealthPacket from './protocol/game/ClientBoundSetHealthPacket';
+import ClientBoundSoundEntityPacket from './protocol/game/ClientBoundSoundEntityPacket';
 import ClientBoundTeleportEntityPacket from './protocol/game/ClientBoundTeleportEntityPacket';
 import type ServerBoundAcceptTeleportationPacket from './protocol/game/ServerBoundAcceptTeleportationPacket';
 import type ServerBoundBlockEntityTagQuery from './protocol/game/ServerBoundBlockEntityTagQuery';
 import type ServerBoundChangeDifficultyPacket from './protocol/game/ServerBoundChangeDifficultyPacket';
 import type ServerBoundChatPacket from './protocol/game/ServerBoundChatPacket';
 import type ServerBoundClientCommandPacket from './protocol/game/ServerBoundClientCommandPacket';
+import { Action } from './protocol/game/ServerBoundClientCommandPacket';
 import type ServerBoundClientInformationPacket from './protocol/game/ServerBoundClientInformationPacket';
 import type ServerBoundCommandSuggestionPacket from './protocol/game/ServerBoundCommandSuggestionPacket';
 import type ServerBoundContainerButtonClickPacket from './protocol/game/ServerBoundContainerButtonClickPacket';
@@ -42,6 +52,7 @@ import type ServerBoundCustomPayloadPacket from './protocol/game/ServerBoundCust
 import type ServerBoundEditBookPacket from './protocol/game/ServerBoundEditBookPacket';
 import type ServerBoundEntityTagQuery from './protocol/game/ServerBoundEntityTagQuery';
 import type ServerBoundInteractPacket from './protocol/game/ServerBoundInteractPacket';
+import { ActionType } from './protocol/game/ServerBoundInteractPacket';
 import type ServerBoundJigsawGeneratePacket from './protocol/game/ServerBoundJigsawGeneratePacket';
 import type ServerBoundKeepAlivePacket from './protocol/game/ServerBoundKeepAlivePacket';
 import type ServerBoundLockDifficultyPacket from './protocol/game/ServerBoundLockDifficultyPacket';
@@ -86,6 +97,7 @@ export default class GamePacketListener implements PacketListener {
     private previousRotation = Vector2.ZERO;
     private previousChunkX = 0;
     private previousChunkZ = 0;
+    private previousHealth = 20;
 
     public constructor(
         public readonly server: BarrierTs,
@@ -276,6 +288,17 @@ export default class GamePacketListener implements PacketListener {
             this.previousChunkX = currentChunkX;
             this.previousChunkZ = currentChunkZ;
         }
+
+        if (this.previousHealth !== this.player.health) {
+            if (this.player.health < this.previousHealth) {
+                // This will not run if healh increases
+                this.server.playerManager.sendAll(new ClientBoundEntityEventPacket(this.player.id, 2), this.player.id);
+                this.server.playerManager.sendAll(new ClientBoundSoundEntityPacket(802, 7, this.player.id, 1, 1));
+                this.server.playerManager.sendAll(new ClientBoundSoundEntityPacket(812, 7, this.player.id, 1, 1));
+                this.send(new ClientBoundSetHealthPacket(this.player.health, 20, 5));
+            }
+            this.previousHealth = this.player.health;
+        }
     }
 
     public send(packet: ClientBoundPacket): void {
@@ -371,8 +394,45 @@ export default class GamePacketListener implements PacketListener {
         );
     }
 
-    public handleClientCommand(_clientCommand: ServerBoundClientCommandPacket): void {
-        throw new Error('Method not implemented.');
+    public handleClientCommand(clientCommand: ServerBoundClientCommandPacket): void {
+        switch (clientCommand.action) {
+            case Action.PERFORM_RESPAWN: {
+                this.player.health = 20;
+
+                this.server.playerManager.sendAll(
+                    new ClientBoundRemoveEntitiesPacket([this.player.id]),
+                    this.player.id,
+                );
+
+                this.server.playerManager.sendAll(
+                    new ClientBoundAddPlayerPacket(
+                        this.player.id,
+                        this.player.gameProfile.id,
+                        this.player.pos.x,
+                        this.player.pos.y,
+                        this.player.pos.z,
+                        Math.floor((this.player.rot.y * 256) / 360),
+                        Math.floor((this.player.rot.x * 256) / 360),
+                    ),
+                    this.player.id,
+                );
+
+                this.send(
+                    new ClientBoundRespawnPacket(
+                        objectToNbt(DimensionType),
+                        new NameSpace('minecraft', 'overworld'),
+                        0n,
+                        GameType.SURVIVAL,
+                        GameType.SURVIVAL,
+                        false,
+                        true,
+                        true,
+                    ),
+                );
+
+                this.teleport(0, -60, 0, 0, 0);
+            }
+        }
     }
 
     public handleClientInformation(clientInformation: ServerBoundClientInformationPacket): void {
@@ -405,8 +465,15 @@ export default class GamePacketListener implements PacketListener {
         throw new Error('Method not implemented.');
     }
 
-    public handleInteract(_interact: ServerBoundInteractPacket): void {
-        throw new Error('Method not implemented.');
+    public handleInteract(interact: ServerBoundInteractPacket): void {
+        switch (interact.action) {
+            case ActionType.ATTACK: {
+                const player = this.server.playerManager.getPlayerById(interact.entityId);
+                if (!player) return;
+                if (player.isDead) return;
+                player.damage(1);
+            }
+        }
     }
 
     public handleJigsawGenerate(_jigsawGenerate: ServerBoundJigsawGeneratePacket): void {
