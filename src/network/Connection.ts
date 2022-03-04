@@ -30,7 +30,7 @@ export default class Connection extends ServerComponent {
     public constructor(private readonly networking: Socket, private readonly server: BarrierTs) {
         super();
 
-        this.networking.on('data', (data): void => {
+        this.networking.on('data', (data: Uint8Array): void => {
             const inData = new DataBuffer(this.decryption ? this.decryption.update(data) : data);
             if (this.compression) {
                 do {
