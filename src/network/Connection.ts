@@ -1,8 +1,10 @@
+import type { Buffer } from 'node:buffer';
 import type { Cipher, Decipher } from 'node:crypto';
 import type { Socket } from 'node:net';
 import { deflateSync, inflateSync } from 'node:zlib';
 import type BarrierTs from '../BarrierTs';
 import Chat, { ChatType } from '../types/classes/Chat';
+import { ServerComponent } from '../types/classes/ServerComponent';
 import UUID from '../types/classes/UUID';
 import { ChatPermission } from '../types/enums/ChatPermission';
 import { GameType } from '../types/enums/GameType';
@@ -18,7 +20,6 @@ import ClientBoundPlayerInfoPacket, { Action } from './protocol/game/ClientBound
 import ClientBoundRemoveEntitiesPacket from './protocol/game/ClientBoundRemoveEntitiesPacket';
 import ClientBoundLoginCompressionPacket from './protocol/login/ClientBoundLoginCompressionPacket';
 import ClientBoundLoginDisconnectPacket from './protocol/login/ClientBoundLoginDisconnectPacket';
-import { ServerComponent } from '../types/classes/ServerComponent';
 
 export default class Connection extends ServerComponent {
     private encryption: Cipher | null = null;
@@ -30,7 +31,7 @@ export default class Connection extends ServerComponent {
     public constructor(private readonly networking: Socket, private readonly server: BarrierTs) {
         super();
 
-        this.networking.on('data', (data: Uint8Array): void => {
+        this.networking.on('data', (data: Buffer): void => {
             const inData = new DataBuffer(this.decryption ? this.decryption.update(data) : data);
             if (this.compression) {
                 do {
