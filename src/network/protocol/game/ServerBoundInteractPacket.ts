@@ -1,5 +1,5 @@
 import type { InteractionHand } from '../../../types/enums/InteractionHand';
-import Vector3 from '../../../utilitys/Vector3';
+import Vector3 from '../../../utilities/Vector3';
 import type DataBuffer from '../../DataBuffer';
 import type GamePacketListener from '../../GamePacketListener';
 import type ServerBoundPacket from '../ServerBoundPacket';

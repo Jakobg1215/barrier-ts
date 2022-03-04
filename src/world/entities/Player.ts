@@ -7,8 +7,8 @@ import Item from '../../types/classes/Item';
 import { ChatVisiblity } from '../../types/enums/ChatVisiblity';
 import { HumanoidArm } from '../../types/enums/HumanoidArm';
 import type SavedData from '../../types/SavedData';
-import Vector2 from '../../utilitys/Vector2';
-import Vector3 from '../../utilitys/Vector3';
+import Vector2 from '../../utilities/Vector2';
+import Vector3 from '../../utilities/Vector3';
 import PlayerInventory from '../contaners/PlayerInventory';
 import LivingEntity from './LivingEntity';
 

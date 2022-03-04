@@ -1,30 +1,25 @@
 import { randomBytes } from 'node:crypto';
 import type BarrierTs from '../BarrierTs';
-import BlockPos from '../types/classes/BlockPos';
 import Chat, { ChatType } from '../types/classes/Chat';
 import Item from '../types/classes/Item';
 import NameSpace from '../types/classes/NameSpace';
 import { ChatPermission } from '../types/enums/ChatPermission';
-import { Direction } from '../types/enums/Direction';
 import { GameType } from '../types/enums/GameType';
 import { InteractionHand } from '../types/enums/InteractionHand';
-import objectToNbt from '../utilitys/objectToNbt';
-import Vector2 from '../utilitys/Vector2';
-import Vector3 from '../utilitys/Vector3';
+import objectToNbt from '../utilities/objectToNbt';
+import Vector2 from '../utilities/Vector2';
+import Vector3 from '../utilities/Vector3';
 import type Player from '../world/entities/Player';
+import ChunkLoader from '../world/level/ChunkLoader';
 import type Connection from './Connection';
 import DimensionType from './DimensionType';
 import type PacketListener from './PacketListener';
 import type ClientBoundPacket from './protocol/ClientBoundPacket';
 import ClientBoundAddPlayerPacket from './protocol/game/ClientBoundAddPlayerPacket';
 import ClientBoundAnimatePacket, { Action as SwingAction } from './protocol/game/ClientBoundAnimatePacket';
-import ClientBoundBlockUpdatePacket from './protocol/game/ClientBoundBlockUpdatePacket';
 import ClientBoundChatPacket from './protocol/game/ClientBoundChatPacket';
 import ClientBoundEntityEventPacket from './protocol/game/ClientBoundEntityEventPacket';
-import ClientBoundForgetLevelChunkPacket from './protocol/game/ClientBoundForgetLevelChunkPacket';
 import ClientBoundKeepAlivePacket from './protocol/game/ClientBoundKeepAlivePacket';
-import ClientBoundLevelChunkWithLightPacket from './protocol/game/ClientBoundLevelChunkWithLightPacket';
-import ClientBoundLevelEventPacket from './protocol/game/ClientBoundLevelEventPacket';
 import ClientBoundMoveEntityPacketPos from './protocol/game/ClientBoundMoveEntityPosPacket';
 import ClientBoundMoveEntityPacketPosRot from './protocol/game/ClientBoundMoveEntityPosRotPacket';
 import ClientBoundMoveEntityPacketRot from './protocol/game/ClientBoundMoveEntityRotPacket';
@@ -32,7 +27,6 @@ import ClientBoundPlayerPositionPacket from './protocol/game/ClientBoundPlayerPo
 import ClientBoundRemoveEntitiesPacket from './protocol/game/ClientBoundRemoveEntitiesPacket';
 import ClientBoundRespawnPacket from './protocol/game/ClientBoundRespawnPacket';
 import ClientBoundRotateHeadPacket from './protocol/game/ClientBoundRotateHeadPacket';
-import ClientBoundSetChunkCacheCenterPacket from './protocol/game/ClientBoundSetChunkCacheCenterPacket';
 import ClientBoundSetEquipmentPacket from './protocol/game/ClientBoundSetEquipmentPacket';
 import ClientBoundSetHealthPacket from './protocol/game/ClientBoundSetHealthPacket';
 import ClientBoundSoundEntityPacket from './protocol/game/ClientBoundSoundEntityPacket';
@@ -98,6 +92,13 @@ export default class GamePacketListener implements PacketListener {
     private previousChunkX = 0;
     private previousChunkZ = 0;
     private previousHealth = 20;
+    public readonly chunkLoader = new ChunkLoader(
+        this.connection,
+        this.server.world.defaultLevel,
+        this.player.pos.x >> 4,
+        this.player.pos.z >> 4,
+        8,
+    );
 
     public constructor(
         public readonly server: BarrierTs,
@@ -175,115 +176,7 @@ export default class GamePacketListener implements PacketListener {
         const currentChunkZ = this.player.pos.z >> 4;
 
         if (currentChunkX !== this.previousChunkX || currentChunkZ !== this.previousChunkZ) {
-            this.send(new ClientBoundSetChunkCacheCenterPacket(currentChunkX, currentChunkZ));
-
-            if (currentChunkX > this.previousChunkX) {
-                const x = currentChunkX + 9;
-                for (let z = -9 + currentChunkZ; z <= 9 + currentChunkZ; z++) {
-                    const chunk = this.server.world.getChunk(x, z);
-                    this.send(new ClientBoundForgetLevelChunkPacket(x, z));
-                    this.send(
-                        new ClientBoundLevelChunkWithLightPacket(
-                            x,
-                            z,
-                            objectToNbt({}),
-                            chunk.toBuffer(),
-                            [],
-                            [3n],
-                            [0n],
-                            [2n],
-                            [7n],
-                            [
-                                Array.from({ length: 2048 }).fill(0) as number[],
-                                Array.from({ length: 2048 }).fill(255) as number[],
-                            ],
-                            [],
-                            true,
-                        ),
-                    );
-                }
-            }
-
-            if (currentChunkX < this.previousChunkX) {
-                const x = currentChunkX - 9;
-                for (let z = -9 + currentChunkZ; z <= 9 + currentChunkZ; z++) {
-                    const chunk = this.server.world.getChunk(x, z);
-                    this.send(new ClientBoundForgetLevelChunkPacket(x, z));
-                    this.send(
-                        new ClientBoundLevelChunkWithLightPacket(
-                            x,
-                            z,
-                            objectToNbt({}),
-                            chunk.toBuffer(),
-                            [],
-                            [3n],
-                            [0n],
-                            [2n],
-                            [7n],
-                            [
-                                Array.from({ length: 2048 }).fill(0) as number[],
-                                Array.from({ length: 2048 }).fill(255) as number[],
-                            ],
-                            [],
-                            true,
-                        ),
-                    );
-                }
-            }
-
-            if (currentChunkZ > this.previousChunkZ) {
-                const z = currentChunkZ + 9;
-                for (let x = -9 + currentChunkX; x <= 9 + currentChunkX; x++) {
-                    const chunk = this.server.world.getChunk(x, z);
-                    this.send(new ClientBoundForgetLevelChunkPacket(x, z));
-                    this.send(
-                        new ClientBoundLevelChunkWithLightPacket(
-                            x,
-                            z,
-                            objectToNbt({}),
-                            chunk.toBuffer(),
-                            [],
-                            [3n],
-                            [0n],
-                            [2n],
-                            [7n],
-                            [
-                                Array.from({ length: 2048 }).fill(0) as number[],
-                                Array.from({ length: 2048 }).fill(255) as number[],
-                            ],
-                            [],
-                            true,
-                        ),
-                    );
-                }
-            }
-
-            if (currentChunkZ < this.previousChunkZ) {
-                const z = currentChunkZ - 9;
-                for (let x = -9 + currentChunkX; x <= 9 + currentChunkX; x++) {
-                    const chunk = this.server.world.getChunk(x, z);
-                    this.send(new ClientBoundForgetLevelChunkPacket(x, z));
-                    this.send(
-                        new ClientBoundLevelChunkWithLightPacket(
-                            x,
-                            z,
-                            objectToNbt({}),
-                            chunk.toBuffer(),
-                            [],
-                            [3n],
-                            [0n],
-                            [2n],
-                            [7n],
-                            [
-                                Array.from({ length: 2048 }).fill(0) as number[],
-                                Array.from({ length: 2048 }).fill(255) as number[],
-                            ],
-                            [],
-                            true,
-                        ),
-                    );
-                }
-            }
+            this.chunkLoader.setChunkPosition(currentChunkX, currentChunkZ);
 
             this.previousChunkX = currentChunkX;
             this.previousChunkZ = currentChunkZ;
@@ -556,13 +449,8 @@ export default class GamePacketListener implements PacketListener {
         this.player.isFlying = playerAbilities.isFlying;
     }
 
-    public handlePlayerAction(playerAction: ServerBoundPlayerActionPacket): void {
-        this.server.world.removeBlock(playerAction.pos.x, playerAction.pos.y, playerAction.pos.z);
-        this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(playerAction.pos, 0), this.player.id);
-        this.server.playerManager.sendAll(
-            new ClientBoundLevelEventPacket(2001, playerAction.pos, 1, false),
-            this.player.id,
-        );
+    public handlePlayerAction(_playerAction: ServerBoundPlayerActionPacket): void {
+        throw new Error('Method not implemented.');
     }
 
     public handlePlayerCommand(playerCommand: ServerBoundPlayerCommandPacket): void {
@@ -684,49 +572,7 @@ export default class GamePacketListener implements PacketListener {
         throw new Error('Method not implemented.');
     }
 
-    public handleUseItemOn(useItemOn: ServerBoundUseItemOnPacket): void {
-        switch (useItemOn.direction) {
-            case Direction.UP: {
-                const newBlock = new BlockPos(useItemOn.blockPos.x, useItemOn.blockPos.y + 1, useItemOn.blockPos.z);
-                this.server.world.setBlock(newBlock.x, newBlock.y, newBlock.z, 1);
-                this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(newBlock, 1));
-                break;
-            }
-
-            case Direction.DOWN: {
-                const newBlock = new BlockPos(useItemOn.blockPos.x, useItemOn.blockPos.y - 1, useItemOn.blockPos.z);
-                this.server.world.setBlock(newBlock.x, newBlock.y, newBlock.z, 1);
-                this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(newBlock, 1));
-                break;
-            }
-
-            case Direction.NORTH: {
-                const newBlock = new BlockPos(useItemOn.blockPos.x, useItemOn.blockPos.y, useItemOn.blockPos.z - 1);
-                this.server.world.setBlock(newBlock.x, newBlock.y, newBlock.z, 1);
-                this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(newBlock, 1));
-                break;
-            }
-
-            case Direction.SOUTH: {
-                const newBlock = new BlockPos(useItemOn.blockPos.x, useItemOn.blockPos.y, useItemOn.blockPos.z + 1);
-                this.server.world.setBlock(newBlock.x, newBlock.y, newBlock.z, 1);
-                this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(newBlock, 1));
-                break;
-            }
-
-            case Direction.EAST: {
-                const newBlock = new BlockPos(useItemOn.blockPos.x + 1, useItemOn.blockPos.y, useItemOn.blockPos.z);
-                this.server.world.setBlock(newBlock.x, newBlock.y, newBlock.z, 1);
-                this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(newBlock, 1));
-                break;
-            }
-
-            case Direction.WEST: {
-                const newBlock = new BlockPos(useItemOn.blockPos.x - 1, useItemOn.blockPos.y, useItemOn.blockPos.z);
-                this.server.world.setBlock(newBlock.x, newBlock.y, newBlock.z, 1);
-                this.server.playerManager.sendAll(new ClientBoundBlockUpdatePacket(newBlock, 1));
-                break;
-            }
-        }
+    public handleUseItemOn(_useItemOn: ServerBoundUseItemOnPacket): void {
+        throw new Error('Method not implemented.');
     }
 }

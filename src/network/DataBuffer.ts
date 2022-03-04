@@ -4,7 +4,7 @@ import type Chat from '../types/classes/Chat';
 import Item from '../types/classes/Item';
 import NameSpace from '../types/classes/NameSpace';
 import UUID from '../types/classes/UUID';
-import NbtReader from '../utilitys/NbtReader';
+import NbtReader from '../utilities/NbtReader';
 
 export default class DataBuffer {
     private bytes: Buffer;

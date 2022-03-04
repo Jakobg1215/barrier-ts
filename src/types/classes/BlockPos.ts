@@ -1,4 +1,4 @@
-import Vector3 from '../../utilitys/Vector3';
+import Vector3 from '../../utilities/Vector3';
 
 export default class BlockPos extends Vector3 {
     public static fromBuffer(value: bigint): BlockPos {

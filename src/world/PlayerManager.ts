@@ -31,8 +31,8 @@ import { ChatPermission } from '../types/enums/ChatPermission';
 import { Difficulty } from '../types/enums/Difficulty';
 import { GameType } from '../types/enums/GameType';
 import type SavedData from '../types/SavedData';
-import NbtReader from '../utilitys/NbtReader';
-import objectToNbt from '../utilitys/objectToNbt';
+import NbtReader from '../utilities/NbtReader';
+import objectToNbt from '../utilities/objectToNbt';
 import type Player from './entities/Player';
 
 export default class PlayerManager {

@@ -8,8 +8,8 @@ import type ServerStatus from './network/protocol/status/ServerStatus';
 import type { PlayersSample } from './network/protocol/status/ServerStatus';
 import Chat, { ChatType } from './types/classes/Chat';
 import type Config from './types/Config';
-import Console from './utilitys/Console';
-import getConfigurations from './utilitys/getConfigurations';
+import Console from './utilities/Console';
+import getConfigurations from './utilities/getConfigurations';
 import PlayerManager from './world/PlayerManager';
 import World from './world/World';
 

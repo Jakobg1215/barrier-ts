@@ -3,7 +3,7 @@ import type { BlockMirror } from '../../../types/enums/BlockMirror';
 import type { BlockRotation } from '../../../types/enums/BlockRotation';
 import type { StructureBlockStructureMode } from '../../../types/enums/StructureBlockStructureMode';
 import type { StructureBlockUpdateType } from '../../../types/enums/StructureBlockUpdateType';
-import Vector3 from '../../../utilitys/Vector3';
+import Vector3 from '../../../utilities/Vector3';
 import type DataBuffer from '../../DataBuffer';
 import type GamePacketListener from '../../GamePacketListener';
 import type ServerBoundPacket from '../ServerBoundPacket';

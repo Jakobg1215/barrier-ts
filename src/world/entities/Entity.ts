@@ -1,7 +1,7 @@
 import { FieldType } from '../../network/protocol/game/ClientBoundSetEntityDataPacket';
 import { Pose } from '../../types/enums/Pose';
-import Vector2 from '../../utilitys/Vector2';
-import Vector3 from '../../utilitys/Vector3';
+import Vector2 from '../../utilities/Vector2';
+import Vector3 from '../../utilities/Vector3';
 import SynchedEntitiyData from './SynchedEntityData';
 
 export default class Entity {
