@@ -3,6 +3,7 @@ import type BarrierTs from '../BarrierTs';
 import Chat, { ChatType } from '../types/classes/Chat';
 import Item from '../types/classes/Item';
 import NameSpace from '../types/classes/NameSpace';
+import { ServerComponent } from '../types/classes/ServerComponent';
 import { ChatPermission } from '../types/enums/ChatPermission';
 import { GameType } from '../types/enums/GameType';
 import { InteractionHand } from '../types/enums/InteractionHand';
@@ -82,7 +83,6 @@ import type ServerBoundSwingPacket from './protocol/game/ServerBoundSwingPacket'
 import type ServerBoundTeleportToEntityPacket from './protocol/game/ServerBoundTeleportToEntityPacket';
 import type ServerBoundUseItemOnPacket from './protocol/game/ServerBoundUseItemOnPacket';
 import type ServerBoundUseItemPacket from './protocol/game/ServerBoundUseItemPacket';
-import { ServerComponent } from '../types/classes/ServerComponent';
 
 export default class GamePacketListener extends ServerComponent implements PacketListener {
     private keepAlive = Date.now();
@@ -137,7 +137,27 @@ export default class GamePacketListener extends ServerComponent implements Packe
             this.player.pos.y !== this.previousPosition.y ||
             this.player.pos.z !== this.previousPosition.z
         ) {
-            if (this.player.rot.x !== this.previousRotation.x || this.player.rot.y !== this.previousRotation.y) {
+            // Sanity-check
+            const xDiff = this.player.pos.x - this.previousPosition.x;
+            const yDiff = this.player.pos.y - this.previousPosition.y;
+            const zDiff = this.player.pos.z - this.previousPosition.z;
+            if (xDiff > 8 || xDiff < -8 || yDiff > 8 || yDiff < -8 || zDiff > 8 || zDiff < -8) {
+                // The player position difference is greater than 8 blocks
+                this.server.playerManager.sendAll(
+                    new ClientBoundTeleportEntityPacket(
+                        this.player.id,
+                        this.player.pos.x,
+                        this.player.pos.y,
+                        this.player.pos.z,
+                        Math.floor((this.player.rot.y * 256) / 360),
+                        Math.floor((this.player.rot.x * 256) / 360),
+                        true,
+                    ),
+                    this.player.id,
+                );
+
+                this.previousPosition = this.player.pos;
+            } else if (this.player.rot.x !== this.previousRotation.x || this.player.rot.y !== this.previousRotation.y) {
                 this.server.playerManager.sendAll(
                     new ClientBoundMoveEntityPacketPosRot(
                         this.player.id,
