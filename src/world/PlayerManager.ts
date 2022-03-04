@@ -138,7 +138,7 @@ export default class PlayerManager extends ServerComponent {
                                 action: 'show_entity',
                                 contents: {
                                     type: 'minecraft:player',
-                                    id: gamelistener.player.gameProfile.id.toFormatedString(),
+                                    id: gamelistener.player.gameProfile.id.toFormattedString(),
                                     name: { text: gamelistener.player.gameProfile.name },
                                 },
                             },

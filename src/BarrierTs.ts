@@ -101,7 +101,7 @@ export default class BarrierTs {
             for (const player of this.playerManager.players.values()) {
                 if (!player.allowsListing) continue;
                 if (playerList.length >= 10) continue;
-                playerList.push({ name: player.gameProfile.name, id: player.gameProfile.id.toFormatedString() });
+                playerList.push({ name: player.gameProfile.name, id: player.gameProfile.id.toFormattedString() });
             }
         }
 
