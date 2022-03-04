@@ -20,7 +20,6 @@ import ClientBoundPlayerInfoPacket, {
 } from '../network/protocol/game/ClientBoundPlayerInfoPacket';
 import ClientBoundRotateHeadPacket from '../network/protocol/game/ClientBoundRotateHeadPacket';
 import ClientBoundSetCarriedItemPacket from '../network/protocol/game/ClientBoundSetCarriedItemPacket';
-import ClientBoundSetChunkCacheCenterPacket from '../network/protocol/game/ClientBoundSetChunkCacheCenterPacket';
 import ClientBoundSetEntityDatapacket from '../network/protocol/game/ClientBoundSetEntityDataPacket';
 import ClientBoundSetEquipmentPacket from '../network/protocol/game/ClientBoundSetEquipmentPacket';
 import RegistryHolder from '../network/RegistryHolder';
@@ -75,8 +74,6 @@ export default class PlayerManager {
 
     public async loginPlayer(gamelistener: GamePacketListener): Promise<void> {
         gamelistener.player.setDataFromSave(await this.getPlayerData(gamelistener.connection));
-        const chunkX = gamelistener.player.pos.x >> 4;
-        const chunkZ = gamelistener.player.pos.z >> 4;
 
         gamelistener.send(
             new ClientBoundLoginPacket(
@@ -118,9 +115,9 @@ export default class PlayerManager {
 
         gamelistener.send(new ClientBoundSetCarriedItemPacket(0));
 
-        gamelistener.send(new ClientBoundSetChunkCacheCenterPacket(chunkX, chunkZ));
+        gamelistener.chunkLoader.setChunkPosition(gamelistener.player.pos.x >> 4, gamelistener.player.pos.z >> 4);
 
-        this.server.world.sendWorldData(gamelistener);
+        gamelistener.chunkLoader.updateChangedChunks();
 
         this.sendAll(
             new ClientBoundChatPacket(

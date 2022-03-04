@@ -1,104 +1,36 @@
 import { Buffer } from 'node:buffer';
-import { endianness } from 'node:os';
-import DataBuffer from '../../network/DataBuffer';
+import ChunkSection from './ChunkSection';
 
 export default class Chunk {
-    public static get EMPTY(): Chunk {
-        return new this();
-    }
+    private readonly chunkSection: ChunkSection[] = [];
+    private readonly sections: number;
+    private readonly maxY: number;
 
-    private readonly data = new Uint16Array(4096);
-    private blockCount = 0;
-
-    public getBlock(x: number, y: number, z: number): number {
-        const index = this.data[this.getBlockIndex(x, y, z)];
-        return index ? index : 0;
-    }
-
-    public removeBlock(x: number, y: number, z: number): void {
-        this.data[this.getBlockIndex(x, y, z)] = 0;
-        this.blockCount--;
+    public constructor(private readonly minY: number, hight: number) {
+        this.maxY = hight + minY;
+        this.sections = hight >> 4;
+        for (let index = 0; index < this.sections; index++) this.chunkSection.push(ChunkSection.EMPTY);
     }
 
     public setBlock(x: number, y: number, z: number, state: number): void {
-        if (this.data[this.getBlockIndex(x, y, z)] !== 0) return;
-        this.data[this.getBlockIndex(x, y, z)] = state;
-        this.blockCount++;
+        if (y > this.maxY || y < this.minY) throw new RangeError(`Y must be between ${this.minY} and ${this.maxY}!`);
+
+        const chunkSection = this.chunkSection.at((y - this.minY) >> 4);
+        if (!chunkSection) throw new Error(`Can not get section ${(y - this.minY) >> 4}!`);
+
+        chunkSection.setBlock(x & 15, y & 15, z & 15, state);
     }
 
-    public toBuffer(): DataBuffer {
-        const data = new DataBuffer();
-        data.writeShort(this.blockCount);
+    public removeBlock(x: number, y: number, z: number): void {
+        if (y > this.maxY || y < this.minY) throw new RangeError(`Y must be between ${this.minY} and ${this.maxY}!`);
 
-        if (this.blockCount === 0) {
-            data.writeUnsignedByte(0);
-            data.writeVarInt(0);
-            data.writeVarInt(0);
-        } else {
-            const uniqueBlockId = [...new Set(this.data)];
-            const bitsPerValue = uniqueBlockId.length.toString(2).length;
+        const chunkSection = this.chunkSection.at((y - this.minY) >> 4);
+        if (!chunkSection) throw new Error(`Can not get section ${(y - this.minY) >> 4}!`);
 
-            if (bitsPerValue <= 4) {
-                data.writeUnsignedByte(4);
-                data.writeVarInt(uniqueBlockId.length);
-                uniqueBlockId.forEach(blockId => data.writeVarInt(blockId));
-                const dataToBits = this.data.reduce(
-                    (pre, cur) => pre + uniqueBlockId.indexOf(cur).toString(2).padStart(4, '0'),
-                    '',
-                );
-                const longDataBits = dataToBits.match(/.{1,64}/g) as string[];
-                const longData = new BigUint64Array(longDataBits.map(val => BigInt(`0b${val}`)));
-                const longBuffer = Buffer.from(longData.buffer);
-
-                if (endianness() === 'LE') longBuffer.swap64();
-
-                data.writeVarInt(longData.length);
-                data.append(longBuffer);
-            }
-
-            if (bitsPerValue > 4 && bitsPerValue <= 8) {
-                data.writeUnsignedByte(bitsPerValue);
-                data.writeVarInt(uniqueBlockId.length);
-                uniqueBlockId.forEach(blockId => data.writeVarInt(blockId));
-                const dataToBits = this.data.reduce(
-                    (pre, cur) => pre + uniqueBlockId.indexOf(cur).toString(2).padStart(4, '0'),
-                    '',
-                );
-                const longDataBits = dataToBits.match(/.{1,64}/g) as string[];
-                const longData = new BigUint64Array(longDataBits.map(val => BigInt(`0b${val}`)));
-                const longBuffer = Buffer.from(longData.buffer);
-
-                if (endianness() === 'LE') longBuffer.swap64();
-
-                data.writeVarInt(longData.length);
-                data.append(longBuffer);
-            }
-
-            if (bitsPerValue > 8) {
-                data.writeUnsignedByte(bitsPerValue);
-                const dataToBits = this.data.reduce(
-                    (pre, cur) => pre + uniqueBlockId.indexOf(cur).toString(2).padStart(4, '0'),
-                    '',
-                );
-                const longDataBits = dataToBits.match(/.{1,64}/g) as string[];
-                const longData = new BigUint64Array(longDataBits.map(val => BigInt(`0b${val}`)));
-                const longBuffer = Buffer.from(longData.buffer);
-
-                if (endianness() === 'LE') longBuffer.swap64();
-
-                data.writeVarInt(longData.length);
-                data.append(longBuffer);
-            }
-        }
-
-        data.writeUnsignedByte(0);
-        data.writeVarInt(0);
-        data.writeVarInt(0);
-
-        return data;
+        chunkSection.removeBlock(x & 15, y & 15, z & 15);
     }
 
-    private getBlockIndex(x: number, y: number, z: number): number {
-        return (y << 8) | (z << 4) | (x ^ 15);
+    public toBuffer() {
+        return this.chunkSection.reduce((pre, cur) => Buffer.concat([pre, cur.toBuffer().buffer]), Buffer.alloc(0));
     }
 }
