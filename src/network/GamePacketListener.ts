@@ -276,7 +276,7 @@ export default class GamePacketListener extends ServerComponent implements Packe
                                 action: 'show_entity',
                                 contents: {
                                     type: 'minecraft:player',
-                                    id: this.player.gameProfile.id.toFormatedString(),
+                                    id: this.player.gameProfile.id.toFormattedString(),
                                     name: { text: this.player.gameProfile.name },
                                 },
                             },

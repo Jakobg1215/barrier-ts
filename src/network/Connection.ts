@@ -107,7 +107,7 @@ export default class Connection extends ServerComponent {
                                     action: 'show_entity',
                                     contents: {
                                         type: 'minecraft:player',
-                                        id: player.gameProfile.id.toFormatedString(),
+                                        id: player.gameProfile.id.toFormattedString(),
                                         name: { text: player.gameProfile.name },
                                     },
                                 },
