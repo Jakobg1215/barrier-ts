@@ -121,6 +121,17 @@ export default class GamePacketListener extends ServerComponent implements Packe
             }
         }
 
+        if (this.previousHealth !== this.player.health) {
+            if (this.player.health < this.previousHealth) {
+                // This will not run if healh increases
+                this.server.playerManager.sendAll(new ClientBoundEntityEventPacket(this.player.id, 2), this.player.id);
+                this.server.playerManager.sendAll(new ClientBoundSoundEntityPacket(802, 7, this.player.id, 1, 1));
+                this.server.playerManager.sendAll(new ClientBoundSoundEntityPacket(812, 7, this.player.id, 1, 1));
+                this.send(new ClientBoundSetHealthPacket(this.player.health, 20, 5));
+            }
+            this.previousHealth = this.player.health;
+        }
+
         if (
             this.player.pos.x !== this.previousPosition.x ||
             this.player.pos.y !== this.previousPosition.y ||
@@ -183,17 +194,6 @@ export default class GamePacketListener extends ServerComponent implements Packe
 
             this.previousChunkX = currentChunkX;
             this.previousChunkZ = currentChunkZ;
-        }
-
-        if (this.previousHealth !== this.player.health) {
-            if (this.player.health < this.previousHealth) {
-                // This will not run if healh increases
-                this.server.playerManager.sendAll(new ClientBoundEntityEventPacket(this.player.id, 2), this.player.id);
-                this.server.playerManager.sendAll(new ClientBoundSoundEntityPacket(802, 7, this.player.id, 1, 1));
-                this.server.playerManager.sendAll(new ClientBoundSoundEntityPacket(812, 7, this.player.id, 1, 1));
-                this.send(new ClientBoundSetHealthPacket(this.player.health, 20, 5));
-            }
-            this.previousHealth = this.player.health;
         }
     }
 
