@@ -34,8 +34,9 @@ import type SavedData from '../types/SavedData';
 import NbtReader from '../utilities/NbtReader';
 import objectToNbt from '../utilities/objectToNbt';
 import type Player from './entities/Player';
+import { ServerComponent } from '../types/classes/ServerComponent';
 
-export default class PlayerManager {
+export default class PlayerManager extends ServerComponent {
     public readonly connections = new Set<Connection>();
     public readonly players = new Map<Connection, Player>();
     public readonly padLock = generateKeyPairSync('rsa', {
@@ -50,9 +51,11 @@ export default class PlayerManager {
         },
     });
 
-    public constructor(private readonly server: BarrierTs) {}
+    public constructor(private readonly server: BarrierTs) {
+        super();
+    }
 
-    public tick() {
+    public override tick() {
         this.connections.forEach(connection => connection.tick());
         this.players.forEach(player => player.tick());
     }

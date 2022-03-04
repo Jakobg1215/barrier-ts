@@ -82,8 +82,9 @@ import type ServerBoundSwingPacket from './protocol/game/ServerBoundSwingPacket'
 import type ServerBoundTeleportToEntityPacket from './protocol/game/ServerBoundTeleportToEntityPacket';
 import type ServerBoundUseItemOnPacket from './protocol/game/ServerBoundUseItemOnPacket';
 import type ServerBoundUseItemPacket from './protocol/game/ServerBoundUseItemPacket';
+import { ServerComponent } from '../types/classes/ServerComponent';
 
-export default class GamePacketListener implements PacketListener {
+export default class GamePacketListener extends ServerComponent implements PacketListener {
     private keepAlive = Date.now();
     private keepAlivePending = false;
     private teleportId = randomBytes(4);
@@ -104,9 +105,11 @@ export default class GamePacketListener implements PacketListener {
         public readonly server: BarrierTs,
         public readonly player: Player,
         public readonly connection: Connection,
-    ) {}
+    ) {
+        super();
+    }
 
-    public tick(): void {
+    public override tick(): void {
         const timeNow = Date.now();
         if (timeNow - this.keepAlive >= 15000) {
             if (this.keepAlivePending) {

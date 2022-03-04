@@ -18,8 +18,9 @@ import ClientBoundPlayerInfoPacket, { Action } from './protocol/game/ClientBound
 import ClientBoundRemoveEntitiesPacket from './protocol/game/ClientBoundRemoveEntitiesPacket';
 import ClientBoundLoginCompressionPacket from './protocol/login/ClientBoundLoginCompressionPacket';
 import ClientBoundLoginDisconnectPacket from './protocol/login/ClientBoundLoginDisconnectPacket';
+import { ServerComponent } from '../types/classes/ServerComponent';
 
-export default class Connection {
+export default class Connection extends ServerComponent {
     private encryption: Cipher | null = null;
     private decryption: Decipher | null = null;
     private compression = false;
@@ -27,6 +28,8 @@ export default class Connection {
     private listener!: PacketListener;
 
     public constructor(private readonly networking: Socket, private readonly server: BarrierTs) {
+        super();
+
         this.networking.on('data', (data): void => {
             const inData = new DataBuffer(this.decryption ? this.decryption.update(data) : data);
             if (this.compression) {
@@ -120,7 +123,7 @@ export default class Connection {
         this.networking.on('error', this.server.console.error);
     }
 
-    public tick() {
+    public override tick() {
         if (this.listener instanceof LoginPacketListener) {
             this.listener.tick();
         }

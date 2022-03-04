@@ -3,8 +3,9 @@ import { Pose } from '../../types/enums/Pose';
 import Vector2 from '../../utilities/Vector2';
 import Vector3 from '../../utilities/Vector3';
 import SynchedEntitiyData from './SynchedEntityData';
+import { ServerComponent } from '../../types/classes/ServerComponent';
 
-export default class Entity {
+export default class Entity extends ServerComponent {
     private static idGenerator = 0;
     public readonly id = Entity.idGenerator++;
     protected readonly synchedData = new SynchedEntitiyData();
@@ -16,11 +17,11 @@ export default class Entity {
     protected pose = Pose.STANDING;
 
     public constructor() {
+        super();
+
         this.synchedData.define(0, FieldType.BYTE, 0);
         this.synchedData.define(6, 18, Pose.STANDING);
     }
-
-    public tick(): void {}
 
     private updateStatusData(): void {
         let status = 0;
