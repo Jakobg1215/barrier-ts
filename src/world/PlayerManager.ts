@@ -20,9 +20,11 @@ import ClientBoundPlayerInfoPacket, {
 } from '../network/protocol/game/ClientBoundPlayerInfoPacket';
 import ClientBoundRotateHeadPacket from '../network/protocol/game/ClientBoundRotateHeadPacket';
 import ClientBoundSetCarriedItemPacket from '../network/protocol/game/ClientBoundSetCarriedItemPacket';
+import ClientBoundSetDefaultSpawnPositionPacket from '../network/protocol/game/ClientBoundSetDefaultSpawnPositionPacket';
 import ClientBoundSetEntityDatapacket from '../network/protocol/game/ClientBoundSetEntityDataPacket';
 import ClientBoundSetEquipmentPacket from '../network/protocol/game/ClientBoundSetEquipmentPacket';
 import RegistryHolder from '../network/RegistryHolder';
+import BlockPos from '../types/classes/BlockPos';
 import Chat, { ChatType } from '../types/classes/Chat';
 import Item from '../types/classes/Item';
 import NameSpace from '../types/classes/NameSpace';
@@ -118,6 +120,27 @@ export default class PlayerManager extends ServerComponent {
 
         gamelistener.send(new ClientBoundSetCarriedItemPacket(0));
 
+        const players: PlayerUpdate[] = [];
+
+        this.players.forEach(player =>
+            players.push({
+                latency: 0,
+                gameMode: GameType.CREATIVE,
+                profile: player.gameProfile,
+                displayName: new Chat(ChatType.TEXT, player.gameProfile.name),
+            }),
+        );
+
+        this.sendAll(new ClientBoundPlayerInfoPacket(Action.ADD_PLAYER, players));
+
+        gamelistener.teleport(
+            gamelistener.player.pos.x,
+            gamelistener.player.pos.y,
+            gamelistener.player.pos.z,
+            gamelistener.player.rot.y,
+            gamelistener.player.rot.x,
+        );
+
         gamelistener.chunkLoader.setChunkPosition(gamelistener.player.pos.x >> 4, gamelistener.player.pos.z >> 4);
 
         this.sendAll(
@@ -146,25 +169,14 @@ export default class PlayerManager extends ServerComponent {
                 ChatPermission.SYSTEM,
                 UUID.EMPTY,
             ),
+            gamelistener.player.id,
         );
+
         this.server.console.log(
             '%s (%s) has joined the server!',
             gamelistener.player.gameProfile.name,
             gamelistener.player.id,
         );
-
-        const players: PlayerUpdate[] = [];
-
-        this.players.forEach(player =>
-            players.push({
-                latency: 0,
-                gameMode: GameType.CREATIVE,
-                profile: player.gameProfile,
-                displayName: new Chat(ChatType.TEXT, player.gameProfile.name),
-            }),
-        );
-
-        this.sendAll(new ClientBoundPlayerInfoPacket(Action.ADD_PLAYER, players));
 
         this.sendAll(
             new ClientBoundAddPlayerPacket(
@@ -177,14 +189,6 @@ export default class PlayerManager extends ServerComponent {
                 Math.floor((gamelistener.player.rot.x * 256) / 360),
             ),
             gamelistener.player.id,
-        );
-
-        gamelistener.teleport(
-            gamelistener.player.pos.x,
-            gamelistener.player.pos.y,
-            gamelistener.player.pos.z,
-            gamelistener.player.rot.y,
-            gamelistener.player.rot.x,
         );
 
         this.players.forEach(player => {
@@ -243,6 +247,8 @@ export default class PlayerManager extends ServerComponent {
             });
             if (equipment.length > 0) gamelistener.send(new ClientBoundSetEquipmentPacket(player.id, equipment));
         });
+
+        gamelistener.send(new ClientBoundSetDefaultSpawnPositionPacket(new BlockPos(0, -60, 0), 0));
 
         gamelistener.send(
             new ClientBoundContainerSetContentPacket(0, 0, gamelistener.player.inventory.getItemSlots(), Item.Empty),

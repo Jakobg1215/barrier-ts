@@ -27,6 +27,7 @@ export default class Connection extends ServerComponent {
     private compression = false;
     private protocol = ConnectionProtocol.HANDSHAKING;
     private listener!: PacketListener;
+    private packetQueue: DataBuffer[] = [];
 
     public constructor(private readonly networking: Socket, private readonly server: BarrierTs) {
         super();
@@ -132,6 +133,8 @@ export default class Connection extends ServerComponent {
         if (this.listener instanceof GamePacketListener) {
             this.listener.tick();
         }
+
+        this.flushQueue();
     }
 
     public send(packet: ClientBoundPacket): void {
@@ -159,7 +162,15 @@ export default class Connection extends ServerComponent {
             dataPacket = new DataBuffer().writeVarInt(packetData.buffer.length).append(packetData);
         }
 
+        this.packetQueue.push(dataPacket);
+    }
+
+    private flushQueue(): void {
+        if (this.packetQueue.length < 0) return;
+        const dataPacket = this.packetQueue.reduce((pre, cur) => pre.append(cur), new DataBuffer());
+
         this.networking.write(this.encryption ? this.encryption.update(dataPacket.buffer) : dataPacket.buffer);
+        this.packetQueue = [];
     }
 
     public disconnect(reason = new Chat(ChatType.TRANSLATE, 'multiplayer.disconnect.generic')): void {
@@ -175,6 +186,7 @@ export default class Connection extends ServerComponent {
             }
         }
 
+        this.flushQueue();
         this.networking.end();
     }
 
