@@ -11,4 +11,5 @@ export default interface Config {
     difficulty: number;
     icon: string;
     playerlisting: boolean;
+    viewDistance: number;
 }

@@ -96,7 +96,7 @@ export default class PlayerManager extends ServerComponent {
                 objectToNbt(DimensionType),
                 new NameSpace('minecraft', 'overworld'),
                 this.server.config.maxplayers,
-                8,
+                this.server.config.viewDistance,
                 8,
                 false,
                 true,

@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import Connection from './network/Connection';
 import HandshakePacketListener from './network/HandshakePacketListener';
 import Protocol from './network/Protocol';
+import ClientBoundSetChunkCacheRadiusPacket from './network/protocol/game/ClientBoundSetChunkCacheRadiusPacket';
 import type ServerStatus from './network/protocol/status/ServerStatus';
 import type { PlayersSample } from './network/protocol/status/ServerStatus';
 import Chat, { ChatType } from './types/classes/Chat';
@@ -87,6 +88,8 @@ export default class BarrierTs {
                 this.console.error('Failed to get server icon!');
             }
         } else this.iconData = null;
+
+        this.playerManager.sendAll(new ClientBoundSetChunkCacheRadiusPacket(this.serverConfigurations.viewDistance));
     }
 
     private tick(): void {

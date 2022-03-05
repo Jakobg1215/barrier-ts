@@ -98,7 +98,7 @@ export default class GamePacketListener extends ServerComponent implements Packe
         this.server.world.defaultLevel,
         this.player.pos.x >> 4,
         this.player.pos.z >> 4,
-        8,
+        this.server.config.viewDistance,
     );
 
     public constructor(
@@ -353,6 +353,11 @@ export default class GamePacketListener extends ServerComponent implements Packe
 
     public handleClientInformation(clientInformation: ServerBoundClientInformationPacket): void {
         this.player.updateOptions(clientInformation);
+
+        if (clientInformation.viewDistance > this.server.config.viewDistance) return;
+        if (clientInformation.viewDistance === this.chunkLoader.viewDistance) return;
+
+        this.chunkLoader.setRadius(clientInformation.viewDistance);
     }
 
     public handleCommandSuggestions(_CommandSuggestions: ServerBoundCommandSuggestionPacket): void {

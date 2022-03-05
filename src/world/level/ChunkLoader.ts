@@ -103,4 +103,8 @@ export default class ChunkLoader {
     public get loadedChunks() {
         return this.chunks;
     }
+
+    public get viewDistance() {
+        return this.radius;
+    }
 }

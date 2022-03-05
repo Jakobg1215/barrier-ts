@@ -23,6 +23,7 @@ const createConfigFile = (values: Config) => {
     formatOption('motd', values.motd, 'The message of the day.');
     formatOption('icon', values.icon, 'The path to the server icon. (must be 64*64 png)');
     formatOption('playerlisting', values.playerlisting, 'Shows players in the server on the selection screen.');
+    formatOption('viewDistance', values.viewDistance, 'The maximum of chunks the server will load for a player.');
     return file.end();
 };
 
@@ -41,6 +42,7 @@ export default function getConfigurations(server: BarrierTs): Promise<Config> {
             difficulty: 2,
             icon: '',
             playerlisting: true,
+            viewDistance: 8,
         };
 
         if (!existsSync(filePath)) createConfigFile(defaultValues);
