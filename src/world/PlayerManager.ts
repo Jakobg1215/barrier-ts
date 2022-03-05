@@ -120,8 +120,6 @@ export default class PlayerManager extends ServerComponent {
 
         gamelistener.chunkLoader.setChunkPosition(gamelistener.player.pos.x >> 4, gamelistener.player.pos.z >> 4);
 
-        gamelistener.chunkLoader.updateChangedChunks();
-
         this.sendAll(
             new ClientBoundChatPacket(
                 new Chat(ChatType.TRANSLATE, 'multiplayer.player.joined', {
