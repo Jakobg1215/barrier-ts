@@ -1,9 +1,9 @@
 import { FieldType } from '../../network/protocol/game/ClientBoundSetEntityDataPacket';
+import { ServerComponent } from '../../types/classes/ServerComponent';
 import { Pose } from '../../types/enums/Pose';
 import Vector2 from '../../utilities/Vector2';
 import Vector3 from '../../utilities/Vector3';
 import SynchedEntitiyData from './SynchedEntityData';
-import { ServerComponent } from '../../types/classes/ServerComponent';
 
 export default class Entity extends ServerComponent {
     private static idGenerator = 0;

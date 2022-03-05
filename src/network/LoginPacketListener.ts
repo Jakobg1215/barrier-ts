@@ -4,6 +4,7 @@ import { get } from 'node:https';
 import { URL } from 'node:url';
 import type BarrierTs from '../BarrierTs';
 import Chat, { ChatType } from '../types/classes/Chat';
+import { ServerComponent } from '../types/classes/ServerComponent';
 import UUID from '../types/classes/UUID';
 import Player from '../world/entities/Player';
 import type Connection from './Connection';
@@ -16,7 +17,6 @@ import GameProfile, { property } from './protocol/login/GameProfile';
 import type ServerBoundCustomQueryPacket from './protocol/login/ServerBoundCustomQueryPacket';
 import type ServerBoundHelloPacket from './protocol/login/ServerBoundHelloPacket';
 import type ServerBoundKeyPacket from './protocol/login/ServerBoundKeyPacket';
-import { ServerComponent } from '../types/classes/ServerComponent';
 
 export default class LoginPacketListener extends ServerComponent implements PacketListener {
     private static readonly MAX_TICKS_BEFORE_LOGIN = 300;

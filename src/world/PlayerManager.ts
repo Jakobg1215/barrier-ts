@@ -26,6 +26,7 @@ import RegistryHolder from '../network/RegistryHolder';
 import Chat, { ChatType } from '../types/classes/Chat';
 import Item from '../types/classes/Item';
 import NameSpace from '../types/classes/NameSpace';
+import { ServerComponent } from '../types/classes/ServerComponent';
 import UUID from '../types/classes/UUID';
 import { ChatPermission } from '../types/enums/ChatPermission';
 import { Difficulty } from '../types/enums/Difficulty';
@@ -34,7 +35,6 @@ import type SavedData from '../types/SavedData';
 import NbtReader from '../utilities/NbtReader';
 import objectToNbt from '../utilities/objectToNbt';
 import type Player from './entities/Player';
-import { ServerComponent } from '../types/classes/ServerComponent';
 
 export default class PlayerManager extends ServerComponent {
     public readonly connections = new Set<Connection>();

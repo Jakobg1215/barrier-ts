@@ -1,8 +1,8 @@
 import type BarrierTs from '../../BarrierTs';
 import ClientBoundSetTimePacket from '../../network/protocol/game/ClientBoundSetTimePacket';
+import { ServerComponent } from '../../types/classes/ServerComponent';
 import type World from '../World';
 import Chunk from './Chunk';
-import { ServerComponent } from '../../types/classes/ServerComponent';
 
 export default class LevelChunkManager extends ServerComponent {
     public readonly levelChunks = new Map<bigint, Chunk>();

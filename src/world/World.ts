@@ -1,6 +1,6 @@
 import type BarrierTs from '../BarrierTs';
-import LevelChunkManager from './level/LevelChunkManager';
 import { ServerComponent } from '../types/classes/ServerComponent';
+import LevelChunkManager from './level/LevelChunkManager';
 export default class World extends ServerComponent {
     private ticks = 0n;
     private levels: LevelChunkManager[] = [];
