@@ -166,7 +166,7 @@ export default class Connection extends ServerComponent {
     }
 
     private flushQueue(): void {
-        if (this.packetQueue.length < 0) return;
+        if (this.packetQueue.length === 0) return;
         const dataPacket = this.packetQueue.reduce((pre, cur) => pre.append(cur), new DataBuffer());
 
         this.networking.write(this.encryption ? this.encryption.update(dataPacket.buffer) : dataPacket.buffer);
