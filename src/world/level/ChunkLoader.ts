@@ -47,8 +47,8 @@ export default class ChunkLoader {
         const loadedChunksPositions = new BigInt64Array(this.chunks.keys());
 
         const newChunks: bigint[] = [];
-        for (let newChunkX = -this.radius; newChunkX <= this.radius; newChunkX++) {
-            for (let newChunkZ = -this.radius; newChunkZ <= this.radius; newChunkZ++) {
+        for (let newChunkX = -this.radius - 1; newChunkX <= this.radius + 1; newChunkX++) {
+            for (let newChunkZ = -this.radius - 1; newChunkZ <= this.radius + 1; newChunkZ++) {
                 newChunks.push((BigInt(newChunkX + this.xPos) << 32n) | (BigInt(newChunkZ + this.zPos) & 0xffffffffn));
             }
         }
@@ -58,11 +58,20 @@ export default class ChunkLoader {
 
         this.connection.send(new ClientBoundSetChunkCacheCenterPacket(this.xPos, this.zPos));
 
+        const isInRange = (x: number, z: number): boolean => {
+            const i = Math.max(0, Math.abs(x - this.xPos));
+            const j = Math.max(0, Math.abs(z - this.zPos));
+            const k = Math.max(0, Math.max(i, j));
+            return Math.min(i, j) ** 2 + k ** 2 <= this.radius ** 2;
+        };
+
         addedChunks.forEach(chunkPos => {
             const newChunk = this.levelChunkManager.getChunk(chunkPos);
 
             const x = Number(chunkPos >> 32n);
             const z = Number(chunkPos & 0xffffffffn) ^ 0;
+
+            if (!isInRange(x, z)) return;
 
             this.connection.send(
                 new ClientBoundLevelChunkWithLightPacket(
