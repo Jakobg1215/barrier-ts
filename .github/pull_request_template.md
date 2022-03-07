@@ -1,6 +1,6 @@
-## What bug is this fixing
+## What does this add or fix?
 
-What bug does this fix and why
+What does this change
 
 ## Links to issues
 
