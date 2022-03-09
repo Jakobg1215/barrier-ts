@@ -21,7 +21,7 @@ import ClientBoundPlayerInfoPacket, {
 import ClientBoundRotateHeadPacket from '../network/protocol/game/ClientBoundRotateHeadPacket';
 import ClientBoundSetCarriedItemPacket from '../network/protocol/game/ClientBoundSetCarriedItemPacket';
 import ClientBoundSetDefaultSpawnPositionPacket from '../network/protocol/game/ClientBoundSetDefaultSpawnPositionPacket';
-import ClientBoundSetEntityDatapacket from '../network/protocol/game/ClientBoundSetEntityDataPacket';
+import ClientBoundSetEntityDataPacket from '../network/protocol/game/ClientBoundSetEntityDataPacket';
 import ClientBoundSetEquipmentPacket from '../network/protocol/game/ClientBoundSetEquipmentPacket';
 import RegistryHolder from '../network/RegistryHolder';
 import BlockPos from '../types/classes/BlockPos';
@@ -208,7 +208,7 @@ export default class PlayerManager extends ServerComponent {
 
             gamelistener.send(new ClientBoundRotateHeadPacket(player.id, Math.floor((player.rot.y * 256) / 360)));
 
-            gamelistener.send(new ClientBoundSetEntityDatapacket(player.id, player.data.getData()));
+            gamelistener.send(new ClientBoundSetEntityDataPacket(player.id, player.data.getData()));
 
             const equipment: { pos: number; item: Item }[] = [];
             player.inventory.getItemSlots().forEach((slot, index) => {
