@@ -22,7 +22,8 @@ export default class BarrierTs {
     public readonly console = new Console(this);
     private serverConfigurations!: Config;
     public readonly protocol = new Protocol();
-    public readonly networking = createServer();
+    //@ts-ignore
+    public readonly networking = createServer({ noDelay: true });
     public readonly playerManager = new PlayerManager(this);
     private serverWorld = new World(this);
     private iconData!: string | null;
