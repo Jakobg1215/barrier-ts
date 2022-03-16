@@ -2,26 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "node",
-            "request": "launch",
-            "name": "Build and Run",
-            "program": "${workspaceFolder}/src/index.ts",
-            "preLaunchTask": "tsc: build - tsconfig.json",
-            "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Watch",
-            "program": "${workspaceFolder}/src/index.ts",
-            "preLaunchTask": "tsc: watch - tsconfig.json",
-            "outFiles": ["${workspaceFolder}/dist/**/*.js"],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
-            "runtimeExecutable": "npx",
-            "runtimeArgs": ["nodemon", "--signal", "SIGHUP"]
+            "name": "Watch",
+            "request": "launch",
+            "runtimeArgs": ["run", "dev"],
+            "runtimeExecutable": "npm",
+            "type": "pwa-node"
         }
     ]
 }

@@ -1,20 +1,31 @@
 {
-    "name": "barrierts",
-    "engines": {
-        "node": ">=17.7.0",
-        "npm": ">=8.5.0"
-    },
     "devDependencies": {
         "@types/node": "^17.0.21",
         "concurrently": "^7.0.0",
         "nodemon": "^2.0.15",
+        "prettier": "^2.5.1",
+        "prettier-plugin-organize-imports": "^2.3.4",
         "typescript": "^4.6.2"
     },
+    "engines": {
+        "node": ">=17.7.0",
+        "npm": ">=8.5.0"
+    },
+    "name": "barrierts",
+    "prettier": {
+        "endOfLine": "crlf",
+        "parser": "typescript",
+        "printWidth": 120,
+        "singleQuote": true,
+        "tabWidth": 4,
+        "trailingComma": "all"
+    },
     "scripts": {
-        "start": "node dist/index.js",
-        "dev": "concurrently -i --default-input-target dev:watch -r npm:dev:*",
-        "dev:watch": "nodemon --signal SIGHUP dist/index",
-        "dev:build": "tsc -w",
-        "build": "tsc"
+        "build": "tsc -b",
+        "dev": "concurrently -i --default-input-target 1 -k true npm:dev:*",
+        "dev:watch": "tsc --preserveWatchOutput -w ",
+        "dev:run": "nodemon -e js -x node -w dist dist/index",
+        "prettier": "prettier -w -c src",
+        "start": "node dist/index"
     }
 }

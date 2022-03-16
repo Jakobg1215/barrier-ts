@@ -8,13 +8,18 @@ A Minecraft Java server written in TypeScript!
 
 Its just a small project that I work in my free time.
 
+# Features
+
+Right we still need to work on the foundations of the software
+
 # SetUp
 
-### Requirements
+## Requirements
 
--   You just need node(I use the Latest version of node)
+-   You must have node installed on your computer. (version 17.7.0 or higher)
+-   You must have npm installed on your computer. (version 8.5.0 or higher)
 
-### Running
+## Running
 
 First you want to install all the dev packages.
 
@@ -33,11 +38,3 @@ Once all that is done you can start the server!
 ```bash
 npm start
 ```
-
-# Development
-
-You can work on this project and submit pull request.
-
-This project will not use any external runtime libraries.
-
-You can use `npm run dev` to run barrierts in nodemon or F5 in VS Code.
