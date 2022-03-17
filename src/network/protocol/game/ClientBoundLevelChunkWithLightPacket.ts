@@ -24,7 +24,7 @@ export default class ClientBoundLevelChunkWithLightPacket implements ClientBound
         packet.writeNbt(this.heightmaps);
         packet.writeVarInt(this.buffer.length).append(this.buffer);
         packet.writeVarInt(this.blockEntitiesData.length);
-        this.blockEntitiesData.forEach(entity => {
+        this.blockEntitiesData.forEach((entity) => {
             packet.writeByte(entity.packedXZ);
             packet.writeShort(entity.y);
             packet.writeVarInt(entity.type);
@@ -32,17 +32,17 @@ export default class ClientBoundLevelChunkWithLightPacket implements ClientBound
         });
         packet.writeBoolean(this.trustEdges);
         packet.writeVarInt(this.skyYMask.length);
-        this.skyYMask.forEach(skyY => packet.writeLong(skyY));
+        this.skyYMask.forEach((skyY) => packet.writeLong(skyY));
         packet.writeVarInt(this.blockYMask.length);
-        this.blockYMask.forEach(blockY => packet.writeLong(blockY));
+        this.blockYMask.forEach((blockY) => packet.writeLong(blockY));
         packet.writeVarInt(this.emptySkyYMask.length);
-        this.emptySkyYMask.forEach(emptyY => packet.writeLong(emptyY));
+        this.emptySkyYMask.forEach((emptyY) => packet.writeLong(emptyY));
         packet.writeVarInt(this.emptyBlockYMask.length);
-        this.emptyBlockYMask.forEach(emptyBlockY => packet.writeLong(emptyBlockY));
+        this.emptyBlockYMask.forEach((emptyBlockY) => packet.writeLong(emptyBlockY));
         packet.writeVarInt(this.skyUpdates.length);
-        this.skyUpdates.forEach(sky => packet.writeByteArray(Buffer.from(sky)));
+        this.skyUpdates.forEach((sky) => packet.writeByteArray(Buffer.from(sky)));
         packet.writeVarInt(this.blockUpdates.length);
-        this.blockUpdates.forEach(block => packet.writeByteArray(Buffer.from(block)));
+        this.blockUpdates.forEach((block) => packet.writeByteArray(Buffer.from(block)));
         return packet;
     }
 }

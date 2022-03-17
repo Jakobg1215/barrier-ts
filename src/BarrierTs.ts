@@ -67,8 +67,8 @@ export default class BarrierTs {
     }
 
     public stop(): Promise<void> {
-        return new Promise(async resolve => {
-            this.playerManager.connections.forEach(async conn => {
+        return new Promise(async (resolve) => {
+            this.playerManager.connections.forEach(async (conn) => {
                 await this.playerManager.savePlayer(conn);
                 conn.disconnect(new Chat(ChatType.TRANSLATE, 'multiplayer.disconnect.server_shutdown'));
             });

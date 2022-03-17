@@ -14,7 +14,7 @@ export default class ClientBoundContainerSetContentPacket implements ClientBound
         packet.writeUnsignedByte(this.containerId);
         packet.writeVarInt(this.stateId);
         packet.writeVarInt(this.items.length);
-        this.items.forEach(item => packet.writeItem(item));
+        this.items.forEach((item) => packet.writeItem(item));
         packet.writeItem(this.carriedItem);
         return packet;
     }

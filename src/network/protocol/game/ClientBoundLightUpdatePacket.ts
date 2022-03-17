@@ -20,13 +20,13 @@ export default class ClientBoundLightUpdatePacket implements ClientBoundPacket {
         packet.writeVarInt(this.z);
         packet.writeBoolean(this.trustEdges);
         packet.writeVarInt(this.skyYMask.length);
-        this.skyYMask.forEach(skyY => packet.writeLong(skyY));
+        this.skyYMask.forEach((skyY) => packet.writeLong(skyY));
         packet.writeVarInt(this.blockYMask.length);
-        this.blockYMask.forEach(blockY => packet.writeLong(blockY));
+        this.blockYMask.forEach((blockY) => packet.writeLong(blockY));
         packet.writeVarInt(this.emptySkyYMask.length);
-        this.emptySkyYMask.forEach(emptyY => packet.writeLong(emptyY));
+        this.emptySkyYMask.forEach((emptyY) => packet.writeLong(emptyY));
         packet.writeVarInt(this.emptyBlockYMask.length);
-        this.emptyBlockYMask.forEach(emptyBlockY => packet.writeLong(emptyBlockY));
+        this.emptyBlockYMask.forEach((emptyBlockY) => packet.writeLong(emptyBlockY));
         packet.writeByteArray(Buffer.from(this.skyUpdates));
         packet.writeByteArray(Buffer.from(this.blockUpdates));
         return packet;

@@ -58,8 +58,8 @@ export default class PlayerManager extends ServerComponent {
     }
 
     public override tick() {
-        this.connections.forEach(connection => connection.tick());
-        this.players.forEach(player => player.tick());
+        this.connections.forEach((connection) => connection.tick());
+        this.players.forEach((player) => player.tick());
     }
 
     public sendAll(packet: ClientBoundPacket, ...exclude: number[]) {
@@ -122,7 +122,7 @@ export default class PlayerManager extends ServerComponent {
 
         const players: PlayerUpdate[] = [];
 
-        this.players.forEach(player =>
+        this.players.forEach((player) =>
             players.push({
                 latency: 0,
                 gameMode: GameType.CREATIVE,
@@ -191,7 +191,7 @@ export default class PlayerManager extends ServerComponent {
             gamelistener.player.id,
         );
 
-        this.players.forEach(player => {
+        this.players.forEach((player) => {
             if (player.id === gamelistener.player.id) return;
 
             gamelistener.send(
@@ -290,7 +290,7 @@ export default class PlayerManager extends ServerComponent {
     }
 
     public savePlayer(conn: Connection): Promise<void> {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             const player = this.players.get(conn);
             if (!player) return;
             const data = {
@@ -307,7 +307,7 @@ export default class PlayerManager extends ServerComponent {
                 inventory: player.inventory.toNBT(),
                 selectedSlot: player.inventory.selectedHand + 'b',
             };
-            mkdir(join(__dirname, '../../world/players'), { recursive: true }).then(_path => {
+            mkdir(join(__dirname, '../../world/players'), { recursive: true }).then((_path) => {
                 writeFile(
                     join(__dirname, '../../world/players', player.gameProfile.id?.toString()! + '.nbt'),
                     objectToNbt(data),

@@ -6,7 +6,7 @@ export default class ClientBoundRemoveEntitiesPacket implements ClientBoundPacke
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeVarInt(this.entityIds.length);
-        this.entityIds.forEach(id => packet.writeVarInt(id));
+        this.entityIds.forEach((id) => packet.writeVarInt(id));
         return packet;
     }
 }

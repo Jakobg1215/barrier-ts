@@ -20,7 +20,7 @@ export default class ClientBoundExplodePacket implements ClientBoundPacket {
         packet.writeFloat(this.z);
         packet.writeFloat(this.power);
         packet.writeVarInt(this.toBlow.length);
-        this.toBlow.forEach(block => {
+        this.toBlow.forEach((block) => {
             packet.writeByte(block.x);
             packet.writeByte(block.y);
             packet.writeByte(block.z);

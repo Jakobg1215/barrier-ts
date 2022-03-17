@@ -123,7 +123,7 @@ export default class LoginPacketListener extends ServerComponent implements Pack
                     this.gameProfile!.name,
                 )}&serverId=${encodeURIComponent(hash)}`,
             ),
-            res => {
+            (res) => {
                 res.on('data', (data: Buffer): void => {
                     const resData: Responce = JSON.parse(data.toString());
                     this.gameProfile = new GameProfile(resData.name, new UUID(resData.id));

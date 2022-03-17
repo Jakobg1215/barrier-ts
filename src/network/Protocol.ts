@@ -363,17 +363,17 @@ export default class Protocol {
             }
 
             case ConnectionProtocol.PLAY: {
-                const packetId = this.gameClientPackets.findIndex(element => packet instanceof element);
+                const packetId = this.gameClientPackets.findIndex((element) => packet instanceof element);
                 return packetId < 0 ? null : packetId;
             }
 
             case ConnectionProtocol.STATUS: {
-                const packetId = this.statusClientPackets.findIndex(element => packet instanceof element);
+                const packetId = this.statusClientPackets.findIndex((element) => packet instanceof element);
                 return packetId < 0 ? null : packetId;
             }
 
             case ConnectionProtocol.LOGIN: {
-                const packetId = this.loginClientPackets.findIndex(element => packet instanceof element);
+                const packetId = this.loginClientPackets.findIndex((element) => packet instanceof element);
                 return packetId < 0 ? null : packetId;
             }
         }

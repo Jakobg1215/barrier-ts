@@ -28,7 +28,7 @@ const createConfigFile = (values: Config) => {
 };
 
 export default function getConfigurations(server: BarrierTs): Promise<Config> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         const defaultValues: Config = {
             port: 25565,
             host: '0.0.0.0',
@@ -48,7 +48,7 @@ export default function getConfigurations(server: BarrierTs): Promise<Config> {
         if (!existsSync(filePath)) createConfigFile(defaultValues);
 
         createInterface(createReadStream(filePath))
-            .on('line', line => {
+            .on('line', (line) => {
                 const [property] = line.split('#') as [string];
                 if (property.trim().length === 0) return;
                 if (!property.includes('=')) return server.console.error(`Property ${property} does not have a value!`);

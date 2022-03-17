@@ -39,7 +39,7 @@ export default class Player extends LivingEntity {
 
         if (this.inventory.changed) {
             const changedItems: { pos: number; item: Item }[] = [];
-            this.inventory.getChangedItems().forEach(slot => {
+            this.inventory.getChangedItems().forEach((slot) => {
                 switch (slot.index) {
                     case 5: {
                         changedItems.push({ pos: 5, item: slot.item });
@@ -107,7 +107,7 @@ export default class Player extends LivingEntity {
         this.postion = new Vector3(data.position.x, data.position.y, data.position.z);
         this.rotation = new Vector2(data.rotation.x, data.rotation.y);
         this.isFlying = !!data.flying;
-        data.inventory.forEach(slot => {
+        data.inventory.forEach((slot) => {
             this.inventory.setSlot(slot.slot, new Item(slot.present, slot.id, slot.count, Buffer.from(slot.nbt)));
         });
         this.inventory.selectedHand = data.selectedSlot;

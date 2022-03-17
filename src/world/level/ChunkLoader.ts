@@ -53,12 +53,12 @@ export default class ChunkLoader {
             }
         }
 
-        const addedChunks = newChunks.filter(chunkPos => !loadedChunksPositions.includes(chunkPos));
-        const removedChunks = loadedChunksPositions.filter(chunkPos => !newChunks.includes(chunkPos));
+        const addedChunks = newChunks.filter((chunkPos) => !loadedChunksPositions.includes(chunkPos));
+        const removedChunks = loadedChunksPositions.filter((chunkPos) => !newChunks.includes(chunkPos));
 
         this.connection.send(new ClientBoundSetChunkCacheCenterPacket(this.xPos, this.zPos));
 
-        addedChunks.forEach(chunkPos => {
+        addedChunks.forEach((chunkPos) => {
             const newChunk = this.levelChunkManager.getChunk(chunkPos);
 
             const x = Number(chunkPos >> 32n);
@@ -87,7 +87,7 @@ export default class ChunkLoader {
             this.chunks.set(chunkPos, newChunk);
         });
 
-        removedChunks.forEach(chunkPos => {
+        removedChunks.forEach((chunkPos) => {
             const chunk = this.chunks.get(chunkPos);
 
             const x = Number(chunkPos >> 32n);

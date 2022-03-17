@@ -7,7 +7,7 @@ export default class ClientBoundSetPassengersPacket implements ClientBoundPacket
     public write(packet: DataBuffer): DataBuffer {
         packet.writeVarInt(this.vehicle);
         packet.writeVarInt(this.passengers.length);
-        this.passengers.forEach(passenger => packet.writeVarInt(passenger));
+        this.passengers.forEach((passenger) => packet.writeVarInt(passenger));
         return packet;
     }
 }

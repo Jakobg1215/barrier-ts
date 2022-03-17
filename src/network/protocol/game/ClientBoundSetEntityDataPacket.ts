@@ -6,7 +6,7 @@ export default class ClientBoundSetEntityDataPacket implements ClientBoundPacket
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeVarInt(this.id);
-        this.packedItems.forEach(item => {
+        this.packedItems.forEach((item) => {
             packet.writeByte(item.index);
             packet.writeVarInt(item.type);
             switch (item.type) {
