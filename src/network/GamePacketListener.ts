@@ -37,7 +37,7 @@ import type ServerBoundBlockEntityTagQuery from './protocol/game/ServerBoundBloc
 import type ServerBoundChangeDifficultyPacket from './protocol/game/ServerBoundChangeDifficultyPacket';
 import type ServerBoundChatPacket from './protocol/game/ServerBoundChatPacket';
 import type ServerBoundClientCommandPacket from './protocol/game/ServerBoundClientCommandPacket';
-import { Action } from './protocol/game/ServerBoundClientCommandPacket';
+import { Action as ClientCommandAction } from './protocol/game/ServerBoundClientCommandPacket';
 import type ServerBoundClientInformationPacket from './protocol/game/ServerBoundClientInformationPacket';
 import type ServerBoundCommandSuggestionPacket from './protocol/game/ServerBoundCommandSuggestionPacket';
 import type ServerBoundContainerButtonClickPacket from './protocol/game/ServerBoundContainerButtonClickPacket';
@@ -312,7 +312,7 @@ export default class GamePacketListener extends ServerComponent implements Packe
 
     public handleClientCommand(clientCommand: ServerBoundClientCommandPacket): void {
         switch (clientCommand.action) {
-            case Action.PERFORM_RESPAWN: {
+            case ClientCommandAction.PERFORM_RESPAWN: {
                 this.player.health = 20;
 
                 this.server.playerManager.sendAll(
