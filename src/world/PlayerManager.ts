@@ -28,7 +28,6 @@ import BlockPos from '../types/classes/BlockPos';
 import Chat, { ChatType } from '../types/classes/Chat';
 import Item from '../types/classes/Item';
 import NameSpace from '../types/classes/NameSpace';
-import { ServerComponent } from '../types/classes/ServerComponent';
 import UUID from '../types/classes/UUID';
 import { ChatPermission } from '../types/enums/ChatPermission';
 import { Difficulty } from '../types/enums/Difficulty';
@@ -38,7 +37,7 @@ import NbtReader from '../utilities/NbtReader';
 import objectToNbt from '../utilities/objectToNbt';
 import type Player from './entities/Player';
 
-export default class PlayerManager extends ServerComponent {
+export default class PlayerManager {
     public readonly connections = new Set<Connection>();
     public readonly players = new Map<Connection, Player>();
     public readonly padLock = generateKeyPairSync('rsa', {
@@ -53,11 +52,9 @@ export default class PlayerManager extends ServerComponent {
         },
     });
 
-    public constructor(private readonly server: BarrierTs) {
-        super();
-    }
+    public constructor(private readonly server: BarrierTs) {}
 
-    public override tick() {
+    public tick() {
         this.connections.forEach((connection) => connection.tick());
         this.players.forEach((player) => player.tick());
     }

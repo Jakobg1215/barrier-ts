@@ -1,18 +1,15 @@
 import type BarrierTs from '../../BarrierTs';
 import ClientBoundSetTimePacket from '../../network/protocol/game/ClientBoundSetTimePacket';
-import { ServerComponent } from '../../types/classes/ServerComponent';
 import type World from '../World';
 import Chunk from './Chunk';
 
-export default class LevelChunkManager extends ServerComponent {
+export default class LevelChunkManager {
     public readonly levelChunks = new Map<bigint, Chunk>();
     private time = 6000n;
 
-    public constructor(private readonly world: World, private readonly server: BarrierTs) {
-        super();
-    }
+    public constructor(private readonly world: World, private readonly server: BarrierTs) {}
 
-    public override tick(): void {
+    public tick(): void {
         this.time++;
 
         if (this.world.age % 20n === 0n) {

@@ -3,7 +3,6 @@ import type BarrierTs from '../BarrierTs';
 import Chat, { ChatType } from '../types/classes/Chat';
 import Item from '../types/classes/Item';
 import NameSpace from '../types/classes/NameSpace';
-import { ServerComponent } from '../types/classes/ServerComponent';
 import { ChatPermission } from '../types/enums/ChatPermission';
 import { GameType } from '../types/enums/GameType';
 import { InteractionHand } from '../types/enums/InteractionHand';
@@ -84,7 +83,7 @@ import type ServerBoundTeleportToEntityPacket from './protocol/game/ServerBoundT
 import type ServerBoundUseItemOnPacket from './protocol/game/ServerBoundUseItemOnPacket';
 import type ServerBoundUseItemPacket from './protocol/game/ServerBoundUseItemPacket';
 
-export default class GamePacketListener extends ServerComponent implements PacketListener {
+export default class GamePacketListener implements PacketListener {
     private keepAlive = Date.now();
     private keepAlivePending = false;
     private teleportId = randomBytes(4);
@@ -105,11 +104,9 @@ export default class GamePacketListener extends ServerComponent implements Packe
         public readonly server: BarrierTs,
         public readonly player: Player,
         public readonly connection: Connection,
-    ) {
-        super();
-    }
+    ) {}
 
-    public override tick(): void {
+    public tick(): void {
         const timeNow = Date.now();
         if (timeNow - this.keepAlive >= 15000) {
             if (this.keepAlivePending) {

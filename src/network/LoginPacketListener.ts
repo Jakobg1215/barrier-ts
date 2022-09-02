@@ -4,7 +4,6 @@ import { get } from 'node:https';
 import { URL } from 'node:url';
 import type BarrierTs from '../BarrierTs';
 import Chat, { ChatType } from '../types/classes/Chat';
-import { ServerComponent } from '../types/classes/ServerComponent';
 import UUID from '../types/classes/UUID';
 import Player from '../world/entities/Player';
 import type Connection from './Connection';
@@ -18,18 +17,16 @@ import type ServerBoundCustomQueryPacket from './protocol/login/ServerBoundCusto
 import type ServerBoundHelloPacket from './protocol/login/ServerBoundHelloPacket';
 import type ServerBoundKeyPacket from './protocol/login/ServerBoundKeyPacket';
 
-export default class LoginPacketListener extends ServerComponent implements PacketListener {
+export default class LoginPacketListener implements PacketListener {
     private static readonly MAX_TICKS_BEFORE_LOGIN = 300;
     private readonly nonce = randomBytes(4);
     private tickCount = 0;
     private state = State.HELLO;
     private gameProfile: GameProfile | null = null;
 
-    public constructor(private readonly server: BarrierTs, private readonly connection: Connection) {
-        super();
-    }
+    public constructor(private readonly server: BarrierTs, private readonly connection: Connection) {}
 
-    public override tick(): void {
+    public tick(): void {
         if (this.state === State.READY_TO_ACCEPT) {
             this.loginPlayer();
         }

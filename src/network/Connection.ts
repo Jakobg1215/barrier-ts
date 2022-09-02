@@ -4,7 +4,6 @@ import type { Socket } from 'node:net';
 import { deflateSync, inflateSync } from 'node:zlib';
 import type BarrierTs from '../BarrierTs';
 import Chat, { ChatType } from '../types/classes/Chat';
-import { ServerComponent } from '../types/classes/ServerComponent';
 import UUID from '../types/classes/UUID';
 import { ChatPermission } from '../types/enums/ChatPermission';
 import { GameType } from '../types/enums/GameType';
@@ -21,7 +20,7 @@ import ClientBoundRemoveEntitiesPacket from './protocol/game/ClientBoundRemoveEn
 import ClientBoundLoginCompressionPacket from './protocol/login/ClientBoundLoginCompressionPacket';
 import ClientBoundLoginDisconnectPacket from './protocol/login/ClientBoundLoginDisconnectPacket';
 
-export default class Connection extends ServerComponent {
+export default class Connection {
     private encryption: Cipher | null = null;
     private decryption: Decipher | null = null;
     private compression = false;
@@ -30,8 +29,6 @@ export default class Connection extends ServerComponent {
     private packetQueue: DataBuffer[] = [];
 
     public constructor(private readonly networking: Socket, private readonly server: BarrierTs) {
-        super();
-
         this.networking.on('data', (data: Buffer): void => {
             const inData = new DataBuffer(this.decryption ? this.decryption.update(data) : data);
             if (this.compression) {
@@ -125,7 +122,7 @@ export default class Connection extends ServerComponent {
         this.networking.on('error', this.server.console.error);
     }
 
-    public override tick() {
+    public tick() {
         if (this.listener instanceof LoginPacketListener) {
             this.listener.tick();
         }
