@@ -9,10 +9,6 @@ export default class LivingEntity extends Entity {
         this.synchedData.define(9, FieldType.FLOAT, 20);
     }
 
-    public override tick(): void {
-        super.tick();
-    }
-
     public damage(amount: number) {
         this.health -= amount;
         this.synchedData.set(9, this.health);
