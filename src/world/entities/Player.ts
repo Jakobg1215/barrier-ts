@@ -28,9 +28,7 @@ export default class Player extends LivingEntity {
         this.synchedData.define(18, FieldType.BYTE, 1);
     }
 
-    public override tick(): void {
-        super.tick();
-
+    public tick(): void {
         if (this.synchedData.changed) {
             this.server.playerManager.sendAll(
                 new ClientBoundSetEntityDatapacket(this.id, this.synchedData.getChangedData()),
