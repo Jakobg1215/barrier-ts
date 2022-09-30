@@ -3,11 +3,7 @@ import type DataBuffer from '../../DataBuffer';
 import type ClientBoundPacket from '../ClientBoundPacket';
 
 export default class ClientBoundCustomQueryPacket implements ClientBoundPacket {
-    public constructor(
-        public readonly transactionId: number,
-        public readonly identifier: NameSpace,
-        public readonly data: DataBuffer,
-    ) {}
+    public constructor(public readonly transactionId: number, public readonly identifier: NameSpace, public readonly data: DataBuffer) {}
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeVarInt(this.transactionId);

@@ -14,8 +14,7 @@ export default class ServerBoundEditBookPacket implements ServerBoundPacket<Game
         this.slot = data.readVarInt();
         const pagesCount = data.readVarInt();
         if (pagesCount > ServerBoundEditBookPacket.MAX_PAGES_COUNT) throw new Error('Got more pages then expected!');
-        for (let index = 0; index < pagesCount; index++)
-            this.pages.push(data.readString(ServerBoundEditBookPacket.PAGE_MAX_CHARS));
+        for (let index = 0; index < pagesCount; index++) this.pages.push(data.readString(ServerBoundEditBookPacket.PAGE_MAX_CHARS));
         if (data.readBoolean()) {
             this.title = data.readString(ServerBoundEditBookPacket.TITLE_MAX_CHARS);
         }

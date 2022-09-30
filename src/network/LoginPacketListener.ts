@@ -57,13 +57,7 @@ export default class LoginPacketListener implements PacketListener {
         this.gameProfile = hello.gameProfile;
         if (this.server.config.online) {
             this.state = State.KEY;
-            this.connection.send(
-                new ClientBoundHelloPacket(
-                    this.server.config.serverId,
-                    this.server.playerManager.padLock.publicKey,
-                    this.nonce,
-                ),
-            );
+            this.connection.send(new ClientBoundHelloPacket(this.server.config.serverId, this.server.playerManager.padLock.publicKey, this.nonce));
         } else {
             this.state = State.READY_TO_ACCEPT;
         }
@@ -106,34 +100,25 @@ export default class LoginPacketListener implements PacketListener {
             return (negative ? '-' : '') + hash.toString('hex').replace(/^0+/g, '');
         };
 
-        const hash = mcHexDigest(
-            createHash('sha1')
-                .update(this.server.config.serverId)
-                .update(secretkey)
-                .update(this.server.playerManager.padLock.publicKey)
-                .digest(),
-        );
+        const hash = mcHexDigest(createHash('sha1').update(this.server.config.serverId).update(secretkey).update(this.server.playerManager.padLock.publicKey).digest());
 
         get(
             new URL(
-                `https://sessionserver.mojang.com/session/minecraft/hasJoined?username=${encodeURIComponent(
-                    this.gameProfile!.name,
-                )}&serverId=${encodeURIComponent(hash)}`,
+                `https://sessionserver.mojang.com/session/minecraft/hasJoined?username=${encodeURIComponent(this.gameProfile!.name)}&serverId=${encodeURIComponent(
+                    hash,
+                )}`,
             ),
             (res) => {
                 res.on('data', (data: Buffer): void => {
                     const resData: Responce = JSON.parse(data.toString());
                     this.gameProfile = new GameProfile(resData.name, new UUID(resData.id));
-                    for (let index = 0; index < resData.properties.length; index++)
-                        this.gameProfile.properties.push(resData.properties.at(index) as property);
+                    for (let index = 0; index < resData.properties.length; index++) this.gameProfile.properties.push(resData.properties.at(index) as property);
 
                     this.state = State.READY_TO_ACCEPT;
                 });
 
                 if (res.statusCode === 204) {
-                    this.connection.disconnect(
-                        new Chat(ChatType.TRANSLATE, 'multiplayer.disconnect.unverified_username'),
-                    );
+                    this.connection.disconnect(new Chat(ChatType.TRANSLATE, 'multiplayer.disconnect.unverified_username'));
                 }
 
                 if (res.statusCode === 502) {

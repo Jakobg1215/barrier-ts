@@ -3,12 +3,7 @@ import type DataBuffer from '../../DataBuffer';
 import type ClientBoundPacket from '../ClientBoundPacket';
 
 export default class ClientBoundContainerSetSlotPacket implements ClientBoundPacket {
-    public constructor(
-        public containerId: number,
-        public stateId: number,
-        public slot: number,
-        public itemStack: Item,
-    ) {}
+    public constructor(public containerId: number, public stateId: number, public slot: number, public itemStack: Item) {}
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeByte(this.containerId);

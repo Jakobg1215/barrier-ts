@@ -3,7 +3,7 @@ import { TagIds } from '../types/enums/NbtTags';
 
 export default class NbtReader {
     private bytes: Buffer;
-    private offset: number = 0;
+    private offset = 0;
 
     private constructor(data: Buffer, private readonly sNBT: boolean) {
         this.bytes = data;
@@ -161,7 +161,7 @@ export default class NbtReader {
 
     private readTagCompound(): object {
         const compound: any = {};
-
+        // eslint-disable-next-line no-constant-condition
         while (true) {
             switch (this.readUnsignedByte()) {
                 case TagIds.END: {
@@ -294,7 +294,7 @@ export default class NbtReader {
         return this.bytes;
     }
 
-    private addOffset(offset: number, retval: boolean = false): number {
+    private addOffset(offset: number, retval = false): number {
         return retval ? (this.offset += offset) : (this.offset += offset) - offset;
     }
 }

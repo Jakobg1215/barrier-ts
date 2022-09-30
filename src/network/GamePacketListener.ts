@@ -100,11 +100,7 @@ export default class GamePacketListener implements PacketListener {
         this.server.config.viewDistance,
     );
 
-    public constructor(
-        public readonly server: BarrierTs,
-        public readonly player: Player,
-        public readonly connection: Connection,
-    ) {}
+    public constructor(public readonly server: BarrierTs, public readonly player: Player, public readonly connection: Connection) {}
 
     public tick(): void {
         const timeNow = Date.now();
@@ -129,11 +125,7 @@ export default class GamePacketListener implements PacketListener {
             this.previousHealth = this.player.health;
         }
 
-        if (
-            this.player.pos.x !== this.previousPosition.x ||
-            this.player.pos.y !== this.previousPosition.y ||
-            this.player.pos.z !== this.previousPosition.z
-        ) {
+        if (this.player.pos.x !== this.previousPosition.x || this.player.pos.y !== this.previousPosition.y || this.player.pos.z !== this.previousPosition.z) {
             // Sanity-check
             const xDiff = this.player.pos.x - this.previousPosition.x;
             const yDiff = this.player.pos.y - this.previousPosition.y;
@@ -167,10 +159,7 @@ export default class GamePacketListener implements PacketListener {
                     ),
                     this.player.id,
                 );
-                this.server.playerManager.sendAll(
-                    new ClientBoundRotateHeadPacket(this.player.id, Math.floor((this.player.rot.y * 256) / 360)),
-                    this.player.id,
-                );
+                this.server.playerManager.sendAll(new ClientBoundRotateHeadPacket(this.player.id, Math.floor((this.player.rot.y * 256) / 360)), this.player.id);
                 this.previousPosition = this.player.pos;
                 this.previousRotation = this.player.rot;
             } else {
@@ -196,10 +185,7 @@ export default class GamePacketListener implements PacketListener {
                 ),
                 this.player.id,
             );
-            this.server.playerManager.sendAll(
-                new ClientBoundRotateHeadPacket(this.player.id, Math.floor((this.player.rot.y * 256) / 360)),
-                this.player.id,
-            );
+            this.server.playerManager.sendAll(new ClientBoundRotateHeadPacket(this.player.id, Math.floor((this.player.rot.y * 256) / 360)), this.player.id);
             this.previousRotation = this.player.rot;
         }
 
@@ -224,35 +210,15 @@ export default class GamePacketListener implements PacketListener {
         this.previousRotation = new Vector2(xRot, yRot);
         this.previousChunkX = x >> 4;
         this.previousChunkZ = z >> 4;
-        this.send(
-            new ClientBoundPlayerPositionPacket(
-                x,
-                y,
-                z,
-                yRot,
-                xRot,
-                0,
-                this.teleportId.readInt32BE(),
-                this.player.isOnGround,
-            ),
-        );
+        this.send(new ClientBoundPlayerPositionPacket(x, y, z, yRot, xRot, 0, this.teleportId.readInt32BE(), this.player.isOnGround));
         this.server.playerManager.sendAll(
-            new ClientBoundTeleportEntityPacket(
-                this.player.id,
-                x,
-                y,
-                z,
-                Math.floor((yRot * 256) / 360),
-                Math.floor((xRot * 256) / 360),
-                true,
-            ),
+            new ClientBoundTeleportEntityPacket(this.player.id, x, y, z, Math.floor((yRot * 256) / 360), Math.floor((xRot * 256) / 360), true),
             this.player.id,
         );
     }
 
     public handleAcceptTeleport(acceptTeleport: ServerBoundAcceptTeleportationPacket): void {
-        if (acceptTeleport.id !== this.teleportId.readInt32BE())
-            return this.server.console.warn('Player invalid teleport id!');
+        if (acceptTeleport.id !== this.teleportId.readInt32BE()) return this.server.console.warn('Player invalid teleport id!');
         this.teleportId = randomBytes(4);
     }
 
@@ -267,13 +233,7 @@ export default class GamePacketListener implements PacketListener {
     public handleChat(chat: ServerBoundChatPacket): void {
         if (chat.message.startsWith('/')) {
             // TODO: handle commands properly on the server then implement this
-            this.send(
-                new ClientBoundChatPacket(
-                    new Chat(ChatType.TEXT, 'TODO'),
-                    ChatPermission.SYSTEM,
-                    this.player.gameProfile.id,
-                ),
-            );
+            this.send(new ClientBoundChatPacket(new Chat(ChatType.TEXT, 'TODO'), ChatPermission.SYSTEM, this.player.gameProfile.id));
             return;
         }
 
@@ -312,10 +272,7 @@ export default class GamePacketListener implements PacketListener {
             case ClientCommandAction.PERFORM_RESPAWN: {
                 this.player.health = 20;
 
-                this.server.playerManager.sendAll(
-                    new ClientBoundRemoveEntitiesPacket([this.player.id]),
-                    this.player.id,
-                );
+                this.server.playerManager.sendAll(new ClientBoundRemoveEntitiesPacket([this.player.id]), this.player.id);
 
                 this.server.playerManager.sendAll(
                     new ClientBoundAddPlayerPacket(
@@ -373,7 +330,9 @@ export default class GamePacketListener implements PacketListener {
         // This can probly be a event for plugins
     }
 
-    public handleCustomPayload(_customPayload: ServerBoundCustomPayloadPacket): void {}
+    public handleCustomPayload(_customPayload: ServerBoundCustomPayloadPacket): void {
+        // This can probly be a event for plugins
+    }
 
     public handleEditBook(_editBook: ServerBoundEditBookPacket): void {
         throw new Error('Method not implemented.');
@@ -514,9 +473,7 @@ export default class GamePacketListener implements PacketListener {
         throw new Error('Method not implemented.');
     }
 
-    public handleRecipeBookChangeSettingsPacket(
-        _recipeBookChangeSettingsPacket: ServerBoundRecipeBookChangeSettingsPacket,
-    ): void {
+    public handleRecipeBookChangeSettingsPacket(_recipeBookChangeSettingsPacket: ServerBoundRecipeBookChangeSettingsPacket): void {
         throw new Error('Method not implemented.');
     }
 
@@ -549,10 +506,7 @@ export default class GamePacketListener implements PacketListener {
 
         const item = this.player.inventory.getSlot(36 + setCarriedItem.slot);
 
-        this.server.playerManager.sendAll(
-            new ClientBoundSetEquipmentPacket(this.player.id, [{ pos: 0, item: item ? item : Item.Empty }]),
-            this.player.id,
-        );
+        this.server.playerManager.sendAll(new ClientBoundSetEquipmentPacket(this.player.id, [{ pos: 0, item: item ? item : Item.Empty }]), this.player.id);
     }
 
     public handleSetCommandBlock(_setCommandBlock: ServerBoundSetCommandBlockPacket): void {
@@ -581,10 +535,7 @@ export default class GamePacketListener implements PacketListener {
 
     public handleSwing(swing: ServerBoundSwingPacket): void {
         this.server.playerManager.sendAll(
-            new ClientBoundAnimatePacket(
-                this.player.id,
-                swing.hand === InteractionHand.MAIN_HAND ? SwingAction.SWING_MAIN_HAND : SwingAction.SWING_OFF_HAND,
-            ),
+            new ClientBoundAnimatePacket(this.player.id, swing.hand === InteractionHand.MAIN_HAND ? SwingAction.SWING_MAIN_HAND : SwingAction.SWING_OFF_HAND),
             this.player.id,
         );
     }

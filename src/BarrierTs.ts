@@ -31,11 +31,7 @@ export default class BarrierTs {
         this.init();
 
         this.networking.on('listening', (): void => {
-            this.console.log(
-                'Server listening on port %s on host %s!',
-                this.serverConfigurations.port,
-                this.serverConfigurations.host,
-            );
+            this.console.log('Server listening on port %s on host %s!', this.serverConfigurations.port, this.serverConfigurations.host);
         });
 
         this.networking.on('connection', (socket): void => {
@@ -49,9 +45,7 @@ export default class BarrierTs {
         this.serverConfigurations = await getConfigurations(this);
         if (this.serverConfigurations.icon.length > 0) {
             try {
-                this.iconData = (await readFile(join(__dirname, '../', this.serverConfigurations.icon))).toString(
-                    'base64',
-                );
+                this.iconData = (await readFile(join(__dirname, '../', this.serverConfigurations.icon))).toString('base64');
             } catch {
                 this.iconData = null;
                 this.console.error('Failed to get server icon!');
@@ -66,7 +60,7 @@ export default class BarrierTs {
     }
 
     public stop(): Promise<void> {
-        return new Promise(async (resolve) => {
+        return new Promise((resolve) => {
             this.playerManager.connections.forEach(async (conn) => {
                 await this.playerManager.savePlayer(conn);
                 conn.disconnect(new Chat(ChatType.TRANSLATE, 'multiplayer.disconnect.server_shutdown'));
@@ -80,9 +74,7 @@ export default class BarrierTs {
         this.serverConfigurations = await getConfigurations(this);
         if (this.serverConfigurations.icon.length > 0) {
             try {
-                this.iconData = (await readFile(join(__dirname, '../', this.serverConfigurations.icon))).toString(
-                    'base64',
-                );
+                this.iconData = (await readFile(join(__dirname, '../', this.serverConfigurations.icon))).toString('base64');
             } catch {
                 this.iconData = null;
                 this.console.error('Failed to get server icon!');

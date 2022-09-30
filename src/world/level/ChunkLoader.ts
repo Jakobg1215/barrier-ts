@@ -75,10 +75,7 @@ export default class ChunkLoader {
                     [0n],
                     [2n],
                     [7n],
-                    [
-                        Array.from({ length: 2048 }).fill(0) as number[],
-                        Array.from({ length: 2048 }).fill(255) as number[],
-                    ],
+                    [Array.from({ length: 2048 }).fill(0) as number[], Array.from({ length: 2048 }).fill(255) as number[]],
                     [],
                     true,
                 ),

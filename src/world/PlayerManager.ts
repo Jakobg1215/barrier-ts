@@ -14,10 +14,7 @@ import ClientBoundContainerSetContentPacket from '../network/protocol/game/Clien
 import ClientBoundCustomPayloadPacket from '../network/protocol/game/ClientBoundCustomPayloadPacket';
 import ClientBoundLoginPacket from '../network/protocol/game/ClientBoundLoginPacket';
 import ClientBoundPlayerAbilitiesPacket from '../network/protocol/game/ClientBoundPlayerAbilitiesPacket';
-import ClientBoundPlayerInfoPacket, {
-    Action,
-    PlayerUpdate,
-} from '../network/protocol/game/ClientBoundPlayerInfoPacket';
+import ClientBoundPlayerInfoPacket, { Action, PlayerUpdate } from '../network/protocol/game/ClientBoundPlayerInfoPacket';
 import ClientBoundRotateHeadPacket from '../network/protocol/game/ClientBoundRotateHeadPacket';
 import ClientBoundSetCarriedItemPacket from '../network/protocol/game/ClientBoundSetCarriedItemPacket';
 import ClientBoundSetDefaultSpawnPositionPacket from '../network/protocol/game/ClientBoundSetDefaultSpawnPositionPacket';
@@ -84,11 +81,7 @@ export default class PlayerManager {
                 false,
                 GameType.CREATIVE,
                 GameType.CREATIVE,
-                [
-                    new NameSpace('minecraft', 'overworld'),
-                    new NameSpace('minecraft', 'the_nether'),
-                    new NameSpace('minecraft', 'the_end'),
-                ],
+                [new NameSpace('minecraft', 'overworld'), new NameSpace('minecraft', 'the_nether'), new NameSpace('minecraft', 'the_end')],
                 objectToNbt(RegistryHolder),
                 objectToNbt(DimensionType),
                 new NameSpace('minecraft', 'overworld'),
@@ -102,18 +95,11 @@ export default class PlayerManager {
             ),
         );
 
-        gamelistener.send(
-            new ClientBoundCustomPayloadPacket(
-                new NameSpace('minecraft', 'brand'),
-                new DataBuffer().writeString(this.server.config.serverName).buffer,
-            ),
-        );
+        gamelistener.send(new ClientBoundCustomPayloadPacket(new NameSpace('minecraft', 'brand'), new DataBuffer().writeString(this.server.config.serverName).buffer));
 
         gamelistener.send(new ClientBoundChangeDifficultyPacket(Difficulty.HARD, true));
 
-        gamelistener.send(
-            new ClientBoundPlayerAbilitiesPacket(true, gamelistener.player.isFlying, true, true, 0.05, 0.1),
-        );
+        gamelistener.send(new ClientBoundPlayerAbilitiesPacket(true, gamelistener.player.isFlying, true, true, 0.05, 0.1));
 
         gamelistener.send(new ClientBoundSetCarriedItemPacket(0));
 
@@ -130,13 +116,7 @@ export default class PlayerManager {
 
         this.sendAll(new ClientBoundPlayerInfoPacket(Action.ADD_PLAYER, players));
 
-        gamelistener.teleport(
-            gamelistener.player.pos.x,
-            gamelistener.player.pos.y,
-            gamelistener.player.pos.z,
-            gamelistener.player.rot.y,
-            gamelistener.player.rot.x,
-        );
+        gamelistener.teleport(gamelistener.player.pos.x, gamelistener.player.pos.y, gamelistener.player.pos.z, gamelistener.player.rot.y, gamelistener.player.rot.x);
 
         gamelistener.chunkLoader.setChunkPosition(gamelistener.player.pos.x >> 4, gamelistener.player.pos.z >> 4);
 
@@ -169,11 +149,7 @@ export default class PlayerManager {
             gamelistener.player.id,
         );
 
-        this.server.console.log(
-            '%s (%s) has joined the server!',
-            gamelistener.player.gameProfile.name,
-            gamelistener.player.id,
-        );
+        this.server.console.log('%s (%s) has joined the server!', gamelistener.player.gameProfile.name, gamelistener.player.id);
 
         this.sendAll(
             new ClientBoundAddPlayerPacket(
@@ -247,9 +223,7 @@ export default class PlayerManager {
 
         gamelistener.send(new ClientBoundSetDefaultSpawnPositionPacket(new BlockPos(0, -60, 0), 0));
 
-        gamelistener.send(
-            new ClientBoundContainerSetContentPacket(0, 0, gamelistener.player.inventory.getItemSlots(), Item.Empty),
-        );
+        gamelistener.send(new ClientBoundContainerSetContentPacket(0, 0, gamelistener.player.inventory.getItemSlots(), Item.Empty));
 
         gamelistener.send(new ClientBoundSetCarriedItemPacket(gamelistener.player.inventory.selectedHand));
     }
@@ -259,9 +233,7 @@ export default class PlayerManager {
         const baseValues = this.getDefaultPlayerData();
         if (!player) return baseValues;
         try {
-            const fileData = await readFile(
-                join(__dirname, '../../world/players', player.gameProfile.id?.toString()! + '.nbt'),
-            );
+            const fileData = await readFile(join(__dirname, '../../world/players', player.gameProfile.id?.toString()! + '.nbt'));
             const nbtData = NbtReader.readData(fileData, false)[0];
             return { ...baseValues, ...nbtData };
         } catch {
@@ -305,10 +277,7 @@ export default class PlayerManager {
                 selectedSlot: player.inventory.selectedHand + 'b',
             };
             mkdir(join(__dirname, '../../world/players'), { recursive: true }).then((_path) => {
-                writeFile(
-                    join(__dirname, '../../world/players', player.gameProfile.id?.toString()! + '.nbt'),
-                    objectToNbt(data),
-                ).then(() => resolve());
+                writeFile(join(__dirname, '../../world/players', player.gameProfile.id?.toString()! + '.nbt'), objectToNbt(data)).then(() => resolve());
             });
         });
     }

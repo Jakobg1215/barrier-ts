@@ -1,31 +1,28 @@
 {
     "devDependencies": {
         "@types/node": "^17.0.45",
-        "concurrently": "^7.3.0",
-        "nodemon": "^2.0.19",
+        "@typescript-eslint/eslint-plugin": "^5.38.1",
+        "@typescript-eslint/parser": "^5.38.1",
+        "concurrently": "^7.4.0",
+        "eslint": "^8.24.0",
+        "eslint-plugin-prettier": "^4.2.1",
+        "nodemon": "^2.0.20",
         "prettier": "^2.7.1",
         "prettier-plugin-organize-imports": "^2.3.4",
-        "typescript": "^4.8.2"
+        "typescript": "^4.8.4"
     },
     "engines": {
         "node": ">=17.7.0",
         "npm": ">=8.5.0"
     },
     "name": "barrierts",
-    "prettier": {
-        "endOfLine": "crlf",
-        "parser": "typescript",
-        "printWidth": 120,
-        "singleQuote": true,
-        "tabWidth": 4,
-        "trailingComma": "all"
-    },
     "scripts": {
         "build": "tsc -b",
         "dev": "concurrently -i --default-input-target 1 -k true npm:dev:*",
         "dev:watch": "tsc --preserveWatchOutput -w ",
         "dev:run": "nodemon -e js -x node -w dist dist/index",
         "prettier": "prettier -w -c src",
+        "lint": "eslint src",
         "start": "node dist/index"
     }
 }

@@ -10,19 +10,9 @@ export default class BlockPos extends Vector3 {
 
     public toBigInt(): bigint {
         return BigInt(
-            `0b${
-                this.x < 0
-                    ? new Uint32Array([this.x]).at(0)?.toString(2).slice(6)
-                    : this.x.toString(2).padStart(26, '0')
-            }${
-                this.z < 0
-                    ? new Uint32Array([this.z]).at(0)?.toString(2).slice(6)
-                    : this.z.toString(2).padStart(26, '0')
-            }${
-                this.y < 0
-                    ? new Uint16Array([this.y]).at(0)?.toString(2).slice(4)
-                    : this.y.toString(2).padStart(12, '0')
-            }`,
+            `0b${this.x < 0 ? new Uint32Array([this.x]).at(0)?.toString(2).slice(6) : this.x.toString(2).padStart(26, '0')}${
+                this.z < 0 ? new Uint32Array([this.z]).at(0)?.toString(2).slice(6) : this.z.toString(2).padStart(26, '0')
+            }${this.y < 0 ? new Uint16Array([this.y]).at(0)?.toString(2).slice(4) : this.y.toString(2).padStart(12, '0')}`,
         );
     }
 }

@@ -2,13 +2,22 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "node",
+            "request": "launch",
+            "name": "Build and Run",
+            "skipFiles": ["<node_internals>/**"],
+            "program": "${workspaceFolder}\\dist\\index.js",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+        },
+        {
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
             "name": "Watch",
             "request": "launch",
             "runtimeArgs": ["run", "dev"],
             "runtimeExecutable": "npm",
-            "type": "pwa-node"
+            "type": "node"
         }
     ]
 }

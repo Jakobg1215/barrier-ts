@@ -5,13 +5,7 @@ import type DataBuffer from '../../DataBuffer';
 import type ClientBoundPacket from '../ClientBoundPacket';
 
 export default class ClientBoundAddPaintingPacket implements ClientBoundPacket {
-    public constructor(
-        public id: number,
-        public uuid: UUID,
-        public pos: BlockPos,
-        public direction: Direction,
-        public motive: number,
-    ) {}
+    public constructor(public id: number, public uuid: UUID, public pos: BlockPos, public direction: Direction, public motive: number) {}
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeVarInt(this.id);

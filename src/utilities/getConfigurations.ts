@@ -53,8 +53,7 @@ export default function getConfigurations(server: BarrierTs): Promise<Config> {
                 if (property.trim().length === 0) return;
                 if (!property.includes('=')) return server.console.error(`Property ${property} does not have a value!`);
                 const [option, value] = property.trim().split('=') as [string, string];
-                if (!(option in defaultValues))
-                    return server.console.warn(`Property ${option} is not a valid property!`);
+                if (!(option in defaultValues)) return server.console.warn(`Property ${option} is not a valid property!`);
                 switch (typeof (defaultValues as any)[option]) {
                     case 'string': {
                         (defaultValues as any)[option] = value;

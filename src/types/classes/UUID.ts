@@ -27,9 +27,6 @@ export default class UUID {
     }
 
     public toFormattedString(): string {
-        return `${this.data.slice(0, 8)}-${this.data.slice(8, 12)}-${this.data.slice(12, 16)}-${this.data.slice(
-            16,
-            20,
-        )}-${this.data.slice(20, 32)}`;
+        return `${this.data.slice(0, 8)}-${this.data.slice(8, 12)}-${this.data.slice(12, 16)}-${this.data.slice(16, 20)}-${this.data.slice(20, 32)}`;
     }
 }

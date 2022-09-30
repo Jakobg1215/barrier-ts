@@ -30,9 +30,7 @@ export default class Player extends LivingEntity {
 
     public tick(): void {
         if (this.synchedData.changed) {
-            this.server.playerManager.sendAll(
-                new ClientBoundSetEntityDatapacket(this.id, this.synchedData.getChangedData()),
-            );
+            this.server.playerManager.sendAll(new ClientBoundSetEntityDatapacket(this.id, this.synchedData.getChangedData()));
         }
 
         if (this.inventory.changed) {
@@ -65,8 +63,7 @@ export default class Player extends LivingEntity {
                     }
                 }
             });
-            if (changedItems.length > 0)
-                this.server.playerManager.sendAll(new ClientBoundSetEquipmentPacket(this.id, changedItems), this.id);
+            if (changedItems.length > 0) this.server.playerManager.sendAll(new ClientBoundSetEquipmentPacket(this.id, changedItems), this.id);
         }
     }
 

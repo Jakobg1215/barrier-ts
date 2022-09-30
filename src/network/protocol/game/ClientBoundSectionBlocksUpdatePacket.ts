@@ -2,12 +2,7 @@ import type DataBuffer from '../../DataBuffer';
 import type ClientBoundPacket from '../ClientBoundPacket';
 
 export default class ClientBoundSectionBlocksUpdatePacket implements ClientBoundPacket {
-    public constructor(
-        public sectionPos: bigint,
-        public positions: number[],
-        public states: number[],
-        public suppressLightUpdates: boolean,
-    ) {}
+    public constructor(public sectionPos: bigint, public positions: number[], public states: number[], public suppressLightUpdates: boolean) {}
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeLong(this.sectionPos);
