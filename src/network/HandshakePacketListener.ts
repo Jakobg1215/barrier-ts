@@ -15,7 +15,8 @@ export default class HandshakePacketListener implements PacketListener {
             case ConnectionProtocol.LOGIN: {
                 this.connection.setProtocol(ConnectionProtocol.LOGIN);
                 if (intention.protocolVersion !== this.server.minecraftVersion.protocol) {
-                    if (intention.protocolVersion < 758) this.connection.disconnect(new Chat(ChatType.TRANSLATE, 'multiplayer.disconnect.outdated_client'));
+                    if (intention.protocolVersion < this.server.minecraftVersion.protocol)
+                        this.connection.disconnect(new Chat(ChatType.TRANSLATE, 'multiplayer.disconnect.outdated_client'));
                     else this.connection.disconnect(new Chat(ChatType.TRANSLATE, 'multiplayer.disconnect.outdated_server'));
                 } else this.connection.setListener(new LoginPacketListener(this.server, this.connection));
                 break;

@@ -16,8 +16,8 @@ import World from './world/World';
 
 export default class BarrierTs {
     public readonly minecraftVersion = {
-        name: '1.18.2',
-        protocol: 758,
+        name: '1.19.2',
+        protocol: 760,
     };
     public readonly console = new Console(this);
     private serverConfigurations!: Config;

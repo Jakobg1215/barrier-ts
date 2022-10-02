@@ -1,8 +1,10 @@
 export default interface ServerStatus {
     description?: string;
-    players: Players;
-    version: Version;
+    players?: Players;
+    version?: Version;
     favicon?: string;
+    previewsChat?: boolean;
+    enforcesSecureChat?: boolean;
 }
 
 export interface Players {

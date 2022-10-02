@@ -3,7 +3,7 @@ import type { GameType } from '../../../types/enums/GameType';
 import type DataBuffer from '../../DataBuffer';
 import type ClientBoundPacket from '../ClientBoundPacket';
 import type GameProfile from '../login/GameProfile';
-import type { property } from '../login/GameProfile';
+import type { Buffer } from 'node:buffer';
 
 export default class ClientBoundPlayerInfoPacket implements ClientBoundPacket {
     public constructor(public action: Action, public entries: PlayerUpdate[]) {}
@@ -13,67 +13,66 @@ export default class ClientBoundPlayerInfoPacket implements ClientBoundPacket {
         packet.writeVarInt(this.entries.length);
         switch (this.action) {
             case Action.ADD_PLAYER: {
-                this.entries.forEach((element: PlayerUpdate): void => {
+                for (const element of this.entries) {
                     packet.writeUUID(element.profile.id);
                     packet.writeString(element.profile.name);
                     packet.writeVarInt(element.profile.properties ? element.profile.properties.length : 0);
                     if (element.profile.properties) {
-                        element.profile.properties.forEach((property: property): void => {
+                        for (const property of element.profile.properties) {
                             packet.writeString(property.name);
                             packet.writeString(property.value);
-                            if (!property.signature) {
-                                packet.writeBoolean(false);
-                                return;
-                            }
-                            packet.writeBoolean(true);
-                            packet.writeString(property.signature);
-                        });
+                            packet.writeBoolean(property.signature !== undefined);
+                            if (property.signature) packet.writeString(property.signature);
+                        }
                     }
                     packet.writeVarInt(element.gameMode);
                     packet.writeVarInt(element.latency);
-                    if (!element.displayName) {
-                        packet.writeBoolean(false);
-                        return;
+                    packet.writeBoolean(element.displayName !== null);
+                    if (element.displayName) packet.writeChat(element.displayName);
+                    packet.writeBoolean(element.profilePublicKey !== null);
+                    if (element.profilePublicKey) {
+                        packet.writeLong(element.profilePublicKey.expiresAt);
+                        packet.writeByteArray(element.profilePublicKey.key);
+                        packet.writeByteArray(element.profilePublicKey.keySignature);
                     }
-                    packet.writeBoolean(true);
-                    packet.writeChat(element.displayName);
-                });
+                }
+
                 break;
             }
 
             case Action.UPDATE_GAME_MODE: {
-                this.entries.forEach((element: PlayerUpdate): void => {
+                for (const element of this.entries) {
                     packet.writeUUID(element.profile.id);
                     packet.writeVarInt(element.gameMode);
-                });
+                }
                 break;
             }
 
             case Action.UPDATE_LATENCY: {
-                this.entries.forEach((element: PlayerUpdate): void => {
+                for (const element of this.entries) {
                     packet.writeUUID(element.profile.id);
                     packet.writeVarInt(element.latency);
-                });
+                }
                 break;
             }
 
             case Action.UPDATE_DISPLAY_NAME: {
-                this.entries.forEach((element: PlayerUpdate): void => {
+                for (const element of this.entries) {
                     packet.writeUUID(element.profile.id);
                     if (!element.displayName) {
                         packet.writeBoolean(false);
-                        return;
+                        continue;
                     }
                     packet.writeBoolean(true);
                     packet.writeChat(element.displayName);
-                });
+                }
                 break;
             }
 
             case Action.REMOVE_PLAYER: {
-                this.entries.forEach((element: PlayerUpdate) => {
+                for (const element of this.entries) {
                     packet.writeUUID(element.profile.id);
-                });
+                }
                 break;
             }
         }
@@ -94,4 +93,9 @@ export interface PlayerUpdate {
     gameMode: GameType;
     profile: GameProfile;
     displayName: Chat | null;
+    profilePublicKey: {
+        expiresAt: bigint;
+        key: Buffer;
+        keySignature: Buffer;
+    } | null;
 }

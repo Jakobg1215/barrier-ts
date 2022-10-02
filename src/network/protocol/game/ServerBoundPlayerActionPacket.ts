@@ -8,11 +8,13 @@ export default class ServerBoundPlayerActionPacket implements ServerBoundPacket<
     public readonly pos: BlockPos;
     public readonly direction: Direction;
     public readonly action: Action;
+    public readonly sequence: number;
 
     public constructor(data: DataBuffer) {
         this.action = data.readVarInt();
         this.pos = data.readBlockPos();
         this.direction = data.readUnsignedByte();
+        this.sequence = data.readVarInt();
     }
 
     public handle(handler: GamePacketListener): void {

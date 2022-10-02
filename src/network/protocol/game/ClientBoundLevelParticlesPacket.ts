@@ -3,6 +3,8 @@ import type ClientBoundPacket from '../ClientBoundPacket';
 
 export default class ClientBoundLevelParticlesPacket implements ClientBoundPacket {
     public constructor(
+        public particletype: number,
+        public overrideLimiter: boolean,
         public x: number,
         public y: number,
         public z: number,
@@ -11,11 +13,12 @@ export default class ClientBoundLevelParticlesPacket implements ClientBoundPacke
         public zDist: number,
         public maxSpeed: number,
         public count: number,
-        public overrideLimiter: boolean,
         public particle: number, // TODO: Add ParticleOptions Type
     ) {}
 
     public write(packet: DataBuffer): DataBuffer {
+        packet.writeVarInt(this.particletype);
+        packet.writeBoolean(this.overrideLimiter);
         packet.writeDouble(this.x);
         packet.writeDouble(this.y);
         packet.writeDouble(this.z);

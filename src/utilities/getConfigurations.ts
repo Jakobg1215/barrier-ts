@@ -18,12 +18,12 @@ const createConfigFile = (values: Config) => {
     formatOption('online', values.online, 'Validate players with Mojang servers.');
     formatOption('compression', values.compression, 'The threshold before packets are compressed.');
     formatOption('serverName', values.serverName, 'Shows in the debug menu.');
-    formatOption('serverId', values.serverId, 'Used for encryption');
     formatOption('maxplayers', values.maxplayers, 'The max amount of players that can join.');
     formatOption('motd', values.motd, 'The message of the day.');
     formatOption('icon', values.icon, 'The path to the server icon. (must be 64*64 png)');
     formatOption('playerlisting', values.playerlisting, 'Shows players in the server on the selection screen.');
-    formatOption('viewDistance', values.viewDistance, 'The maximum of chunks the server will load for a player.');
+    formatOption('viewDistance', values.viewDistance, 'The radius of chunks the server will load for a player.');
+    formatOption('simulationDistance', values.simulationDistance, 'The radius of chunks the server will process for a player.');
     return file.end();
 };
 
@@ -36,13 +36,13 @@ export default function getConfigurations(server: BarrierTs): Promise<Config> {
             online: true,
             compression: 256,
             serverName: 'BarrierTs',
-            serverId: '',
             maxplayers: 20,
             motd: 'A BarrierTs Server',
             difficulty: 2,
             icon: '',
             playerlisting: true,
             viewDistance: 8,
+            simulationDistance: 8,
         };
 
         if (!existsSync(filePath)) createConfigFile(defaultValues);

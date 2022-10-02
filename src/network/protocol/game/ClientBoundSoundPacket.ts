@@ -2,7 +2,16 @@ import type DataBuffer from '../../DataBuffer';
 import type ClientBoundPacket from '../ClientBoundPacket';
 
 export default class ClientBoundSoundPacket implements ClientBoundPacket {
-    public constructor(public sound: number, public source: number, public x: number, public y: number, public z: number, public volume: number, public pitch: number) {}
+    public constructor(
+        public sound: number,
+        public source: number,
+        public x: number,
+        public y: number,
+        public z: number,
+        public volume: number,
+        public pitch: number,
+        public seed: bigint,
+    ) {}
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeVarInt(this.sound);
@@ -12,6 +21,7 @@ export default class ClientBoundSoundPacket implements ClientBoundPacket {
         packet.writeInt(this.z);
         packet.writeFloat(this.volume);
         packet.writeFloat(this.pitch);
+        packet.writeLong(this.seed);
         return packet;
     }
 }

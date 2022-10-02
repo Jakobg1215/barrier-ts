@@ -3,21 +3,17 @@ import type BarrierTs from '../BarrierTs';
 import Chat, { ChatType } from '../types/classes/Chat';
 import Item from '../types/classes/Item';
 import NameSpace from '../types/classes/NameSpace';
-import { ChatPermission } from '../types/enums/ChatPermission';
 import { GameType } from '../types/enums/GameType';
 import { InteractionHand } from '../types/enums/InteractionHand';
-import objectToNbt from '../utilities/objectToNbt';
 import Vector2 from '../utilities/Vector2';
 import Vector3 from '../utilities/Vector3';
 import type Player from '../world/entities/Player';
 import ChunkLoader from '../world/level/ChunkLoader';
 import type Connection from './Connection';
-import DimensionType from './DimensionType';
 import type PacketListener from './PacketListener';
 import type ClientBoundPacket from './protocol/ClientBoundPacket';
 import ClientBoundAddPlayerPacket from './protocol/game/ClientBoundAddPlayerPacket';
 import ClientBoundAnimatePacket, { Action as SwingAction } from './protocol/game/ClientBoundAnimatePacket';
-import ClientBoundChatPacket from './protocol/game/ClientBoundChatPacket';
 import ClientBoundEntityEventPacket from './protocol/game/ClientBoundEntityEventPacket';
 import ClientBoundKeepAlivePacket from './protocol/game/ClientBoundKeepAlivePacket';
 import ClientBoundMoveEntityPacketPos from './protocol/game/ClientBoundMoveEntityPosPacket';
@@ -34,7 +30,10 @@ import ClientBoundTeleportEntityPacket from './protocol/game/ClientBoundTeleport
 import type ServerBoundAcceptTeleportationPacket from './protocol/game/ServerBoundAcceptTeleportationPacket';
 import type ServerBoundBlockEntityTagQuery from './protocol/game/ServerBoundBlockEntityTagQuery';
 import type ServerBoundChangeDifficultyPacket from './protocol/game/ServerBoundChangeDifficultyPacket';
+import type ServerBoundChatAckPacket from './protocol/game/ServerBoundChatAckPacket';
+import type ServerBoundChatCommandPacket from './protocol/game/ServerBoundChatCommandPacket';
 import type ServerBoundChatPacket from './protocol/game/ServerBoundChatPacket';
+import type ServerBoundChatPreviewPacket from './protocol/game/ServerBoundChatPreviewPacket';
 import type ServerBoundClientCommandPacket from './protocol/game/ServerBoundClientCommandPacket';
 import { Action as ClientCommandAction } from './protocol/game/ServerBoundClientCommandPacket';
 import type ServerBoundClientInformationPacket from './protocol/game/ServerBoundClientInformationPacket';
@@ -118,8 +117,8 @@ export default class GamePacketListener implements PacketListener {
             if (this.player.health < this.previousHealth) {
                 // This will not run if healh increases
                 this.server.playerManager.sendAll(new ClientBoundEntityEventPacket(this.player.id, 2), this.player.id);
-                this.server.playerManager.sendAll(new ClientBoundSoundEntityPacket(802, 7, this.player.id, 1, 1));
-                this.server.playerManager.sendAll(new ClientBoundSoundEntityPacket(812, 7, this.player.id, 1, 1));
+                this.server.playerManager.sendAll(new ClientBoundSoundEntityPacket(802, 7, this.player.id, 1, 1, 0n));
+                this.server.playerManager.sendAll(new ClientBoundSoundEntityPacket(812, 7, this.player.id, 1, 1, 0n));
                 this.send(new ClientBoundSetHealthPacket(this.player.health, 20, 5));
             }
             this.previousHealth = this.player.health;
@@ -233,38 +232,22 @@ export default class GamePacketListener implements PacketListener {
     public handleChat(chat: ServerBoundChatPacket): void {
         if (chat.message.startsWith('/')) {
             // TODO: handle commands properly on the server then implement this
-            this.send(new ClientBoundChatPacket(new Chat(ChatType.TEXT, 'TODO'), ChatPermission.SYSTEM, this.player.gameProfile.id));
             return;
         }
 
         this.server.console.log('<%s> %s', this.player.gameProfile.name, chat.message);
-        this.server.playerManager.sendAll(
-            new ClientBoundChatPacket(
-                new Chat(ChatType.TRANSLATE, 'chat.type.text', {
-                    with: [
-                        {
-                            text: this.player.gameProfile.name,
-                            insertion: this.player.gameProfile.name,
-                            clickEvent: {
-                                action: 'suggest_command',
-                                value: `/tell ${this.player.gameProfile.name} `,
-                            },
-                            hoverEvent: {
-                                action: 'show_entity',
-                                contents: {
-                                    type: 'minecraft:player',
-                                    id: this.player.gameProfile.id.toFormattedString(),
-                                    name: { text: this.player.gameProfile.name },
-                                },
-                            },
-                        },
-                        chat.message,
-                    ],
-                }),
-                ChatPermission.CHAT,
-                this.player.gameProfile.id,
-            ),
-        );
+    }
+
+    public handleChatAckPacket(_chatAckPacket: ServerBoundChatAckPacket): void {
+        throw new Error('Method not implemented.');
+    }
+
+    public handleChatCommandPacket(_chatCommandPacket: ServerBoundChatCommandPacket): void {
+        throw new Error('Method not implemented.');
+    }
+
+    public handleChatPreviewPacket(_chatPreviewPacket: ServerBoundChatPreviewPacket): void {
+        throw new Error('Method not implemented.');
     }
 
     public handleClientCommand(clientCommand: ServerBoundClientCommandPacket): void {
@@ -289,7 +272,7 @@ export default class GamePacketListener implements PacketListener {
 
                 this.send(
                     new ClientBoundRespawnPacket(
-                        objectToNbt(DimensionType),
+                        new NameSpace('minecraft', 'overworld'),
                         new NameSpace('minecraft', 'overworld'),
                         0n,
                         GameType.SURVIVAL,
@@ -297,6 +280,7 @@ export default class GamePacketListener implements PacketListener {
                         false,
                         true,
                         true,
+                        null,
                     ),
                 );
 

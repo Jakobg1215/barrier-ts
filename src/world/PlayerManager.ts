@@ -4,12 +4,10 @@ import { join } from 'node:path';
 import type BarrierTs from '../BarrierTs';
 import type Connection from '../network/Connection';
 import DataBuffer from '../network/DataBuffer';
-import DimensionType from '../network/DimensionType';
 import type GamePacketListener from '../network/GamePacketListener';
 import type ClientBoundPacket from '../network/protocol/ClientBoundPacket';
 import ClientBoundAddPlayerPacket from '../network/protocol/game/ClientBoundAddPlayerPacket';
 import ClientBoundChangeDifficultyPacket from '../network/protocol/game/ClientBoundChangeDifficultyPacket';
-import ClientBoundChatPacket from '../network/protocol/game/ClientBoundChatPacket';
 import ClientBoundContainerSetContentPacket from '../network/protocol/game/ClientBoundContainerSetContentPacket';
 import ClientBoundCustomPayloadPacket from '../network/protocol/game/ClientBoundCustomPayloadPacket';
 import ClientBoundLoginPacket from '../network/protocol/game/ClientBoundLoginPacket';
@@ -25,8 +23,6 @@ import BlockPos from '../types/classes/BlockPos';
 import Chat, { ChatType } from '../types/classes/Chat';
 import Item from '../types/classes/Item';
 import NameSpace from '../types/classes/NameSpace';
-import UUID from '../types/classes/UUID';
-import { ChatPermission } from '../types/enums/ChatPermission';
 import { Difficulty } from '../types/enums/Difficulty';
 import { GameType } from '../types/enums/GameType';
 import type SavedData from '../types/SavedData';
@@ -77,21 +73,22 @@ export default class PlayerManager {
         gamelistener.send(
             new ClientBoundLoginPacket(
                 gamelistener.player.id,
-                0n,
                 false,
                 GameType.CREATIVE,
                 GameType.CREATIVE,
-                [new NameSpace('minecraft', 'overworld'), new NameSpace('minecraft', 'the_nether'), new NameSpace('minecraft', 'the_end')],
+                [new NameSpace('minecraft', 'overworld')],
                 objectToNbt(RegistryHolder),
-                objectToNbt(DimensionType),
                 new NameSpace('minecraft', 'overworld'),
+                new NameSpace('minecraft', 'overworld'),
+                0n,
                 this.server.config.maxplayers,
                 this.server.config.viewDistance,
-                8,
+                this.server.config.simulationDistance,
                 false,
                 true,
                 false,
                 true,
+                null,
             ),
         );
 
@@ -111,6 +108,7 @@ export default class PlayerManager {
                 gameMode: GameType.CREATIVE,
                 profile: player.gameProfile,
                 displayName: new Chat(ChatType.TEXT, player.gameProfile.name),
+                profilePublicKey: null,
             }),
         );
 
@@ -119,35 +117,6 @@ export default class PlayerManager {
         gamelistener.teleport(gamelistener.player.pos.x, gamelistener.player.pos.y, gamelistener.player.pos.z, gamelistener.player.rot.y, gamelistener.player.rot.x);
 
         gamelistener.chunkLoader.setChunkPosition(gamelistener.player.pos.x >> 4, gamelistener.player.pos.z >> 4);
-
-        this.sendAll(
-            new ClientBoundChatPacket(
-                new Chat(ChatType.TRANSLATE, 'multiplayer.player.joined', {
-                    color: 'yellow',
-                    with: [
-                        {
-                            text: gamelistener.player.gameProfile.name,
-                            insertion: gamelistener.player.gameProfile.name,
-                            clickEvent: {
-                                action: 'suggest_command',
-                                value: `/tell ${gamelistener.player.gameProfile.name} `,
-                            },
-                            hoverEvent: {
-                                action: 'show_entity',
-                                contents: {
-                                    type: 'minecraft:player',
-                                    id: gamelistener.player.gameProfile.id.toFormattedString(),
-                                    name: { text: gamelistener.player.gameProfile.name },
-                                },
-                            },
-                        },
-                    ],
-                }),
-                ChatPermission.SYSTEM,
-                UUID.EMPTY,
-            ),
-            gamelistener.player.id,
-        );
 
         this.server.console.log('%s (%s) has joined the server!', gamelistener.player.gameProfile.name, gamelistener.player.id);
 

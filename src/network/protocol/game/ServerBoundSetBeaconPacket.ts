@@ -3,12 +3,12 @@ import type GamePacketListener from '../../GamePacketListener';
 import type ServerBoundPacket from '../ServerBoundPacket';
 
 export default class ServerBoundSetBeaconPacket implements ServerBoundPacket<GamePacketListener> {
-    public readonly primary: number;
-    public readonly secondary: number;
+    public readonly primary: number | null = null;
+    public readonly secondary: number | null = null;
 
     public constructor(data: DataBuffer) {
-        this.primary = data.readVarInt();
-        this.secondary = data.readVarInt();
+        if (data.readBoolean()) this.primary = data.readVarInt();
+        if (data.readBoolean()) this.secondary = data.readVarInt();
     }
 
     public handle(handler: GamePacketListener): void {

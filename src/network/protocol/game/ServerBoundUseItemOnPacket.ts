@@ -12,6 +12,7 @@ export default class ServerBoundUseItemOnPacket implements ServerBoundPacket<Gam
     public readonly location: Vector3;
     public readonly inside: boolean;
     public readonly hand: InteractionHand;
+    public readonly sequence: number;
 
     public constructor(data: DataBuffer) {
         this.hand = data.readVarInt();
@@ -19,6 +20,7 @@ export default class ServerBoundUseItemOnPacket implements ServerBoundPacket<Gam
         this.direction = data.readVarInt();
         this.location = new Vector3(data.readFloat(), data.readFloat(), data.readFloat());
         this.inside = data.readBoolean();
+        this.sequence = data.readVarInt();
     }
 
     public handle(handler: GamePacketListener): void {

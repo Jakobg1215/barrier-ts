@@ -8,7 +8,7 @@ export default class ClientBoundBlockEntityDataPacket implements ClientBoundPack
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeBlockPos(this.pos);
-        packet.writeUnsignedByte(this.type);
+        packet.writeVarInt(this.type);
         packet.writeNbt(this.tag);
         return packet;
     }

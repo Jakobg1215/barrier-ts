@@ -22,7 +22,7 @@ export default class ClientBoundLevelChunkWithLightPacket implements ClientBound
         packet.writeInt(this.x);
         packet.writeInt(this.z);
         packet.writeNbt(this.heightmaps);
-        packet.writeVarInt(this.buffer.length).append(this.buffer);
+        packet.writeByteArray(this.buffer);
         packet.writeVarInt(this.blockEntitiesData.length);
         this.blockEntitiesData.forEach((entity) => {
             packet.writeByte(entity.packedXZ);

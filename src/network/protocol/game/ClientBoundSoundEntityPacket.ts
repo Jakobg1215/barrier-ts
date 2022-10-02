@@ -8,6 +8,7 @@ export default class ClientBoundSoundEntityPacket implements ClientBoundPacket {
         public id: number,
         public volume: number,
         public pitch: number,
+        public seed: bigint,
     ) {}
 
     public write(packet: DataBuffer): DataBuffer {
@@ -16,6 +17,7 @@ export default class ClientBoundSoundEntityPacket implements ClientBoundPacket {
         packet.writeVarInt(this.id);
         packet.writeFloat(this.volume);
         packet.writeFloat(this.pitch);
+        packet.writeLong(this.seed);
         return packet;
     }
 }

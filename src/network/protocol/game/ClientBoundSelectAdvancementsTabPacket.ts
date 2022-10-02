@@ -6,12 +6,8 @@ export default class ClientBoundSelectAdvancementsTabPacket implements ClientBou
     public constructor(public tab: NameSpace | null) {}
 
     public write(packet: DataBuffer): DataBuffer {
-        if (this.tab === null) {
-            packet.writeBoolean(false);
-            return packet;
-        }
-        packet.writeBoolean(true);
-        packet.writeNameSpace(this.tab);
+        packet.writeBoolean(this.tab !== null);
+        if (this.tab) packet.writeNameSpace(this.tab);
         return packet;
     }
 }

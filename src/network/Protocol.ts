@@ -2,20 +2,17 @@ import type ClientBoundPacket from './protocol/ClientBoundPacket';
 import { ConnectionProtocol } from './protocol/ConnectionProtocol';
 import ClientBoundAddEntityPacket from './protocol/game/ClientBoundAddEntityPacket';
 import ClientBoundAddExperienceOrbPacket from './protocol/game/ClientBoundAddExperienceOrbPacket';
-import ClientBoundAddMobPacket from './protocol/game/ClientBoundAddMobPacket';
-import ClientBoundAddPaintingPacket from './protocol/game/ClientBoundAddPaintingPacket';
 import ClientBoundAddPlayerPacket from './protocol/game/ClientBoundAddPlayerPacket';
-import ClientBoundAddVibrationSignalPacket from './protocol/game/ClientBoundAddVibrationSignalPacket';
 import ClientBoundAnimatePacket from './protocol/game/ClientBoundAnimatePacket';
 import ClientBoundAwardStatsPacket from './protocol/game/ClientBoundAwardStatsPacket';
-import ClientBoundBlockBreakAckPacket from './protocol/game/ClientBoundBlockBreakAckPacket';
+import ClientBoundBlockChangedAckPacket from './protocol/game/ClientBoundBlockChangedAckPacket';
 import ClientBoundBlockDestructionPacket from './protocol/game/ClientBoundBlockDestructionPacket';
 import ClientBoundBlockEntityDataPacket from './protocol/game/ClientBoundBlockEntityDataPacket';
 import ClientBoundBlockEventPacket from './protocol/game/ClientBoundBlockEventPacket';
 import ClientBoundBlockUpdatePacket from './protocol/game/ClientBoundBlockUpdatePacket';
 import ClientBoundBossEventPacket from './protocol/game/ClientBoundBossEventPacket';
 import ClientBoundChangeDifficultyPacket from './protocol/game/ClientBoundChangeDifficultyPacket';
-import ClientBoundChatPacket from './protocol/game/ClientBoundChatPacket';
+import ClientBoundChatPreviewPacket from './protocol/game/ClientBoundChatPreviewPacket';
 import ClientBoundClearTitlesPacket from './protocol/game/ClientBoundClearTitlesPacket';
 import ClientBoundCommandsPacket from './protocol/game/ClientBoundCommandsPacket';
 import ClientBoundCommandSuggestionsPacket from './protocol/game/ClientBoundCommandSuggestionsPacket';
@@ -24,8 +21,10 @@ import ClientBoundContainerSetContentPacket from './protocol/game/ClientBoundCon
 import ClientBoundContainerSetDataPacket from './protocol/game/ClientBoundContainerSetDataPacket';
 import ClientBoundContainerSetSlotPacket from './protocol/game/ClientBoundContainerSetSlotPacket';
 import ClientBoundCooldownPacket from './protocol/game/ClientBoundCooldownPacket';
+import ClientBoundCustomChatCompletionsPacket from './protocol/game/ClientBoundCustomChatCompletionsPacket';
 import ClientBoundCustomPayloadPacket from './protocol/game/ClientBoundCustomPayloadPacket';
 import ClientBoundCustomSoundPacket from './protocol/game/ClientBoundCustomSoundPacket';
+import ClientBoundDeleteChatPacket from './protocol/game/ClientBoundDeleteChatPacket';
 import ClientBoundDisconnectPacket from './protocol/game/ClientBoundDisconnectPacket';
 import ClientBoundEntityEventPacket from './protocol/game/ClientBoundEntityEventPacket';
 import ClientBoundExplodePacket from './protocol/game/ClientBoundExplodePacket';
@@ -51,6 +50,8 @@ import ClientBoundOpenSignEditorPacket from './protocol/game/ClientBoundOpenSign
 import ClientBoundPingPacket from './protocol/game/ClientBoundPingPacket';
 import ClientBoundPlaceGhostRecipePacket from './protocol/game/ClientBoundPlaceGhostRecipePacket';
 import ClientBoundPlayerAbilitiesPacket from './protocol/game/ClientBoundPlayerAbilitiesPacket';
+import ClientBoundPlayerChatHeaderPacket from './protocol/game/ClientBoundPlayerChatHeaderPacket';
+import ClientBoundPlayerChatPacket from './protocol/game/ClientBoundPlayerChatPacket';
 import ClientBoundPlayerCombatEndPacket from './protocol/game/ClientBoundPlayerCombatEndPacket';
 import ClientBoundPlayerCombatEnterPacket from './protocol/game/ClientBoundPlayerCombatEnterPacket';
 import ClientBoundPlayerCombatKillPacket from './protocol/game/ClientBoundPlayerCombatKillPacket';
@@ -65,6 +66,7 @@ import ClientBoundRespawnPacket from './protocol/game/ClientBoundRespawnPacket';
 import ClientBoundRotateHeadPacket from './protocol/game/ClientBoundRotateHeadPacket';
 import ClientBoundSectionBlocksUpdatePacket from './protocol/game/ClientBoundSectionBlocksUpdatePacket';
 import ClientBoundSelectAdvancementsTabPacket from './protocol/game/ClientBoundSelectAdvancementsTabPacket';
+import ClientBoundServerDataPacket from './protocol/game/ClientBoundServerDataPacket';
 import ClientBoundSetActionBarTextPacket from './protocol/game/ClientBoundSetActionBarTextPacket';
 import ClientBoundSetBorderCenterPacket from './protocol/game/ClientBoundSetBorderCenterPacket';
 import ClientBoundSetBorderLerpSizePacket from './protocol/game/ClientBoundSetBorderLerpSizePacket';
@@ -76,6 +78,7 @@ import ClientBoundSetCarriedItemPacket from './protocol/game/ClientBoundSetCarri
 import ClientBoundSetChunkCacheCenterPacket from './protocol/game/ClientBoundSetChunkCacheCenterPacket';
 import ClientBoundSetChunkCacheRadiusPacket from './protocol/game/ClientBoundSetChunkCacheRadiusPacket';
 import ClientBoundSetDefaultSpawnPositionPacket from './protocol/game/ClientBoundSetDefaultSpawnPositionPacket';
+import ClientBoundSetDisplayChatPreviewPacket from './protocol/game/ClientBoundSetDisplayChatPreviewPacket';
 import ClientBoundSetDisplayObjectivePacket from './protocol/game/ClientBoundSetDisplayObjectivePacket';
 import ClientBoundSetEntityDataPacket from './protocol/game/ClientBoundSetEntityDataPacket';
 import ClientBoundSetEntityLinkPacket from './protocol/game/ClientBoundSetEntityLinkPacket';
@@ -95,6 +98,7 @@ import ClientBoundSetTitleTextPacket from './protocol/game/ClientBoundSetTitleTe
 import ClientBoundSoundEntityPacket from './protocol/game/ClientBoundSoundEntityPacket';
 import ClientBoundSoundPacket from './protocol/game/ClientBoundSoundPacket';
 import ClientBoundStopSoundPacket from './protocol/game/ClientBoundStopSoundPacket';
+import ClientBoundSystemChatPacket from './protocol/game/ClientBoundSystemChatPacket';
 import ClientBoundTabListPacket from './protocol/game/ClientBoundTabListPacket';
 import ClientBoundTagQueryPacket from './protocol/game/ClientBoundTagQueryPacket';
 import ClientBoundTakeItemEntityPacket from './protocol/game/ClientBoundTakeItemEntityPacket';
@@ -107,7 +111,10 @@ import ClientBoundUpdateTagsPacket from './protocol/game/ClientBoundUpdateTagsPa
 import ServerBoundAcceptTeleportationPacket from './protocol/game/ServerBoundAcceptTeleportationPacket';
 import ServerBoundBlockEntityTagQueryPacket from './protocol/game/ServerBoundBlockEntityTagQuery';
 import ServerBoundChangeDifficultyPacket from './protocol/game/ServerBoundChangeDifficultyPacket';
+import ServerBoundChatAckPacket from './protocol/game/ServerBoundChatAckPacket';
+import ServerBoundChatCommandPacket from './protocol/game/ServerBoundChatCommandPacket';
 import ServerBoundChatPacket from './protocol/game/ServerBoundChatPacket';
+import ServerBoundChatPreviewPacket from './protocol/game/ServerBoundChatPreviewPacket';
 import ServerBoundClientCommandPacket from './protocol/game/ServerBoundClientCommandPacket';
 import ServerBoundClientInformationPacket from './protocol/game/ServerBoundClientInformationPacket';
 import ServerBoundCommandSuggestionPacket from './protocol/game/ServerBoundCommandSuggestionPacket';
@@ -174,7 +181,10 @@ export default class Protocol {
         ServerBoundAcceptTeleportationPacket,
         ServerBoundBlockEntityTagQueryPacket,
         ServerBoundChangeDifficultyPacket,
+        ServerBoundChatAckPacket,
+        ServerBoundChatCommandPacket,
         ServerBoundChatPacket,
+        ServerBoundChatPreviewPacket,
         ServerBoundClientCommandPacket,
         ServerBoundClientInformationPacket,
         ServerBoundCommandSuggestionPacket,
@@ -232,20 +242,17 @@ export default class Protocol {
     private readonly gameClientPackets = [
         ClientBoundAddEntityPacket,
         ClientBoundAddExperienceOrbPacket,
-        ClientBoundAddMobPacket,
-        ClientBoundAddPaintingPacket,
         ClientBoundAddPlayerPacket,
-        ClientBoundAddVibrationSignalPacket,
         ClientBoundAnimatePacket,
         ClientBoundAwardStatsPacket,
-        ClientBoundBlockBreakAckPacket,
+        ClientBoundBlockChangedAckPacket,
         ClientBoundBlockDestructionPacket,
         ClientBoundBlockEntityDataPacket,
         ClientBoundBlockEventPacket,
         ClientBoundBlockUpdatePacket,
         ClientBoundBossEventPacket,
         ClientBoundChangeDifficultyPacket,
-        ClientBoundChatPacket,
+        ClientBoundChatPreviewPacket,
         ClientBoundClearTitlesPacket,
         ClientBoundCommandSuggestionsPacket,
         ClientBoundCommandsPacket,
@@ -254,8 +261,10 @@ export default class Protocol {
         ClientBoundContainerSetDataPacket,
         ClientBoundContainerSetSlotPacket,
         ClientBoundCooldownPacket,
+        ClientBoundCustomChatCompletionsPacket,
         ClientBoundCustomPayloadPacket,
         ClientBoundCustomSoundPacket,
+        ClientBoundDeleteChatPacket,
         ClientBoundDisconnectPacket,
         ClientBoundEntityEventPacket,
         ClientBoundExplodePacket,
@@ -281,6 +290,8 @@ export default class Protocol {
         ClientBoundPingPacket,
         ClientBoundPlaceGhostRecipePacket,
         ClientBoundPlayerAbilitiesPacket,
+        ClientBoundPlayerChatHeaderPacket,
+        ClientBoundPlayerChatPacket,
         ClientBoundPlayerCombatEndPacket,
         ClientBoundPlayerCombatEnterPacket,
         ClientBoundPlayerCombatKillPacket,
@@ -295,6 +306,7 @@ export default class Protocol {
         ClientBoundRotateHeadPacket,
         ClientBoundSectionBlocksUpdatePacket,
         ClientBoundSelectAdvancementsTabPacket,
+        ClientBoundServerDataPacket,
         ClientBoundSetActionBarTextPacket,
         ClientBoundSetBorderCenterPacket,
         ClientBoundSetBorderLerpSizePacket,
@@ -306,6 +318,7 @@ export default class Protocol {
         ClientBoundSetChunkCacheCenterPacket,
         ClientBoundSetChunkCacheRadiusPacket,
         ClientBoundSetDefaultSpawnPositionPacket,
+        ClientBoundSetDisplayChatPreviewPacket,
         ClientBoundSetDisplayObjectivePacket,
         ClientBoundSetEntityDataPacket,
         ClientBoundSetEntityLinkPacket,
@@ -325,6 +338,7 @@ export default class Protocol {
         ClientBoundSoundEntityPacket,
         ClientBoundSoundPacket,
         ClientBoundStopSoundPacket,
+        ClientBoundSystemChatPacket,
         ClientBoundTabListPacket,
         ClientBoundTagQueryPacket,
         ClientBoundTakeItemEntityPacket,

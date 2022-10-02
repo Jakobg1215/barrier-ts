@@ -11,6 +11,7 @@ export default class ClientBoundCustomSoundPacket implements ClientBoundPacket {
         public z: number,
         public volume: number,
         public pitch: number,
+        public seed: bigint,
     ) {}
 
     public write(packet: DataBuffer): DataBuffer {
@@ -21,6 +22,7 @@ export default class ClientBoundCustomSoundPacket implements ClientBoundPacket {
         packet.writeInt(this.z);
         packet.writeFloat(this.volume);
         packet.writeFloat(this.pitch);
+        packet.writeLong(this.seed);
         return packet;
     }
 }

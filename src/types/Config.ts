@@ -5,11 +5,11 @@ export default interface Config {
     online: boolean;
     compression: number;
     serverName: string;
-    serverId: string;
     maxplayers: number;
     motd: string;
     difficulty: number;
     icon: string;
     playerlisting: boolean;
     viewDistance: number;
+    simulationDistance: number;
 }

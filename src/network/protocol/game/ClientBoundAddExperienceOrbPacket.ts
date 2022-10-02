@@ -8,7 +8,7 @@ export default class ClientBoundAddExperienceOrbPacket implements ClientBoundPac
         packet.writeVarInt(this.id);
         packet.writeDouble(this.x);
         packet.writeDouble(this.y);
-        packet.writeVarInt(this.z);
+        packet.writeDouble(this.z);
         packet.writeShort(this.value);
         return packet;
     }

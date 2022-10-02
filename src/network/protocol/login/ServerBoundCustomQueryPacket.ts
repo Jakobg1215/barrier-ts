@@ -5,19 +5,16 @@ import type ServerBoundPacket from '../ServerBoundPacket';
 export default class ServerBoundCustomQueryPacket implements ServerBoundPacket<LoginPacketListener> {
     private static readonly MAX_PAYLOAD_SIZE = 1048576;
     public readonly transactionId: number;
-    public readonly data: DataBuffer | null;
+    public readonly data: DataBuffer | null = null;
 
     public constructor(data: DataBuffer) {
         this.transactionId = data.readVarInt();
         if (data.readBoolean()) {
-            const leftOvers = data.getReadableBytes().buffer.length;
-
-            if (leftOvers < 0 || leftOvers > ServerBoundCustomQueryPacket.MAX_PAYLOAD_SIZE) {
-                throw new Error('Payload is an incorrect size!');
-            }
+            if (data.getReadableBytes().buffer.length <= ServerBoundCustomQueryPacket.MAX_PAYLOAD_SIZE)
+                throw new Error(`Payload may not be larger than ${ServerBoundCustomQueryPacket.MAX_PAYLOAD_SIZE} bytes`);
 
             this.data = data.getReadableBytes();
-        } else this.data = null;
+        }
     }
 
     public handle(handler: LoginPacketListener): void {

@@ -18,11 +18,12 @@ import type ServerBoundHelloPacket from './protocol/login/ServerBoundHelloPacket
 import type ServerBoundKeyPacket from './protocol/login/ServerBoundKeyPacket';
 
 export default class LoginPacketListener implements PacketListener {
-    private static readonly MAX_TICKS_BEFORE_LOGIN = 300;
+    private static readonly MAX_TICKS_BEFORE_LOGIN = 600;
     private readonly nonce = randomBytes(4);
     private tickCount = 0;
     private state = State.HELLO;
-    private gameProfile: GameProfile | null = null;
+    public publicKeyData: { expiresAt: bigint; publicKey: Buffer; keySignature: Buffer } | null = null;
+    private gameProfile!: GameProfile;
 
     public constructor(private readonly server: BarrierTs, private readonly connection: Connection) {}
 
@@ -37,10 +38,6 @@ export default class LoginPacketListener implements PacketListener {
     }
 
     private loginPlayer(): void {
-        if (!this.gameProfile?.isComplete()) {
-            this.gameProfile = new GameProfile(this.gameProfile!.name!);
-        }
-
         this.state = State.ACCEPTED;
         if (this.server.config.compression >= 0) this.connection.enableCompression(this.server.config.compression);
         this.connection.send(new ClientBoundGameProfilePacket(this.gameProfile));
@@ -54,22 +51,25 @@ export default class LoginPacketListener implements PacketListener {
 
     public handleHello(hello: ServerBoundHelloPacket): void {
         if (this.state !== State.HELLO) throw new Error('Unexpected hello packet');
-        this.gameProfile = hello.gameProfile;
+        this.gameProfile = new GameProfile(hello.name, hello.profileId || undefined);
         if (this.server.config.online) {
+            if (hello.expiresAt || hello.publicKey || hello.keySignature) {
+                this.publicKeyData = {
+                    expiresAt: hello.expiresAt!,
+                    publicKey: hello.publicKey!,
+                    keySignature: hello.keySignature!,
+                };
+            }
             this.state = State.KEY;
-            this.connection.send(new ClientBoundHelloPacket(this.server.config.serverId, this.server.playerManager.padLock.publicKey, this.nonce));
+            this.connection.send(new ClientBoundHelloPacket('', this.server.playerManager.padLock.publicKey, this.nonce));
         } else {
             this.state = State.READY_TO_ACCEPT;
         }
     }
 
     public handleKey(key: ServerBoundKeyPacket): void {
-        if (this.state !== State.KEY) throw new Error('Unexpected hello packet');
+        if (this.state !== State.KEY) throw new Error('Unexpected key packet');
         const privateKey = this.server.playerManager.padLock.privateKey;
-
-        const nonce = privateDecrypt({ key: privateKey, padding: constants.RSA_PKCS1_PADDING }, key.nonce);
-
-        if (Buffer.compare(nonce, this.nonce) !== 0) throw Error('Protocol error');
 
         const secretkey = privateDecrypt({ key: privateKey, padding: constants.RSA_PKCS1_PADDING }, key.keybytes);
 
@@ -79,33 +79,32 @@ export default class LoginPacketListener implements PacketListener {
 
         this.state = State.AUTHENTICATING;
 
-        const performTwosCompliment = (buffer: Buffer): void => {
-            let carry = true;
-            let i: number, newByte: number, value: number;
-            for (i = buffer.length - 1; i >= 0; --i) {
-                value = buffer.readUInt8(i);
-                newByte = ~value & 0xff;
-                if (carry) {
-                    carry = newByte === 0xff;
-                    buffer.writeUInt8(carry ? 0 : newByte + 1, i);
-                } else {
-                    buffer.writeUInt8(newByte, i);
-                }
+        let hash = createHash('sha1').update('').update(secretkey).update(this.server.playerManager.padLock.publicKey).digest();
+
+        const isNegative = (hash.readUInt8(0) & (1 << 7)) !== 0;
+
+        if (isNegative) {
+            const inverted = Buffer.allocUnsafe(hash.length);
+            let carry = 0;
+            for (let i = hash.length - 1; i >= 0; i--) {
+                let num = hash.readUInt8(i) ^ 0b11111111;
+                if (i === hash.length - 1) num++;
+                num += carry;
+                carry = Math.max(0, num - 0b11111111);
+                num = Math.min(0b11111111, num);
+                inverted.writeUInt8(num, i);
             }
-        };
+            hash = inverted;
+        }
 
-        const mcHexDigest = (hash: Buffer): string => {
-            const negative: boolean = hash.readInt8(0) < 0;
-            if (negative) performTwosCompliment(hash);
-            return (negative ? '-' : '') + hash.toString('hex').replace(/^0+/g, '');
-        };
+        let result = hash.toString('hex').replace(/^0+/, '');
 
-        const hash = mcHexDigest(createHash('sha1').update(this.server.config.serverId).update(secretkey).update(this.server.playerManager.padLock.publicKey).digest());
+        if (isNegative) result = `-${result}`;
 
         get(
             new URL(
-                `https://sessionserver.mojang.com/session/minecraft/hasJoined?username=${encodeURIComponent(this.gameProfile!.name)}&serverId=${encodeURIComponent(
-                    hash,
+                `https://sessionserver.mojang.com/session/minecraft/hasJoined?username=${encodeURIComponent(this.gameProfile.name)}&serverId=${encodeURIComponent(
+                    result,
                 )}`,
             ),
             (res) => {

@@ -12,7 +12,6 @@ export default class ServerBoundSetStructureBlockPacket implements ServerBoundPa
     private static readonly FLAG_IGNORE_ENTITIES = 1;
     private static readonly FLAG_SHOW_AIR = 2;
     private static readonly FLAG_SHOW_BOUNDING_BOX = 4;
-    private static readonly MAX_DATA_LENGTH = 128;
     public readonly pos: BlockPos;
     public readonly updateType: StructureBlockUpdateType;
     public readonly mode: StructureBlockStructureMode;
@@ -37,7 +36,7 @@ export default class ServerBoundSetStructureBlockPacket implements ServerBoundPa
         this.size = new Vector3(data.readByte(), data.readByte(), data.readByte());
         this.mirror = data.readVarInt();
         this.rotation = data.readVarInt();
-        this.data = data.readString(ServerBoundSetStructureBlockPacket.MAX_DATA_LENGTH);
+        this.data = data.readString(128);
         this.integrity = data.readFloat();
         this.seed = data.readVarLong();
         const bitMask = data.readByte();

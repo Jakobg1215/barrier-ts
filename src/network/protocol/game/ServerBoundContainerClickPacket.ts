@@ -21,7 +21,7 @@ export default class ServerBoundContainerClickPacket implements ServerBoundPacke
         this.buttonNum = data.readByte();
         this.clickType = data.readVarInt();
         const changedSlotsSize = data.readVarInt();
-        if (changedSlotsSize > ServerBoundContainerClickPacket.MAX_SLOT_COUNT) throw new Error('Mapping is longer than expected!');
+        if (changedSlotsSize > ServerBoundContainerClickPacket.MAX_SLOT_COUNT) throw new Error('Mapping is longer than limit!');
         for (let index = 0; index < changedSlotsSize; index++) this.changedSlots.set(data.readShort(), data.readItem());
         this.carriedItem = data.readItem();
     }

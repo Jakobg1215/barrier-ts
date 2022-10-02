@@ -3,13 +3,13 @@ import type ClientBoundPacket from '../ClientBoundPacket';
 
 export default class ClientBoundPlayerLookAtPacket implements ClientBoundPacket {
     public constructor(
+        public fromAnchor: number,
         public x: number,
         public y: number,
         public z: number,
-        public entity: number,
-        public fromAnchor: number,
-        public toAnchor: number,
         public atEntity: boolean,
+        public entity: number,
+        public toAnchor: number,
     ) {}
 
     public write(packet: DataBuffer): DataBuffer {
