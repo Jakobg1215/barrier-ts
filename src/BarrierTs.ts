@@ -11,8 +11,8 @@ import Chat, { ChatType } from './types/classes/Chat';
 import type Config from './types/Config';
 import Console from './utilities/Console';
 import getConfigurations from './utilities/getConfigurations';
-import PlayerManager from './world/PlayerManager';
 import World from './world/World';
+import PlayerManager from './world/PlayerManager';
 
 export default class BarrierTs {
     public readonly minecraftVersion = {

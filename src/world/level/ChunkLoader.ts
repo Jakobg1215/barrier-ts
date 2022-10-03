@@ -4,19 +4,13 @@ import ClientBoundLevelChunkWithLightPacket from '../../network/protocol/game/Cl
 import ClientBoundSetChunkCacheCenterPacket from '../../network/protocol/game/ClientBoundSetChunkCacheCenterPacket';
 import objectToNbt from '../../utilities/objectToNbt';
 import type Chunk from './Chunk';
-import type LevelChunkManager from './LevelChunkManager';
+import type World from '../World';
 
 export default class ChunkLoader {
     private readonly chunks = new Map<bigint, Chunk>();
     private radius: number;
 
-    public constructor(
-        private readonly connection: Connection,
-        private levelChunkManager: LevelChunkManager,
-        private xPos: number,
-        private zPos: number,
-        radius: number,
-    ) {
+    public constructor(private readonly connection: Connection, private world: World, private xPos: number, private zPos: number, radius: number) {
         this.radius = ++radius;
         this.clampRadius();
     }
@@ -33,9 +27,9 @@ export default class ChunkLoader {
         this.updateChangedChunks();
     }
 
-    public changeLevel(chunkManager: LevelChunkManager): void {
+    public changeLevel(chunkManager: World): void {
         this.chunks.clear();
-        this.levelChunkManager = chunkManager;
+        this.world = chunkManager;
         this.updateChangedChunks();
     }
 
@@ -59,7 +53,7 @@ export default class ChunkLoader {
         this.connection.send(new ClientBoundSetChunkCacheCenterPacket(this.xPos, this.zPos));
 
         addedChunks.forEach((chunkPos) => {
-            const newChunk = this.levelChunkManager.getChunk(chunkPos);
+            const newChunk = this.world.getChunk(chunkPos);
 
             const x = Number(chunkPos >> 32n);
             const z = Number(chunkPos & 0xffffffffn) ^ 0;
