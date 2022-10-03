@@ -1,4 +1,3 @@
-import type { Buffer } from 'node:buffer';
 import type { Cipher, Decipher } from 'node:crypto';
 import type { Socket } from 'node:net';
 import { deflateSync, inflateSync } from 'node:zlib';
@@ -28,6 +27,8 @@ export default class Connection {
     public constructor(private readonly networking: Socket, private readonly server: BarrierTs) {
         this.networking.on('data', (data: Buffer): void => {
             const inData = new DataBuffer(this.decryption ? this.decryption.update(data) : data);
+
+            if (data.at(0) === 0xfe) return this.handleLegacyPing();
             if (this.compression) {
                 do {
                     const packetLength = inData.readVarInt();
@@ -168,6 +169,10 @@ export default class Connection {
     public enableCompression(level: number): void {
         this.send(new ClientBoundLoginCompressionPacket(level));
         this.compression = true;
+    }
+
+    private handleLegacyPing(): void {
+        // TODO: Legacy ping
     }
 
     public get protocolState() {
