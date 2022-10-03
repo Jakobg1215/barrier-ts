@@ -101,6 +101,8 @@ export default class LoginPacketListener implements PacketListener {
 
         if (isNegative) result = `-${result}`;
 
+        let data = Buffer.allocUnsafe(0);
+
         get(
             new URL(
                 `https://sessionserver.mojang.com/session/minecraft/hasJoined?username=${encodeURIComponent(this.gameProfile.name)}&serverId=${encodeURIComponent(
@@ -108,12 +110,15 @@ export default class LoginPacketListener implements PacketListener {
                 )}`,
             ),
             (res) => {
-                res.on('data', (data: Buffer): void => {
-                    const resData: Responce = JSON.parse(data.toString());
-                    this.gameProfile = new GameProfile(resData.name, new UUID(resData.id));
-                    for (let index = 0; index < resData.properties.length; index++) this.gameProfile.properties.push(resData.properties.at(index) as property);
+                res.on('data', (playerInfo: Buffer): void => {
+                    try {
+                        data = Buffer.concat([data, playerInfo]);
+                        const resData: Responce = JSON.parse(data.toString());
+                        this.gameProfile = new GameProfile(resData.name, new UUID(resData.id));
+                        for (let index = 0; index < resData.properties.length; index++) this.gameProfile.properties.push(resData.properties.at(index) as property);
 
-                    this.state = State.READY_TO_ACCEPT;
+                        this.state = State.READY_TO_ACCEPT;
+                    } catch {}
                 });
 
                 if (res.statusCode === 204) {

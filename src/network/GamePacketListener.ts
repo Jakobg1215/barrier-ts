@@ -230,11 +230,6 @@ export default class GamePacketListener implements PacketListener {
     }
 
     public handleChat(chat: ServerBoundChatPacket): void {
-        if (chat.message.startsWith('/')) {
-            // TODO: handle commands properly on the server then implement this
-            return;
-        }
-
         this.server.console.log('<%s> %s', this.player.gameProfile.name, chat.message);
     }
 
