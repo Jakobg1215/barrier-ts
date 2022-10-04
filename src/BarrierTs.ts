@@ -35,6 +35,7 @@ export default class BarrierTs {
         });
 
         this.networking.on('connection', (socket): void => {
+            socket.setNoDelay(true);
             const connection = new Connection(socket, this);
             connection.setListener(new HandshakePacketListener(this, connection));
             this.playerManager.connections.add(connection);
