@@ -91,7 +91,13 @@ export default class GamePacketListener implements PacketListener {
     private previousChunkX = 0;
     private previousChunkZ = 0;
     private previousHealth = 20;
-    public readonly chunkLoader = new ChunkLoader(this.connection, this.server.world, this.player.pos.x >> 4, this.player.pos.z >> 4, this.server.config.viewDistance);
+    public readonly chunkLoader = new ChunkLoader(
+        this.connection,
+        this.server.world,
+        this.player.pos.x >> 4,
+        this.player.pos.z >> 4,
+        this.server.config.viewDistance,
+    );
 
     public constructor(public readonly server: BarrierTs, public readonly player: Player, public readonly connection: Connection) {}
 

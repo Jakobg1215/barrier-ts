@@ -92,7 +92,9 @@ export default class PlayerManager {
             ),
         );
 
-        gamelistener.send(new ClientBoundCustomPayloadPacket(new NameSpace('minecraft', 'brand'), new DataBuffer().writeString(this.server.config.serverName).buffer));
+        gamelistener.send(
+            new ClientBoundCustomPayloadPacket(new NameSpace('minecraft', 'brand'), new DataBuffer().writeString(this.server.config.serverName).buffer),
+        );
 
         gamelistener.send(new ClientBoundChangeDifficultyPacket(Difficulty.HARD, true));
 
@@ -114,7 +116,13 @@ export default class PlayerManager {
 
         this.sendAll(new ClientBoundPlayerInfoPacket(Action.ADD_PLAYER, players));
 
-        gamelistener.teleport(gamelistener.player.pos.x, gamelistener.player.pos.y, gamelistener.player.pos.z, gamelistener.player.rot.y, gamelistener.player.rot.x);
+        gamelistener.teleport(
+            gamelistener.player.pos.x,
+            gamelistener.player.pos.y,
+            gamelistener.player.pos.z,
+            gamelistener.player.rot.y,
+            gamelistener.player.rot.x,
+        );
 
         gamelistener.chunkLoader.setChunkPosition(gamelistener.player.pos.x >> 4, gamelistener.player.pos.z >> 4);
 
@@ -136,7 +144,9 @@ export default class PlayerManager {
         this.players.forEach((player) => {
             if (player.id === gamelistener.player.id) return;
 
-            gamelistener.send(new ClientBoundAddPlayerPacket(player.id, player.gameProfile.id, player.pos.x, player.pos.y, player.pos.z, player.rot.y, player.rot.x));
+            gamelistener.send(
+                new ClientBoundAddPlayerPacket(player.id, player.gameProfile.id, player.pos.x, player.pos.y, player.pos.z, player.rot.y, player.rot.x),
+            );
 
             gamelistener.send(new ClientBoundRotateHeadPacket(player.id, player.rot.y));
 

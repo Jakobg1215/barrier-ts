@@ -105,9 +105,9 @@ export default class LoginPacketListener implements PacketListener {
 
         get(
             new URL(
-                `https://sessionserver.mojang.com/session/minecraft/hasJoined?username=${encodeURIComponent(this.gameProfile.name)}&serverId=${encodeURIComponent(
-                    result,
-                )}`,
+                `https://sessionserver.mojang.com/session/minecraft/hasJoined?username=${encodeURIComponent(
+                    this.gameProfile.name,
+                )}&serverId=${encodeURIComponent(result)}`,
             ),
             (res) => {
                 res.on('data', (playerInfo: Buffer): void => {
@@ -115,7 +115,8 @@ export default class LoginPacketListener implements PacketListener {
                         data = Buffer.concat([data, playerInfo]);
                         const resData: Responce = JSON.parse(data.toString());
                         this.gameProfile = new GameProfile(resData.name, new UUID(resData.id));
-                        for (let index = 0; index < resData.properties.length; index++) this.gameProfile.properties.push(resData.properties.at(index) as property);
+                        for (let index = 0; index < resData.properties.length; index++)
+                            this.gameProfile.properties.push(resData.properties.at(index) as property);
 
                         this.state = State.READY_TO_ACCEPT;
                     } catch {}

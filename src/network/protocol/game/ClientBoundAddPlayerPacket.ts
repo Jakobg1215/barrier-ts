@@ -3,7 +3,15 @@ import type DataBuffer from '../../DataBuffer';
 import type ClientBoundPacket from '../ClientBoundPacket';
 
 export default class ClientBoundAddPlayerPacket implements ClientBoundPacket {
-    public constructor(public entityId: number, public playerId: UUID, public x: number, public y: number, public z: number, public yRot: number, public xRot: number) {}
+    public constructor(
+        public entityId: number,
+        public playerId: UUID,
+        public x: number,
+        public y: number,
+        public z: number,
+        public yRot: number,
+        public xRot: number,
+    ) {}
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeVarInt(this.entityId);

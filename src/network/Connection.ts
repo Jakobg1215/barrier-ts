@@ -34,7 +34,9 @@ export default class Connection {
                     const packetLength = inData.readVarInt();
                     const packetDataRaw = new DataBuffer(inData.getReadableBytes().buffer.slice(0, packetLength));
                     const dataLength = packetDataRaw.readVarInt();
-                    const packetData = new DataBuffer(dataLength > 0 ? inflateSync(packetDataRaw.getReadableBytes().buffer) : packetDataRaw.getReadableBytes().buffer);
+                    const packetData = new DataBuffer(
+                        dataLength > 0 ? inflateSync(packetDataRaw.getReadableBytes().buffer) : packetDataRaw.getReadableBytes().buffer,
+                    );
                     const packetId = packetData.readVarInt();
                     inData.addOffset(packetLength);
                     const packet = server.protocol.getPacket(this.protocolState, packetId);
