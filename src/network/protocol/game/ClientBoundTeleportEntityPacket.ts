@@ -9,8 +9,8 @@ export default class ClientBoundTeleportEntityPacket implements ClientBoundPacke
         packet.writeDouble(this.x);
         packet.writeDouble(this.y);
         packet.writeDouble(this.z);
-        packet.writeByte(this.yRot);
-        packet.writeByte(this.xRot);
+        packet.writeByte(Math.floor((this.yRot * 256) / 360));
+        packet.writeByte(Math.floor((this.xRot * 256) / 360));
         packet.writeBoolean(this.onGround);
         return packet;
     }

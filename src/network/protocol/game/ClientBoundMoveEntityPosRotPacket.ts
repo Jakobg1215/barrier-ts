@@ -14,11 +14,11 @@ export default class ClientBoundMoveEntityPacketPosRot implements ClientBoundPac
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeVarInt(this.entityId);
-        packet.writeShort(this.xa);
-        packet.writeShort(this.ya);
-        packet.writeShort(this.za);
-        packet.writeByte(this.yRot);
-        packet.writeByte(this.xRot);
+        packet.writeShort(Math.floor(this.xa * 4096));
+        packet.writeShort(Math.floor(this.ya * 4096));
+        packet.writeShort(Math.floor(this.za * 4096));
+        packet.writeByte(Math.floor(this.yRot * 256) / 360);
+        packet.writeByte(Math.floor((this.xRot * 256) / 360));
         packet.writeBoolean(this.onGround);
         return packet;
     }

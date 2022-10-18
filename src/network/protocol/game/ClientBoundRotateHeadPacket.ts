@@ -6,7 +6,7 @@ export default class ClientBoundRotateHeadPacket implements ClientBoundPacket {
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeVarInt(this.entityId);
-        packet.writeByte(this.yHeadRot);
+        packet.writeByte(Math.floor((this.yHeadRot * 256) / 360));
         return packet;
     }
 }

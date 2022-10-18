@@ -6,8 +6,8 @@ export default class ClientBoundMoveEntityPacketRot implements ClientBoundPacket
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeVarInt(this.entityId);
-        packet.writeByte(this.yRot);
-        packet.writeByte(this.xRot);
+        packet.writeByte(Math.floor((this.yRot * 256) / 360));
+        packet.writeByte(Math.floor((this.xRot * 256) / 360));
         packet.writeBoolean(this.onGround);
         return packet;
     }

@@ -6,9 +6,9 @@ export default class ClientBoundMoveEntityPacketPos implements ClientBoundPacket
 
     public write(packet: DataBuffer): DataBuffer {
         packet.writeVarInt(this.entityId);
-        packet.writeShort(this.xa);
-        packet.writeShort(this.ya);
-        packet.writeShort(this.za);
+        packet.writeShort(Math.floor(this.xa * 4096));
+        packet.writeShort(Math.floor(this.ya * 4096));
+        packet.writeShort(Math.floor(this.za * 4096));
         packet.writeBoolean(this.onGround);
         return packet;
     }

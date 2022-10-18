@@ -131,8 +131,8 @@ export default class GamePacketListener implements PacketListener {
                         this.player.pos.x,
                         this.player.pos.y,
                         this.player.pos.z,
-                        Math.floor((this.player.rot.y * 256) / 360),
-                        Math.floor((this.player.rot.x * 256) / 360),
+                        this.player.rot.y,
+                        this.player.rot.x,
                         true,
                     ),
                     this.player.id,
@@ -143,25 +143,25 @@ export default class GamePacketListener implements PacketListener {
                 this.server.playerManager.sendAll(
                     new ClientBoundMoveEntityPacketPosRot(
                         this.player.id,
-                        (this.player.pos.x * 32 - this.previousPosition.x * 32) * 128,
-                        (this.player.pos.y * 32 - this.previousPosition.y * 32) * 128,
-                        (this.player.pos.z * 32 - this.previousPosition.z * 32) * 128,
-                        Math.floor((this.player.rot.y * 256) / 360),
-                        Math.floor((this.player.rot.x * 256) / 360),
+                        this.player.pos.x - this.previousPosition.x,
+                        this.player.pos.y - this.previousPosition.y,
+                        this.player.pos.z - this.previousPosition.z,
+                        this.player.rot.y,
+                        this.player.rot.x,
                         this.player.isOnGround,
                     ),
                     this.player.id,
                 );
-                this.server.playerManager.sendAll(new ClientBoundRotateHeadPacket(this.player.id, Math.floor((this.player.rot.y * 256) / 360)), this.player.id);
+                this.server.playerManager.sendAll(new ClientBoundRotateHeadPacket(this.player.id, this.player.rot.y), this.player.id);
                 this.previousPosition = this.player.pos;
                 this.previousRotation = this.player.rot;
             } else {
                 this.server.playerManager.sendAll(
                     new ClientBoundMoveEntityPacketPos(
                         this.player.id,
-                        (this.player.pos.x * 32 - this.previousPosition.x * 32) * 128,
-                        (this.player.pos.y * 32 - this.previousPosition.y * 32) * 128,
-                        (this.player.pos.z * 32 - this.previousPosition.z * 32) * 128,
+                        this.player.pos.x - this.previousPosition.x,
+                        this.player.pos.y - this.previousPosition.y,
+                        this.player.pos.z - this.previousPosition.z,
                         this.player.isOnGround,
                     ),
                     this.player.id,
@@ -170,15 +170,10 @@ export default class GamePacketListener implements PacketListener {
             }
         } else if (this.player.rot.x !== this.previousRotation.x || this.player.rot.y !== this.previousRotation.y) {
             this.server.playerManager.sendAll(
-                new ClientBoundMoveEntityPacketRot(
-                    this.player.id,
-                    Math.floor((this.player.rot.y * 256) / 360),
-                    Math.floor((this.player.rot.x * 256) / 360),
-                    this.player.isOnGround,
-                ),
+                new ClientBoundMoveEntityPacketRot(this.player.id, this.player.rot.y, this.player.rot.x, this.player.isOnGround),
                 this.player.id,
             );
-            this.server.playerManager.sendAll(new ClientBoundRotateHeadPacket(this.player.id, Math.floor((this.player.rot.y * 256) / 360)), this.player.id);
+            this.server.playerManager.sendAll(new ClientBoundRotateHeadPacket(this.player.id, this.player.rot.y), this.player.id);
             this.previousRotation = this.player.rot;
         }
 
@@ -204,10 +199,7 @@ export default class GamePacketListener implements PacketListener {
         this.previousChunkX = x >> 4;
         this.previousChunkZ = z >> 4;
         this.send(new ClientBoundPlayerPositionPacket(x, y, z, yRot, xRot, 0, this.teleportId.readInt32BE(), this.player.isOnGround));
-        this.server.playerManager.sendAll(
-            new ClientBoundTeleportEntityPacket(this.player.id, x, y, z, Math.floor((yRot * 256) / 360), Math.floor((xRot * 256) / 360), true),
-            this.player.id,
-        );
+        this.server.playerManager.sendAll(new ClientBoundTeleportEntityPacket(this.player.id, x, y, z, yRot, xRot, true), this.player.id);
     }
 
     public handleAcceptTeleport(acceptTeleport: ServerBoundAcceptTeleportationPacket): void {
@@ -378,8 +370,8 @@ export default class GamePacketListener implements PacketListener {
                 this.player.pos.x,
                 this.player.pos.y,
                 this.player.pos.z,
-                Math.floor((this.player.rot.y * 256) / 360),
-                Math.floor((this.player.rot.x * 256) / 360),
+                this.player.rot.y,
+                this.player.rot.x,
                 movePlayerStatusOnly.onGround,
             ),
             this.player.id,
