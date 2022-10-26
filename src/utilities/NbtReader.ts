@@ -161,7 +161,6 @@ export default class NbtReader {
 
     private readTagCompound(): object {
         const compound: any = {};
-        // eslint-disable-next-line no-constant-condition
         while (true) {
             switch (this.readUnsignedByte()) {
                 case TagIds.END: {
